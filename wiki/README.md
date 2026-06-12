@@ -4,8 +4,8 @@ This directory holds markdown source for pages that belong on the project's GitH
 
 ## Current pages
 
-- [`Agentic-Tools-and-Models.md`](./Agentic-Tools-and-Models.md) — Which agentic VS Code extensions can drive the pipeline (Roo Code, Cline, Kilo Code), why Claude Code is not currently recommended, and which underlying LLMs perform well in which phases.
-- [`Kilo-Code-Setup.md`](./Kilo-Code-Setup.md) — Dedicated step-by-step setup tutorial for users who want to drive the pipeline with Kilo Code rather than Roo Code. Covers install, provider configuration, per-phase custom agents, and Kilo-specific troubleshooting.
+- [`Agentic-Tools-and-Models.md`](./Agentic-Tools-and-Models.md) — Which agentic VS Code extensions can drive the pipeline (Kilo Code, Cline — plus a migration note on the retired Roo Code), why Claude Code is not currently recommended, and which underlying LLMs perform well in which phases.
+- [`Kilo-Code-Setup.md`](./Kilo-Code-Setup.md) — Dedicated step-by-step setup tutorial for users who want to drive the pipeline with Kilo Code. Covers install, provider configuration, per-phase custom agents, and Kilo-specific troubleshooting.
 
 ## Publishing a page to the wiki
 

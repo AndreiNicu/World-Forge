@@ -4,7 +4,7 @@
 
 World-Forge takes you from a raw idea to a complete, runtime-ready world package: character cards, a tiered lorebook system, a chat completion preset, and audit reports — all aligned with how SillyTavern actually assembles prompts at runtime. The pipeline is a sequence of specialized agents, each with a defined role, that walks you through five-plus phases of structured drafting, validation, and export.
 
-The repository **is** the pipeline. There is no application code to compile, no service to deploy, no dependencies. The agents are markdown specifications consumed at runtime by an agentic IDE extension — [Roo Code](https://github.com/RooCodeInc/Roo-Code) (Orchestrator mode), [Kilo Code](https://github.com/Kilo-Org/kilocode), or [Cline](https://github.com/cline/cline) — running inside VS Code. When you invoke `/worldforge start`, the orchestrator reads these specifications and dispatches each phase. See [`wiki/Agentic-Tools-and-Models.md`](./wiki/Agentic-Tools-and-Models.md) for the tool comparison, and [`wiki/Kilo-Code-Setup.md`](./wiki/Kilo-Code-Setup.md) for a dedicated Kilo Code setup walkthrough.
+The repository **is** the pipeline. There is no application code to compile, no service to deploy, no dependencies. The agents are markdown specifications consumed at runtime by an agentic IDE extension — [Kilo Code](https://github.com/Kilo-Org/kilocode) (recommended; the repo ships a preconfigured `.kilo/kilo.jsonc`) or [Cline](https://github.com/cline/cline) — running inside VS Code. When you invoke `/worldforge start`, the orchestrator reads these specifications and dispatches each phase. See [`wiki/Agentic-Tools-and-Models.md`](./wiki/Agentic-Tools-and-Models.md) for the tool comparison, and [`wiki/Kilo-Code-Setup.md`](./wiki/Kilo-Code-Setup.md) for a dedicated Kilo Code setup walkthrough. (Roo Code, the tool the pipeline was originally authored against, was retired on May 15, 2026 — see the wiki's migration note.)
 
 A companion SillyTavern fork — [AndreiNicu/SillyTavern](https://github.com/AndreiNicu/SillyTavern) — is maintained alongside this repository. It is optional but recommended when running World-Forge worlds at scale: it relaxes some of stock SillyTavern's constraints that World-Forge outputs would otherwise bump into (notably allowing more than one matching lorebook entry to fire in a scene, which World Director cards rely on) and ships a small `world-forge` ST extension that wires style-override runtime support. See [Companion SillyTavern fork](#companion-sillytavern-fork-optional) below.
 
@@ -74,12 +74,12 @@ The pipeline pauses for user input under specific conditions:
 
 ## Quick start
 
-You need: VS Code with an agentic extension — [Roo Code](https://github.com/RooCodeInc/Roo-Code) (Orchestrator mode), [Kilo Code](https://github.com/Kilo-Org/kilocode), or [Cline](https://github.com/cline/cline) — configured with an LLM API key. For the Kilo Code path specifically, follow [`wiki/Kilo-Code-Setup.md`](./wiki/Kilo-Code-Setup.md); for the tool/model comparison, see [`wiki/Agentic-Tools-and-Models.md`](./wiki/Agentic-Tools-and-Models.md).
+You need: VS Code with an agentic extension — [Kilo Code](https://github.com/Kilo-Org/kilocode) (recommended) or [Cline](https://github.com/cline/cline) — configured with an LLM API key. For the Kilo Code path specifically, follow [`wiki/Kilo-Code-Setup.md`](./wiki/Kilo-Code-Setup.md); for the tool/model comparison, see [`wiki/Agentic-Tools-and-Models.md`](./wiki/Agentic-Tools-and-Models.md).
 
-**A note on model choice.** The agent specs in `agent_roles/` and the orchestrator in `workflows/world-forge.md` are deliberately long and prescriptive — each phase loads several thousand tokens of structural rules, validation checks, hard-fail conditions, and cross-references. To get the full benefit of the pipeline (and not silent skipping of validation steps or drift in tier discipline), use a model with strong long-context attention and a high tolerance for following dense, multi-step instructions. From the testing done so far, **DeepSeek 4 Pro** has held up well across the full pipeline. **Grok** failed during a run, though it is not yet clear whether the failure was the model itself or the way Roo Code drove it — treat this as a caveat, not a verdict. If you run the pipeline against a model not listed here and it succeeds (or fails in an interesting way), reports are welcome.
+**A note on model choice.** The agent specs in `agent_roles/` and the orchestrator in `workflows/world-forge.md` are deliberately long and prescriptive — each phase loads several thousand tokens of structural rules, validation checks, hard-fail conditions, and cross-references. To get the full benefit of the pipeline (and not silent skipping of validation steps or drift in tier discipline), use a model with strong long-context attention and a high tolerance for following dense, multi-step instructions. From the testing done so far, **DeepSeek 4 Pro** has held up well across the full pipeline. **Grok** failed during a run, though it is not yet clear whether the failure was the model itself or the way the agentic tool (Roo Code, since retired) drove it — treat this as a caveat, not a verdict. If you run the pipeline against a model not listed here and it succeeds (or fails in an interesting way), reports are welcome.
 
 1. Clone this repository and open it as a VS Code workspace.
-2. Open your agentic extension and select the orchestrator-class entry point: **Orchestrator mode** in Roo Code, the **Code** agent in Kilo Code, or the default agent in Cline.
+2. Open your agentic extension and select the orchestrator-class entry point: the **Code** agent in Kilo Code, or the default agent in Cline.
 3. In the chat, type:
    ```
    /worldforge start
@@ -100,7 +100,7 @@ What you get when you clone:
 World-Forge/
 ├── README.md                     ← This file
 ├── tutorial.md                   ← Extended usage walkthrough
-├── AGENTS.md                     ← Standing instructions for agentic tools (Kilo/Roo/Cline)
+├── AGENTS.md                     ← Standing instructions for agentic tools (Kilo/Cline)
 ├── CLAUDE.md                     ← Standing context for AI coding agents working on the repo
 ├── Notes_On_functionality.md     ← Authoritative reference for SillyTavern's runtime behavior
 ├── Notes_Quick_Reference.md      ← Compact distillation of the above (agents consult it first)

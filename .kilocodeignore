@@ -1,8 +1,8 @@
 # .kilocodeignore — keeps heavyweight reference material out of the runtime agent's context.
 #
-# Kilo Code (and Roo Code via .rooignore conventions) auto-includes workspace files in
-# context. On 128K-class models (DeepSeek, GLM) one auto-included sample lorebook can eat
-# a third of the window. Nothing below is needed while RUNNING the pipeline.
+# Kilo Code auto-includes workspace files in context. On 128K-class models (DeepSeek,
+# GLM) one auto-included sample lorebook can eat a third of the window. Nothing below is
+# needed while RUNNING the pipeline.
 #
 # NOTE: if you are doing MAINTENANCE on the pipeline itself (editing agent_roles/,
 # templates/, workflows/) from inside Kilo, temporarily comment out the CLAUDE.md and

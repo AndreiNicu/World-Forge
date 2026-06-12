@@ -13,6 +13,36 @@ numbers. Newest first.
 
 ---
 
+## 2026-06-12 — Roo Code retirement: Kilo Code becomes the reference tool
+
+Roo Code — the agentic extension the pipeline was originally authored against —
+shut down all its products on May 15, 2026 (extension archived, repository
+read-only, no further updates). Documentation-only change (#29, reported by
+mrzando-lastone): nothing in the pipeline itself was Roo-specific, and the only
+shipped tool configuration was already Kilo Code's (`.kilo/kilo.jsonc`,
+`.kilocodeignore`).
+
+### Changed
+- **`wiki/Agentic-Tools-and-Models.md`** — Kilo Code promoted to §2.1
+  (recommended — reference tool), absorbing the orchestration rationale from
+  the old Roo section; Roo Code demoted to §2.3 as a retired entry with
+  migration guidance (Kilo Code as the fork with shared history, Cline as Roo's
+  own parting recommendation); compatibility table, troubleshooting rows,
+  model-section asides, and summary updated accordingly.
+- **`README.md`, `tutorial.md`** — Roo Code removed from the prerequisites and
+  quick-start tool lists; Kilo Code listed as recommended. The Grok
+  model-caveat note keeps its historical Roo reference, marked as retired.
+- **`CLAUDE.md`, `AGENTS.md`, `wiki/README.md`, `wiki/Kilo-Code-Setup.md`,
+  `.kilocodeignore`** — remaining "typically Roo Code" / "Kilo/Roo/Cline" /
+  "rather than Roo Code" phrasings updated; purely historical mentions
+  (lineage, changelog) retained.
+
+### Unchanged
+- No agent spec, template, or workflow file referenced Roo Code; none were
+  touched. Earlier CHANGELOG entries keep their historical Roo mentions.
+
+---
+
 ## 2026-06-12 — Lorebook export schema: entry key/UID parity + camelCase entry fields
 
 Both fixes verified against the official SillyTavern source (`world-info.js`,

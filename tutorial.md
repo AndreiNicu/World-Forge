@@ -10,7 +10,7 @@ The Lucifer world was authored by skipping Phase 0 (the user wrote `World_Seed_L
 
 You need:
 
-- **VS Code** with an agentic extension — [Roo Code](https://github.com/RooCodeInc/Roo-Code), [Kilo Code](https://github.com/Kilo-Org/kilocode), or [Cline](https://github.com/cline/cline) — configured with an LLM API key. For tool-by-tool guidance see [`wiki/Agentic-Tools-and-Models.md`](./wiki/Agentic-Tools-and-Models.md); Kilo Code users have a dedicated setup walkthrough at [`wiki/Kilo-Code-Setup.md`](./wiki/Kilo-Code-Setup.md).
+- **VS Code** with an agentic extension — [Kilo Code](https://github.com/Kilo-Org/kilocode) (recommended) or [Cline](https://github.com/cline/cline) — configured with an LLM API key. For tool-by-tool guidance see [`wiki/Agentic-Tools-and-Models.md`](./wiki/Agentic-Tools-and-Models.md); Kilo Code users have a dedicated setup walkthrough at [`wiki/Kilo-Code-Setup.md`](./wiki/Kilo-Code-Setup.md).
 - A clone of this repository, opened as a VS Code workspace.
 
 That is the entire setup. The pipeline is markdown specifications — there is nothing to build or install.

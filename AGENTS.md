@@ -1,6 +1,6 @@
 # AGENTS.md — standing instructions for agentic tools
 
-> Read this first. It applies to Kilo Code, Roo Code, Cline, and any other agentic IDE
+> Read this first. It applies to Kilo Code, Cline, and any other agentic IDE
 > tool opening this workspace. It is deliberately short — it routes you to the right
 > document for your session type instead of duplicating them.
 

@@ -8,7 +8,7 @@
 
 World Forge is a **multi-agent pipeline for building immersive roleplay worlds for SillyTavern**. It is not application code in the traditional sense — it is a curated collection of agent specifications (markdown), templates (markdown and JSON), and orchestration logic (markdown) that together define a structured creative writing pipeline.
 
-The pipeline is designed to run inside an agentic VS Code extension (typically Roo Code in Orchestrator mode). When invoked, it walks a user from a raw idea through 5+ phases of structured drafting and validation, producing a complete SillyTavern-ready world package.
+The pipeline is designed to run inside an agentic VS Code extension (typically Kilo Code; the formerly-recommended Roo Code was retired May 15, 2026). When invoked, it walks a user from a raw idea through 5+ phases of structured drafting and validation, producing a complete SillyTavern-ready world package.
 
 **The repository is the pipeline itself.** Editing files here changes how the pipeline behaves on its next run. There is no compilation step, no test suite, no deployment — files are read directly by the runtime agent.
 
@@ -17,7 +17,7 @@ The pipeline is designed to run inside an agentic VS Code extension (typically R
 ## What this repository is NOT
 
 - **Not a SillyTavern fork or extension.** SillyTavern is the runtime environment that consumes the pipeline's outputs. This repo produces files for SillyTavern; it does not modify SillyTavern itself.
-- **Not a runtime engine.** The pipeline does not execute — it is consumed by an agentic IDE extension (Roo Code) that orchestrates LLM calls. Do not add execution logic, build steps, or deployment configuration.
+- **Not a runtime engine.** The pipeline does not execute — it is consumed by an agentic IDE extension (Kilo Code) that orchestrates LLM calls. Do not add execution logic, build steps, or deployment configuration.
 - **Not a code project.** The "code" here is markdown agent specifications. Treat them as you would treat carefully-versioned prose documents, not as source code.
 - **Not for editing during pipeline runs.** When a user is actively running `/worldforge start`, the pipeline files are being read by the runtime agent. Editing them mid-run produces undefined behavior.
 
@@ -29,7 +29,7 @@ The pipeline is designed to run inside an agentic VS Code extension (typically R
 World-Forge/
 ├── README.md                         ← Human-facing project description
 ├── tutorial.md                       ← Usage tutorial
-├── AGENTS.md                         ← Standing instructions for agentic tools (Kilo/Roo/Cline); routes run-vs-maintenance sessions
+├── AGENTS.md                         ← Standing instructions for agentic tools (Kilo/Cline); routes run-vs-maintenance sessions
 ├── Notes_On_functionality.md         ← Authoritative reference: how SillyTavern works internally
 ├── Notes_Quick_Reference.md          ← DERIVED ~5KB distillation of Notes (position enum, flags, assembly); agents consult it first
 ├── LICENSE
@@ -82,7 +82,7 @@ World-Forge/
 │   └── world-forge-convert.md        ← Convert fork (reframe a shipped world into a new build, Phase C0)
 ├── wiki/                             ← Setup & tooling guides (linked from README/tutorial)
 │   ├── README.md                     ← Wiki index
-│   ├── Agentic-Tools-and-Models.md   ← Roo/Kilo/Cline + model comparison
+│   ├── Agentic-Tools-and-Models.md   ← Kilo/Cline + model comparison (incl. Roo Code retirement note)
 │   └── Kilo-Code-Setup.md            ← Dedicated Kilo Code setup walkthrough
 └── Samples/                          ← Example world outputs for reference
 ```

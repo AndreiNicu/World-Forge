@@ -2,7 +2,7 @@
 
 This page covers which agentic VS Code extensions can drive the World-Forge pipeline, how to configure them, and which underlying LLMs perform well in each phase. It is aimed at users who already understand what the pipeline does (see the [README](../README.md) and [tutorial.md](../tutorial.md)) and want to set up the *runtime environment* that executes it.
 
-> **TL;DR** — The pipeline was designed against **Roo Code in Orchestrator mode**, which remains the strongest fit. **Cline** and **Kilo Code** work well as alternatives. The pipeline is **not** optimized for code-focused agents like Claude Code — see [Why Claude Code is a poor fit](#why-claude-code-is-a-poor-fit-currently). For the underlying LLM, prefer literary-register models (Claude Opus / Sonnet, GPT-5, Gemini 2.5 Pro) over coding-tuned variants.
+> **TL;DR** — The recommended tool is **Kilo Code**, which this repo ships preconfigured for (`.kilo/kilo.jsonc`). **Cline** works well as a simpler alternative. **Roo Code** — the tool the pipeline was originally designed against — was **retired on May 15, 2026** and should not be adopted for new setups; see [§2.3](#23-roo-code-retired-may-15-2026). The pipeline is **not** optimized for code-focused agents like Claude Code — see [Why Claude Code is a poor fit](#why-claude-code-is-a-poor-fit-currently). For the underlying LLM, prefer literary-register models (Claude Opus / Sonnet, GPT-5, Gemini 2.5 Pro) over coding-tuned variants.
 
 ---
 
@@ -22,24 +22,22 @@ You do **not** need: code execution, terminal automation, build/test integration
 
 ## 2. Supported agentic tools
 
-### 2.1 Roo Code (recommended — reference tool)
+> **Roo Code retirement (May 15, 2026).** The pipeline was originally authored against Roo Code's Orchestrator mode. Roo Code shut down all its products on May 15, 2026 — the VS Code extension is archived and receives no further updates. The recommended tool is now **Kilo Code**, which began as a Roo fork and is feature-compatible for the pipeline's purposes. See [§2.3](#23-roo-code-retired-may-15-2026) if you are still running Roo.
 
-[Roo Code](https://github.com/RooCodeInc/Roo-Code) is the tool the pipeline was authored against. Its **Orchestrator mode** is the load-bearing feature: it lets a top-level "orchestrator" agent delegate subtasks to specialized "worker" agents, which maps cleanly onto World-Forge's phase-by-phase persona swaps.
+### 2.1 Kilo Code (recommended — reference tool)
+
+[Kilo Code](https://github.com/Kilo-Org/kilocode) is the recommended tool and the one this repository ships configuration for (`.kilo/kilo.jsonc` per-phase agents, `.kilocodeignore` context discipline). It is an open-source extension that began as a fork of Roo Code — the tool the pipeline was authored against — and merges features from Roo and Cline, so its orchestration model maps cleanly onto World-Forge's phase-by-phase persona swaps.
 
 **Why it fits:**
-- Orchestrator mode treats each phase's persona (`agent_roles/00_The_Interviewer.md`, `agent_roles/02_The_Architect.md`, etc.) as a distinct subtask with its own system prompt. You don't have to manually re-prime the agent between phases.
+- **Subagent delegation** is built into the default Code / Plan / Debug agents: the top-level agent dispatches each phase's persona (`agent_roles/00_The_Interviewer.md`, `agent_roles/02_The_Architect.md`, etc.) as a distinct subtask with its own system prompt. You don't have to manually re-prime the agent between phases.
 - Strong file-edit toolchain (read, write, diff, search-and-replace) — required for the Architect's draft files and the Compiler's JSON output.
 - Supports any OpenAI-compatible API endpoint, so you can route to Anthropic, OpenAI, Google, OpenRouter, or a local server.
-- Custom modes — useful if you want, e.g., a dedicated "Editor" mode with read-only filesystem access mirroring the [Audit-vs-Apply separation](../CLAUDE.md#3-audit-vs-apply-separation).
+- **Custom agents with per-agent model and temperature selection** — each phase's agent pins its system prompt to the matching spec file (e.g., a `WorldForge-Architect` agent pinned to `agent_roles/02_The_Architect.md`), which reduces drift on long runs and mirrors the [Audit-vs-Apply separation](../CLAUDE.md#3-audit-vs-apply-separation). The repo's shipped `.kilo/kilo.jsonc` already defines this agent set.
+- Open source under a permissive license — useful if you want to audit or extend the tool itself.
 
-**Setup:**
-1. Install the Roo Code extension from the VS Code marketplace.
-2. Open this repository (or your world project that includes a copy of `workflows/`, `templates/`, `agent_roles/`, and `Notes_On_functionality.md`) as the VS Code workspace.
-3. In Roo Code's settings, configure your model provider (see [§3](#3-model-recommendations)).
-4. Switch to **Orchestrator** mode.
-5. In the chat, type `/worldforge start`.
+**Terminology caveat (April 2026 rebuild):** Kilo renamed "Modes" to **Agents** and **deprecated the dedicated Orchestrator mode** — subagent delegation is now built into the default Code / Plan / Debug agents. Older Roo-style tutorials that say "switch to Orchestrator mode" do not map directly; use the **Code** agent as the entry point and pin custom subagents per phase.
 
-**Tip:** If you have the budget, define a custom mode per phase that pins the system prompt to the matching agent spec file (e.g., a "WorldForge-Architect" mode pinned to `agent_roles/02_The_Architect.md`). This reduces drift on long runs.
+**Setup:** See the dedicated [Kilo Code Setup tutorial](./Kilo-Code-Setup.md) for step-by-step install, provider configuration, custom-agent definition, and a first-run smoke test. Short version: install the `kilocode.Kilo-Code` extension, configure your provider via the sidebar gear icon, open the World-Forge workspace, select the **Code** agent, and type `/worldforge start`.
 
 ### 2.2 Cline
 
@@ -50,8 +48,8 @@ You do **not** need: code execution, terminal automation, build/test integration
 - Conservative auto-approval defaults make it easy to step through each phase manually, which is useful during your first run.
 - Wide model provider support (Anthropic, OpenAI, Bedrock, Vertex, OpenRouter, local).
 
-**Tradeoffs vs. Roo Code:**
-- No native Orchestrator mode. The agent stays in one persona across the run, so you depend on `workflows/world-forge.md` to instruct it to "now act as the Editor" at the right moment. In practice this works but is more prone to persona bleed on long runs.
+**Tradeoffs vs. Kilo Code:**
+- No native subagent delegation. The agent stays in one persona across the run, so you depend on `workflows/world-forge.md` to instruct it to "now act as the Editor" at the right moment. In practice this works but is more prone to persona bleed on long runs.
 - No custom modes — you can't enforce read-only filesystem access for auditor phases at the tool level; you depend on the auditor agent specs themselves to honor the [Audit-vs-Apply separation](../CLAUDE.md#3-audit-vs-apply-separation).
 
 **Setup:**
@@ -59,31 +57,26 @@ You do **not** need: code execution, terminal automation, build/test integration
 2. Configure your model provider in Cline settings.
 3. Open the workspace and type `/worldforge start` in the chat.
 
-**Recommendation:** Good first-time choice if you want a simpler tool with fewer knobs. Migrate to Roo Code's Orchestrator mode once you're comfortable with the pipeline's structure.
+**Recommendation:** Good first-time choice if you want a simpler tool with fewer knobs. Migrate to Kilo Code's per-phase custom agents once you're comfortable with the pipeline's structure.
 
-### 2.3 Kilo Code
+### 2.3 Roo Code (retired May 15, 2026)
 
-[Kilo Code](https://github.com/Kilo-Org/kilocode) is an open-source fork that merges features from Roo Code and Cline. It has the same file-edit toolchain and supports custom personas with per-persona model selection.
+[Roo Code](https://github.com/RooCodeInc/Roo-Code) is the tool the pipeline was originally authored against; its **Orchestrator mode** shaped the pipeline's phase-dispatch design. **It was retired on May 15, 2026:** all Roo Code products (the VS Code extension, Roo Code Cloud, and the Router) were shut down, the GitHub repository was archived (read-only), and the extension remains on the VS Code Marketplace only in its final state — no bug fixes, no model updates.
 
-**Why consider it:**
-- Open source under a permissive license — useful if you want to audit or extend the tool itself.
-- Feature-compatible with Roo Code for the pipeline's purposes (custom personas, subagent delegation, file edits, per-persona model selection).
-- Active development cadence and rapid uptake of new model APIs.
+**Do not adopt Roo Code for a new setup.** If you are still running the pipeline under a final-state Roo install, it will keep working until a VS Code or provider-API change breaks it, but you should migrate:
 
-**Tradeoffs:**
-- Smaller community than Roo Code or Cline, so fewer third-party guides and prompts.
-- If you encounter a bug, you may be filing it upstream rather than finding an existing issue.
-- **April 2026 rebuild caveat:** Kilo renamed "Modes" to **Agents** and **deprecated the dedicated Orchestrator mode** — subagent delegation is now built into the default Code / Plan / Debug agents. Older Roo-style tutorials that say "switch to Orchestrator mode" do not map directly; use the **Code** agent as the entry point and pin custom subagents per phase.
+- **Kilo Code** ([§2.1](#21-kilo-code-recommended--reference-tool)) started as a Roo fork with shared git history — custom modes, project rules, and per-mode model selection all carry over, and this repo ships a preconfigured `.kilo/kilo.jsonc`. This is the recommended destination.
+- **Cline** ([§2.2](#22-cline)) is Roo Code's own parting recommendation for a model-agnostic open-source extension, at the cost of no per-phase mode switching.
 
-**Setup:** See the dedicated [Kilo Code Setup tutorial](./Kilo-Code-Setup.md) for step-by-step install, provider configuration, custom-agent definition, and a first-run smoke test. Short version: install the `kilocode.Kilo-Code` extension, configure your provider via the sidebar gear icon, open the World-Forge workspace, select the **Code** agent, and type `/worldforge start`.
+Nothing in the pipeline itself is Roo-specific — the trigger commands are free-form prompts interpreted against `workflows/world-forge.md` — so migration is a tool swap, not a pipeline change.
 
 ### 2.4 Compatibility summary
 
 | Tool | Orchestrator / multi-mode | File edit tools | Custom modes | Recommended for |
 |---|---|---|---|---|
-| **Roo Code** | Yes (Orchestrator) | Yes | Yes | Production runs, long pipelines, repeat users |
+| **Kilo Code** | Yes (subagent delegation from Code/Plan/Debug agents) | Yes | Yes | All runs — ships preconfigured in this repo (`.kilo/kilo.jsonc`) |
 | **Cline** | No (single-mode) | Yes | No | First-time users, simpler runs |
-| **Kilo Code** | Yes (subagent delegation from Code/Plan/Debug; Orchestrator mode deprecated) | Yes | Yes | Users who want an open-source Roo Code alternative |
+| **Roo Code** | Yes (Orchestrator) | Yes | Yes | **Nothing — retired May 15, 2026; migrate to Kilo Code or Cline** |
 
 ---
 
@@ -105,7 +98,7 @@ The pipeline is unusually demanding of the underlying LLM. Most phases are *lite
 - **Claude Sonnet 4.6** — the best price/quality balance for the bulk of the run. The pipeline was authored against Sonnet-class models and works well end-to-end on it.
 - **GPT-5** — strong literary capability, very long context. Slightly more "instructed" feel than Claude in prose registers; sometimes over-explains.
 - **Gemini 2.5 Pro** — excellent at long-context cross-reference work (useful for the Editor's cross-tier validation). Prose register is acceptable but tends toward neutral; pair with explicit tonal directives.
-- **DeepSeek 4 Pro** — strong literary register and characterization at a materially lower price point than the frontier proprietary models. Solid instruction adherence on long agent specs; a viable alternative for cost-sensitive runs where you still want creative-phase quality. Verify your agentic tool's provider list supports it (Roo Code, Cline, and Kilo Code all do via OpenAI-compatible endpoints or OpenRouter). Nominal **1M context window**, so the pipeline never comes close to filling it — but read [§3.4](#34-context-discipline-on-deepseek-and-glm) before committing a full run: *effective* recall under dense instructions, not window size, is what to manage.
+- **DeepSeek 4 Pro** — strong literary register and characterization at a materially lower price point than the frontier proprietary models. Solid instruction adherence on long agent specs; a viable alternative for cost-sensitive runs where you still want creative-phase quality. Verify your agentic tool's provider list supports it (Kilo Code and Cline both do via OpenAI-compatible endpoints or OpenRouter). Nominal **1M context window**, so the pipeline never comes close to filling it — but read [§3.4](#34-context-discipline-on-deepseek-and-glm) before committing a full run: *effective* recall under dense instructions, not window size, is what to manage.
 - **GLM 5** — capable literary register and good structured-output discipline at DeepSeek-class pricing; a solid pick for the drafting phases on a budget run. Nominal **200K context** — the same class the pipeline was sized against — though the [§3.4 context discipline](#34-context-discipline-on-deepseek-and-glm) still pays off in audit sharpness and cost. Available via OpenRouter (`z-ai/glm-5`) and OpenAI-compatible endpoints.
 
 **Acceptable for utility phases (Refiner classification, Compiler JSON transformation, Prompt Engineer block assembly):**
@@ -120,7 +113,7 @@ The pipeline is unusually demanding of the underlying LLM. Most phases are *lite
 
 ### 3.3 Mixing models across phases
 
-If your agentic tool supports per-mode model configuration (Roo Code and Kilo Code do), a cost-effective pattern is:
+If your agentic tool supports per-mode model configuration (Kilo Code does), a cost-effective pattern is:
 
 | Phase | Suggested model |
 |---|---|
@@ -184,11 +177,11 @@ The issues are at the agent-harness level, not the model level:
 
 3. **Code-quality reflexes applied to prose.** When the Editor or Architect produces a long, deliberately dense character description, Claude Code's harness instincts (DRY, "remove redundant content," "extract to a helper") fire inappropriately. Prose redundancy is sometimes intentional (e.g., the [ARC_STATE two-subsection structure](../CLAUDE.md#5-arc_state-two-subsection-structure) repeats some content across the descriptive and directive subsections — this is load-bearing, not a bug).
 
-4. **No native multi-persona mode.** Unlike Roo Code's Orchestrator, Claude Code expects a single coherent task scope per session. Re-priming it with a different persona spec mid-run is awkward and the previous persona bleeds through.
+4. **No native multi-persona mode.** Unlike Kilo Code's subagent delegation, Claude Code expects a single coherent task scope per session. Re-priming it with a different persona spec mid-run is awkward and the previous persona bleeds through.
 
 5. **Tool surface is wrong for the job.** Claude Code's strengths (Bash execution, git integration, type checking, build tools) are unused here. Its weaknesses for this use case (terse output, code-style reflexes) are exposed every turn.
 
-The *model* under Claude Code (Claude Opus / Sonnet) is in fact the best model for the pipeline. The issue is the harness. Run the same model through Roo Code, Cline, or Kilo Code and the experience is materially different — the agent reads agent specs as creative-writing instructions rather than as engineering tickets, and the prose output matches the pipeline's register expectations.
+The *model* under Claude Code (Claude Opus / Sonnet) is in fact the best model for the pipeline. The issue is the harness. Run the same model through Kilo Code or Cline and the experience is materially different — the agent reads agent specs as creative-writing instructions rather than as engineering tickets, and the prose output matches the pipeline's register expectations.
 
 > **Future note:** If a future Claude Code release supports custom personas or a "creative-writing" mode that swaps the orientation, this guidance would change. As of writing, it does not.
 
@@ -198,8 +191,8 @@ The *model* under Claude Code (Claude Opus / Sonnet) is in fact the best model f
 
 These are not the recommended path but come up often enough to be worth a sentence each:
 
-- **Cursor / Windsurf** — separate IDEs (VS Code forks), not extensions. They can run the pipeline, but their agent UX is optimized for in-editor coding rather than long agentic runs. Workable but not recommended over Roo Code.
-- **GitHub Copilot (Agent mode)** — the agent mode is improving but is currently weaker on long-context multi-file orchestration than Roo Code or Cline.
+- **Cursor / Windsurf** — separate IDEs (VS Code forks), not extensions. They can run the pipeline, but their agent UX is optimized for in-editor coding rather than long agentic runs. Workable but not recommended over Kilo Code.
+- **GitHub Copilot (Agent mode)** — the agent mode is improving but is currently weaker on long-context multi-file orchestration than Kilo Code or Cline.
 - **Continue** — primarily a chat / inline-edit assistant, not an agentic orchestrator. Insufficient for the pipeline.
 - **Aider** — CLI, not VS Code. Works if you prefer the terminal, but loses the workspace file tree affordance the pipeline assumes.
 - **Antigravity** (Google) — early-stage agentic IDE platform. May be a future option as it matures.
@@ -211,8 +204,8 @@ These are not the recommended path but come up often enough to be worth a senten
 | Symptom | Likely cause | Fix |
 |---|---|---|
 | Agent ignores `/worldforge start` and asks "what would you like to build?" | Tool didn't read `workflows/world-forge.md` — usually because the workspace root isn't this repo, or the file isn't visible. | Open this repo (or your world project containing it) as the VS Code workspace root. Confirm `workflows/world-forge.md` exists and is readable. |
-| Agent jumps phases or skips auditors | Single-mode tool (e.g., Cline) lost the orchestrator instructions after a long Phase 2. | Re-prime with `/worldforge resume phase[N]`. Consider switching to Roo Code Orchestrator mode for longer worlds. |
-| Voice is flat, generic, "AI-assistant" register | Wrong model tier or wrong tool harness. | Switch to Sonnet 4.6 or Opus 4.7. If already on those models via Claude Code, switch tools to Roo Code or Cline. |
+| Agent jumps phases or skips auditors | Single-mode tool (e.g., Cline) lost the orchestrator instructions after a long Phase 2. | Re-prime with `/worldforge resume phase[N]`. Consider switching to Kilo Code's per-phase custom agents ([Kilo setup §5](./Kilo-Code-Setup.md#5-recommended-define-custom-agents-per-phase)) for longer worlds. |
+| Voice is flat, generic, "AI-assistant" register | Wrong model tier or wrong tool harness. | Switch to Sonnet 4.6 or Opus 4.7. If already on those models via Claude Code, switch tools to Kilo Code or Cline. |
 | Editor passes everything on round 1 | Model is being sycophantic (often a small or coding-tuned model). | Switch to a stronger creative model. Verify the Editor agent spec is being loaded. |
 | Context-window errors in Phase 3+ | Model has insufficient context. | Use a 200K+ context model. Verify the tool isn't loading every file in the workspace by default (some tools auto-include too much). |
 | Phase 4 JSON output is sparse, missing fields, or omits literal strings like `{{original}}` from `system_prompt` / `post_history_instructions` | Flash-tier or summarization-prone model used for the Compiler. Observed on **Gemini 3.1 Flash**. | Switch the Compiler (and ideally the Architect) to a Pro-tier or frontier-tier model. The Compiler must emit verbatim content; summarizing models silently drop macros and break the [Override Architecture](../CLAUDE.md#2-the-override-architecture-paired-contract). |
@@ -221,7 +214,7 @@ These are not the recommended path but come up often enough to be worth a senten
 
 ## 7. Summary
 
-- **Tool:** Roo Code (Orchestrator mode) is the reference. Cline and Kilo Code are valid alternatives. Claude Code is not currently recommended.
+- **Tool:** Kilo Code is the reference (the repo ships its per-phase agent set in `.kilo/kilo.jsonc`). Cline is a valid simpler alternative. Roo Code is retired (May 15, 2026) — do not adopt it. Claude Code is not currently recommended.
 - **Model:** Spend on Opus 4.7 / Sonnet 4.6 / GPT-5 / Gemini 2.5 Pro for creative phases. Use cheaper models for the Refiner, Compiler, and Prompt Engineer if you want to save cost.
 - **Setup:** Open this repo as a VS Code workspace, configure your tool's model provider, switch to orchestrator mode if available, type `/worldforge start`.
 

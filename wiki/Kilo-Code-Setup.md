@@ -1,6 +1,6 @@
 # Running World-Forge under Kilo Code
 
-A step-by-step setup tutorial for users who want to drive the World-Forge pipeline with [Kilo Code](https://github.com/Kilo-Org/kilocode) rather than Roo Code. If you are looking for the comparison across tools (Roo Code, Cline, Kilo Code, Claude Code) and the model-selection guidance, read [`Agentic-Tools-and-Models.md`](./Agentic-Tools-and-Models.md) first — this page assumes you have already chosen Kilo and just want it configured correctly.
+A step-by-step setup tutorial for users who want to drive the World-Forge pipeline with [Kilo Code](https://github.com/Kilo-Org/kilocode), the recommended tool. If you are looking for the comparison across tools (Kilo Code, Cline, Claude Code — plus a migration note on the retired Roo Code) and the model-selection guidance, read [`Agentic-Tools-and-Models.md`](./Agentic-Tools-and-Models.md) first — this page assumes you have already chosen Kilo and just want it configured correctly.
 
 > **Terminology note (April 2026 rebuild).** Kilo Code renamed **Modes** to **Agents** throughout the UI and docs. Where older guides say "switch to Orchestrator mode," current Kilo builds expose **Code / Plan / Debug** agents with built-in subagent delegation; the dedicated Orchestrator mode is deprecated. This page uses the current terminology and notes the old name in parentheses where useful.
 
@@ -10,12 +10,12 @@ A step-by-step setup tutorial for users who want to drive the World-Forge pipeli
 
 The pipeline asks four things of a runtime tool: file read/write across the workspace, multi-step autonomy, long-context tolerance, and per-persona configurability. Kilo Code provides all four:
 
-- **File-edit tools** are the same lineage as Roo Code / Cline — read, write, search-and-replace, diff.
+- **File-edit tools** are the same battle-tested lineage as Cline and the retired Roo Code — read, write, search-and-replace, diff.
 - **Subagent delegation** is now built into the full-access agents (Code, Plan, Debug). The top-level agent can dispatch to a custom subagent without you switching modes manually. This maps onto World-Forge's phase-by-phase persona handoffs cleanly.
 - **Custom agents** can be pinned to a specific markdown system-prompt file — e.g., a `WorldForge-Architect` agent pinned to `agent_roles/02_The_Architect.md`. Used well, this reduces persona drift on long runs (a real risk by Phase 3).
 - **Per-agent model selection** lets you spend on Opus 4.7 for the Editor and Auditors while routing the Refiner and Compiler to cheaper models. See the [§3.3 mixing table](./Agentic-Tools-and-Models.md#33-mixing-models-across-phases).
 
-Nothing in the pipeline itself is Kilo-specific or Roo-specific. The trigger commands (`/worldforge start`, `/worldforge resume phase[N]`) are free-form user prompts that the executing agent interprets against `workflows/world-forge.md` — they are not bound to any tool's slash-command surface.
+Nothing in the pipeline itself is Kilo-specific. The trigger commands (`/worldforge start`, `/worldforge resume phase[N]`) are free-form user prompts that the executing agent interprets against `workflows/world-forge.md` — they are not bound to any tool's slash-command surface.
 
 ---
 
@@ -106,7 +106,7 @@ For most users running the full pipeline: **OpenRouter** if you want a single wa
 
 You *can* run the entire pipeline from Kilo's default **Code** agent — it will read `workflows/world-forge.md` and switch personas internally as the orchestrator dispatches each phase. This works on a first run. On a longer run (multiple arcs, multiple characters, intimacy in scope), persona drift becomes a real cost: the top-level agent's accumulated context bleeds into later phases and the Editor starts being too lenient because the Architect's framing is still warm in its head.
 
-Custom agents pin a specific system-prompt file per persona, so the persona is reset cleanly when the orchestrator dispatches the next phase. This is the Kilo equivalent of Roo's per-mode pinning.
+Custom agents pin a specific system-prompt file per persona, so the persona is reset cleanly when the orchestrator dispatches the next phase.
 
 > **Running DeepSeek 4 or GLM 5? Read this anyway.** Neither model is window-starved (DeepSeek 4 Pro: 1M nominal; GLM 5: 200K), but per-phase custom agents are how the pipeline protects *audit quality*: each phase starts with a clean window, the persona resets, and accumulated drafting context cannot soften the Editor. On GLM 5 they additionally prevent genuine overflow on large worlds (multiple arcs + intimacy in scope accumulates past 200K by Phase 3 when run inline); on DeepSeek's 1M window the motive is recall sharpness and cost, since effective recall under dense instructions degrades long before nominal limits on every current model. See [§3.4 of the models page](./Agentic-Tools-and-Models.md#34-context-discipline-on-deepseek-and-glm) for the full discipline (shipped `.kilocodeignore`, per-spec `📂 CONTEXT MANIFEST` blocks, where to spend a frontier seat).
 
