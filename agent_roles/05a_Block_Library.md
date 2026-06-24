@@ -1,7 +1,7 @@
 # THE BLOCK LIBRARY — Chat Completion Preset blocks
 *Companion reference to `agent_roles/05_The_Prompt_Engineer.md` (Phase 5 / Preset Resync). Split out so the audit workstream can run without loading it.*
 
-> **Who loads this file, and when:** the Prompt Engineer, at the start of preset authoring (Workstream B, Section 5 of the parent spec) or Preset Resync Mode (parent Section 8) — alongside `templates/Chat_Completion_Preset_template.json`. The audit workstream (parent Sections 3–4b) does NOT need this file; do not load it for the audit. The revise mini-Prompt-Engineer loads it only when a block toggle requires authoring block content.
+> **Who loads this file, and when:** the Prompt Engineer, at the start of preset authoring (Workstream B, Section 5 of the parent spec) or Preset Resync Mode (`agent_roles/05b_Preset_Resync.md`) — alongside `templates/Chat_Completion_Preset_template.json`. The audit workstream (parent Sections 3–4b) does NOT need this file; do not load it for the audit. The revise mini-Prompt-Engineer loads it only when a block toggle requires authoring block content.
 >
 > Section numbering (5a, 5a-detail) is preserved from the parent spec so existing cross-references resolve. The parent's Sections 5b–5f (marker blocks, custom block schema, `prompt_order`, required fields, pre-save self-validation) remain in the parent — they govern preset structure in both workstreams.
 
