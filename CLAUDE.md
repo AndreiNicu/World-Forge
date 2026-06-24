@@ -43,6 +43,7 @@ World-Forge/
 │   ├── 00_The_Interviewer.md
 │   ├── 01_The_Refiner.md
 │   ├── 02_The_Architect.md
+│   ├── 02a_ARC_STATE_Examples.md     ← Two ARC_STATE worked examples (split from 02; loaded only when authoring an ARC_STATE entry)
 │   ├── 03_The_Editor.md
 │   ├── 03b_The_Voice_Auditor.md
 │   ├── 03c_The_Arc_Transition_Auditor.md
