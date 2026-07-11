@@ -82,6 +82,8 @@ Draft in this sequence to prevent cross-contamination:
 
 Do not draft Tier 3 entries before Tier 2 is complete for the relevant characters and NPCs. The register is meaningless without the substrate it deltas from.
 
+**Checkpoint discipline** (`workflows/world-forge.md`): write each profile and register file to disk as it completes — checkpointing entry-by-entry within a file is fine; one complete entry is the grain floor. Verify each write landed (non-empty, ends with the entry just written) before starting the next. On `/worldforge resume phase2.5`, inventory the intimacy drafts against Phase 2.5's mandatory outputs and continue from the first missing or incomplete file.
+
 ---
 
 ## 6. TIER 2 INTIMACY PROFILE — `Drafts/Tier2_[CharName]_Intimacy_Profile.md`

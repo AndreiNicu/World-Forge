@@ -79,6 +79,8 @@ Draft in this sequence to prevent cross-contamination:
 5. Tier 3 lorebook entries — *arc mode:* one file per arc (Section 8); *sandbox mode:* one `Tier3_Sandbox_Entries.md` (Section 8S)
 6. LLM Instruction drafts (system_prompt + post_history_instructions per card)
 
+**Checkpoint discipline** (`workflows/world-forge.md`): each numbered item is written to disk as it completes — one file per write, and within the large entry files (Tier 1 / Tier 2 / Tier 3) you may checkpoint entry-by-entry with appends. The grain floor is one complete entry; never write line-at-a-time. After each write, verify it landed: the file is non-empty and ends with the entry or section just written — a zero-byte or truncated draft halts that file until rewritten. On `/worldforge resume phase2`, inventory `Drafts/` against the mandatory-output list (Foundational Rule 4) and continue from the first missing, empty, or incomplete file; do not regenerate drafts that verify intact.
+
 ---
 
 ## 5. CHARACTER CARD DRAFTS — `Drafts/Card_[CharName].md`
@@ -969,6 +971,9 @@ Append to your submission note before handing to The Editor:
 
 ```
 ## ARCHITECT PRE-SUBMISSION CHECK
+
+### File Integrity
+- [ ] Every mandatory draft file (Foundational Rule 4) exists on disk, is non-empty, and ends with its final intended section — no zero-byte, truncated, or mojibake-corrupted (`â€` / `Ã`) files
 
 ### Character Cards
 - [ ] Card description: full physical + psychological, no arc content

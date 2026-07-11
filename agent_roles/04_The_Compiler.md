@@ -22,6 +22,8 @@ If all ten pass, write the file. If any fails, the file is wrong — fix the sou
 
 > **⚠️ FILE-WRITING & ENCODING — write UTF-8, never through PowerShell.** Lorebook and card content is dense with non-ASCII: em-dashes (—), curly quotes (" " ' '), ellipses (…), accented names. Write every JSON file as UTF-8 — use your file-write tool directly, or a **Python or Node** script (`json.dump(obj, f, ensure_ascii=False)` / `fs.writeFileSync(path, text, 'utf8')`). **Do NOT write JSON through PowerShell** (`Out-File`, `Set-Content`, `>` redirection): Windows PowerShell re-encodes to UTF-16 / Windows-1252 and silently corrupts em-dashes and curly quotes into mojibake (`—` → `â€"`, `'` → `â€™`). This corruption **still passes `JSON.parse`** — the file is valid JSON with garbled text — so guard 1 above will not catch it. After writing each file, verify: re-read it and confirm a known em-dash or accented name is intact, or grep for the mojibake markers `â€` and `Ã` and confirm zero matches. If anything was corrupted, rewrite with a UTF-8-safe tool before sign-off.
 
+**Write verification & resume** (checkpoint discipline — `workflows/world-forge.md`): the post-write re-read above doubles as the landed-check — a missing, empty, or unparseable file halts that file; rewrite it before starting the next. On `/worldforge resume phase4`, inventory `Export/` against the Output Manifest: re-verify existing files (parse + mojibake grep) and compile only what is missing or fails verification. UIDs and manifest references resolve per-file, so recompiling one lorebook does not disturb the others.
+
 ---
 
 ## 📂 CONTEXT MANIFEST — load exactly this

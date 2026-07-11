@@ -146,7 +146,7 @@ For each tier, identify what is missing:
 Gaps requiring user input → log in `UNRESOLVED_QUESTIONS.md` and halt. Do not proceed to Phase 2 until resolved.
 
 ### Step 3 — Draft Master Design
-Author the `Master_Design.md` using the structure in Section 5.
+Author the `Master_Design.md` using the structure in Section 5 — **checkpointed section by section** (checkpoint discipline — `workflows/world-forge.md`), never as one monolithic end-of-phase write. Write each Master Design section to disk as you complete it and verify it landed (file non-empty, ends with the section just written) before starting the next. The Pipeline State Ledger block is the exception: per its contract you author it once at sign-off, inserted at the top of the completed file. On `/worldforge resume phase1`, read what exists in `Drafts/Master_Design.md` and continue from the first missing section; do not regenerate sections that verify intact.
 
 ---
 
