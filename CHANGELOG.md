@@ -13,6 +13,52 @@ numbers. Newest first.
 
 ---
 
+## 2026-07-11 — Checkpoint discipline (write-as-you-go)
+
+A field run surfaced two related failure modes: a ~6-hour Phase 0 interview
+held every settled seed section in conversation memory until a single
+end-of-interview write (context rot + one oversized write as the single point
+of failure), and a Phase 2 run shipped a zero-byte `Instructions_[CardName].md`
+that no agent caught because nothing verified that writes actually landed. Both
+were amplified by a provider whose tool calls degraded on long outputs — the
+user's own workaround (line-at-a-time PowerShell `Add-Content`) then burned the
+session and risked mojibake in Drafts markdown. This change makes incremental
+committing, write verification, and disk-first resume an explicit pipeline-wide
+contract.
+
+### Added
+- **`workflows/world-forge.md`** — new **CHECKPOINT DISCIPLINE** section (after
+  PIPELINE STATE LEDGER): three rules — commit each unit as it locks (with a
+  one-entry/one-section grain floor; no line-at-a-time writes), verify every
+  write landed (non-empty, ends with the content just written), and resume from
+  disk, not memory. Checkpoint state is inferred from disk, not tracked in the
+  ledger; fallback writes obey the Compiler's FILE-WRITING & ENCODING guard
+  (never PowerShell).
+- **`agent_roles/00_The_Interviewer.md`** — Section 3 gains a "commit each
+  section to disk as it locks" working-approach paragraph (explicitly *not*
+  softening the never-draft-ahead rule); Section 7 notes the seed is authored
+  incrementally across the interview.
+- **`agent_roles/01_The_Refiner.md`** — Step 3 writes the Master Design
+  checkpointed section by section, with the Pipeline State Ledger still
+  authored once at sign-off per its existing contract.
+- **`agent_roles/02_The_Architect.md`** — Section 4 (Draft Order) gains the
+  checkpoint rule (per-file writes, optional per-entry appends within the large
+  entry files, resume-from-inventory); the pre-submission checklist gains a
+  **File Integrity** block (no zero-byte, truncated, or mojibake-corrupted
+  drafts).
+- **`agent_roles/06_The_Intimacy_Architect.md`** — Section 5 (Draft Order)
+  gains the same rule for profiles and registers.
+- **`agent_roles/04_The_Compiler.md`** — the FILE-WRITING & ENCODING guard
+  gains a write-verification & resume note (`resume phase4` re-verifies
+  existing Export files and recompiles only what fails; UIDs resolve per-file,
+  so single-file recompiles are safe).
+- **`CLAUDE.md`** — cross-file consistency row for the checkpoint set-piece.
+  The Editor, auditors, and Prompt Engineer are covered generically by the
+  workflow section (their unit is one report file); revise minis inherit the
+  parents' checkpoint rules with no delta text.
+
+---
+
 ## 2026-07-07 — Brainstormer: dice-oracle awareness (leaning-only, all postures)
 
 The Brainstormer had zero awareness of the dice oracle, so it never proposed it

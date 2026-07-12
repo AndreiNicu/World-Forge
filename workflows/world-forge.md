@@ -143,6 +143,18 @@ Loop state — which phase is live, what round it is on, which sign-offs are in 
 
 ---
 
+## 💾 CHECKPOINT DISCIPLINE (write-as-you-go)
+
+Every phase agent that writes a pipeline artifact follows three rules. They exist because long phases otherwise accumulate hours of settled work in conversation memory, and because a failed or silently-empty tool write otherwise goes unnoticed until a later phase reads the file. Both failure modes are documented from live runs: a Phase 0 interview held ~6 hours of seed content in memory before its first write, and a Phase 2 run shipped a zero-byte `Instructions_[CardName].md` that nobody caught until the user checked.
+
+1. **Commit each unit as it locks.** A unit is the phase's natural grain: a World Seed section (Interviewer), a Master Design section (Refiner), a draft file — or, within the large entry files, a complete lorebook entry (Architect / Intimacy Architect) — an Export file (Compiler), a report file (Editor / auditors / Prompt Engineer). Write the unit to disk as soon as it is settled; never hold more than one locked-but-unwritten unit in memory. Do not batch multiple units into one oversized write. Do not degrade below the unit grain either — line-at-a-time writing multiplies the failure surface and burns the session; one complete section or entry per write is the floor.
+2. **Verify the write landed.** After each write, re-read or stat the target: it exists, is non-empty, and ends with the content just written. A write that failed, timed out, or produced an empty or truncated file halts that unit — rewrite the *same* unit until it verifies. Never build unit N+1 on an unverified unit N.
+3. **Resume from disk, not memory.** Every `resume phase[N]` — and any mid-phase recovery after an error — starts by inventorying the phase's output files against the phase's mandatory-output list: which units exist, which are missing, empty, or truncated. Continue from the first incomplete unit. Do not rewrite units that verify intact, and do not reconstruct from conversation memory what is already on disk — the file is the source of truth.
+
+Checkpoint state is inferred from disk; it is not tracked in the Pipeline State Ledger (the ledger tracks phases, checkpoints track units within one). Fallback writes under a failing tool obey the Compiler's FILE-WRITING & ENCODING guard: UTF-8 via the file-write tool or a Python/Node script — never PowerShell `Set-Content`/`Add-Content`/`>` redirection, which mojibakes em-dashes and curly quotes in Drafts markdown exactly as it does in Export JSON.
+
+---
+
 ## BRAINSTORM (optional ideation, upstream of Phase 0)
 
 Some users arrive with a fully-formed concept; the Interviewer is built for them. Others arrive with only a vibe — an image, a mood, a single character, a "what if" — and nothing solid enough for the Interviewer's structured, specificity-demanding questions to land. `/worldforge brainstorm` is the optional front porch for that state.
