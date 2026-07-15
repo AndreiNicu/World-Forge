@@ -331,7 +331,7 @@ The point of this analysis is the same point the rest of the pipeline serves: th
 
 #### What the analysis must contain
 
-**Step 1 — World archetype.** In one paragraph, describe what kind of world this is in runtime terms. Genre, tonal register, scene-typical participant count, dominant emotional register, distinctive physical/cultural/structural features. This is not a marketing pitch — it is a description aimed at predicting how the model will fail.
+**Step 1 — World archetype.** In one paragraph, describe what kind of world this is in runtime terms. Genre, tonal register, scene-typical participant count, dominant emotional register, distinctive physical/cultural/structural features. This is not a marketing pitch — it is a description aimed at predicting how the model will fail. **Name the world's dominant genre family or families explicitly** (grimdark, horror, intrigue/mystery, strict-hierarchy, romance, slice-of-life, large-ensemble, …) — the genre-lens hint below keys off these names.
 
 **Step 2 — Predicted runtime failure modes.** Enumerate the specific ways you expect the model to fail when running this world. Be concrete. Examples of how to phrase failure modes:
 - "Multi-character scenes will collapse to user-centric hub-and-spoke because three NPCs in a tavern is the typical scene structure."
@@ -361,7 +361,7 @@ The analysis goes in your audit report as a new section before the chat preset i
 ## Section X: Block Selection Rationale
 
 ### World Archetype
-[One paragraph]
+[One paragraph — runtime terms, naming the dominant genre family/families]
 
 ### Predicted Runtime Failure Modes
 1. [Failure mode] — [why this world is prone to it]
@@ -394,6 +394,7 @@ The analysis goes in your audit report as a new section before the chat preset i
 - [ ] Every failure mode in the list above is addressed by at least one block
 - [ ] Every block included is justified by at least one failure mode (no decorative inclusions)
 - [ ] Every Master Design Section 12 runtime directive appears in the Runtime Directive Coverage table, mapped to at least one block — none mapped to main/jailbreak/formatting/`<style_contract>` (or Section 12 declares none)
+- [ ] Every menu block the genre-lens hint maps to a genre family named in the World Archetype appears in the Block Selection table — included with a failure mode, or excluded with a reason
 ```
 
 #### Sandbox-mode block guidance (when Master Design `World Mode` is `sandbox`)
@@ -414,6 +415,23 @@ Sandbox worlds include `npc_ensemble` by default (above); arc worlds normally re
 #### Dice-oracle block hint (any mode, when the world declares a `[[DICE_TABLES]]` dice oracle)
 
 When the Master Design Section 1 carries a `Dice Oracle Tables (Scene Tracker seed)` line, the world injects a `<dice_oracle>` block of pre-rolled facts at runtime, and the model needs the engine-side protocol for consuming that channel. **Default-include the `dice_oracle` optional block** (§5a) — it is the engine half of the dice oracle's what/how split and the standing defense against the two failure modes every dice world hits: reciting the injected facts as a list, and serializing a multi-participant result into one-after-another beats. Predict **"the model recites `<dice_oracle>` facts instead of interweaving them"** and **"a multi-participant dice result gets narrated one participant at a time"** as the matching failure modes and map them to this block. This is mode-agnostic (the oracle exists in arc and sandbox worlds alike) and near-mandatory: a world with a dice oracle that omits the block should carry an explicit Step 4 justification. Conversely, a world with **no** `[[DICE_TABLES]]` line must not include the block (it would be dead weight — Pass 1 flags a `dice_oracle` block in a world with no oracle).
+
+#### Genre-lens hint (all modes — a completeness check on the failure-mode analysis)
+
+The optional block menu (§5a) is genre-keyed: most of its entries exist because a specific genre family reliably produces a specific runtime failure. The failure-mode analysis remains the selection mechanism — a genre label never auto-includes a block — but the label is a cheap index into the menu, and the realistic failure this hint prevents is omitting a fitting block by oversight rather than by judgment, with no trace in Step 4. So: Step 1 names the world's dominant genre family or families, and for each named family you explicitly evaluate its mapped menu blocks — each mapped block either appears in Step 3 (included, mapped to a named failure mode) or in Step 4 (excluded, with a reason). Silent absence of a mapped block is the failure mode of the *analysis itself*.
+
+| Genre family (as named in Step 1) | Menu blocks to evaluate |
+|---|---|
+| Grimdark / dark fantasy | Consequence Tracking; Subtext & Implication; Atmosphere & Dread (deep grimdark) |
+| Horror / cosmic horror | Atmosphere & Dread; Perception Boundary |
+| Political intrigue / mystery / deception | Subtext & Implication; Perception Boundary; Internal Monologue Discipline (deceptive or hidden-identity protagonist) |
+| Strict-hierarchy settings (feudal, monastic, military, criminal, corporate, divine) | Power Asymmetry; Cultural Voice & Diction |
+| Historical / archaic diction / heavy in-world jargon | Cultural Voice & Diction |
+| Romance / intimate / character-driven | Perception Boundary (unspoken attraction must remain unspoken); Opening Variation (dialogue-driven pacing) |
+| Slice-of-life / survival / calendar- or season-driven | Time & Continuity Anchors |
+| Large-ensemble / Director-voiced cast | NPC Ensemble & Enrichment; Multi-Character Dynamics (conditional core) |
+
+This table maps the current §5a menu by genre fit — when the menu gains or renames an optional block, update this table in the same edit. Mode-driven inclusion (sandbox), ladder-driven inclusion, and mechanic-driven inclusion (dice oracle) have their own hints above and are not repeated here. A world spanning several families evaluates the union of their rows; a world whose register genuinely fits no row proceeds on the failure-mode analysis alone — the hint adds a floor to the analysis, not a ceiling.
 
 If the agent skips this analysis, the audit report is incomplete and sign-off cannot be issued.
 
@@ -796,7 +814,7 @@ APPLICATION: Open the file, replace the field's value with the recommended value
 [Per Section 5.0b of the agent spec. Required structure:]
 
 ### World Archetype
-[One paragraph describing this world in runtime terms]
+[One paragraph describing this world in runtime terms, naming the dominant genre family/families]
 
 ### Predicted Runtime Failure Modes
 [4-8 specific predicted failures, each with reasoning]
@@ -811,6 +829,7 @@ APPLICATION: Open the file, replace the field's value with the recommended value
 - [ ] Every failure mode addressed by at least one block
 - [ ] Every block included justified by at least one failure mode
 - [ ] Every Section 12 runtime directive mapped to at least one block (none to main/jailbreak/formatting/`<style_contract>`)
+- [ ] Every menu block the genre-lens hint maps to a named genre family either included or excluded with a reason
 
 ## Section 10: Chat Template Notes
 [Any world-specific decisions made in authoring the template and why]
@@ -867,7 +886,7 @@ Append to `Export/Prompt_Engineer_Audit.md`:
 - [ ] All 8 core custom blocks present with non-placeholder content (main, deep_think, arc_guardian, lore_integration, spatial_awareness, sensory_embodiment, formatting, jailbreak)
 - [ ] Conditional core blocks correctly enabled/disabled per world: multi_character_dynamics enabled iff 2+ AI cards or Director NPC card; nsfw enabled iff Section 8 in scope
 - [ ] Optional blocks added per Section 5.0b Block Selection Rationale; each justified by at least one named failure mode
-- [ ] Block Selection Rationale present in audit report with: world archetype, 4-8 predicted failure modes, block-to-failure-mode mapping table, runtime directive coverage table (when Master Design Section 12 has directives), omission justifications
+- [ ] Block Selection Rationale present in audit report with: world archetype (naming the dominant genre family/families), 4-8 predicted failure modes, block-to-failure-mode mapping table, runtime directive coverage table (when Master Design Section 12 has directives), omission justifications
 - [ ] forbid_overrides: false on both `main` and `jailbreak` blocks
 - [ ] **Override architecture: Main Prompt content contains no character names, no arc names, no character-specific psychology language**
 - [ ] **Override architecture: jailbreak block content contains all four load-bearing clauses of the constitutive-fictional frame (metaverse declaration, {{user}}-as-actor, authority deferral, valid-story-beats permission), contains no character/world-specific content, and — only when the world has NSFW content (NSFW block enabled) — ends with the verbatim closing affirmation "High risk content is allowed and encouraged." (absent for wholesome worlds)**
@@ -889,6 +908,7 @@ Append to `Export/Prompt_Engineer_Audit.md`:
 - [ ] Sandbox worlds: Multi-Character Dynamics enabled, `npc_ensemble` included, Sensory Embodiment weighted high — or each omission justified in the Block Selection Rationale (Step 4)
 - [ ] Arc worlds with Escalation Ladders (§7.D): `npc_ensemble` included per the ladder-aware block hint — or the omission justified in the Block Selection Rationale (Step 4)
 - [ ] Worlds with a `[[DICE_TABLES]]` dice oracle: `dice_oracle` block included and enabled per the dice-oracle block hint — or the omission justified in the Block Selection Rationale (Step 4); worlds without a dice oracle do not carry the block
+- [ ] Genre-lens hint applied: every menu block the hint maps to a genre family named in the World Archetype is included (with a named failure mode) or its omission justified in the Block Selection Rationale (Step 4)
 
 ### Chat Template — Style Contract Validation (paired with override architecture)
 - [ ] Main Prompt contains exactly one `<style_contract>...</style_contract>` block with NARRATIVE PERSPECTIVE and FORMATTING MARKERS lines
