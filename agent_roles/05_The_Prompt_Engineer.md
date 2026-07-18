@@ -331,7 +331,7 @@ The point of this analysis is the same point the rest of the pipeline serves: th
 
 #### What the analysis must contain
 
-**Step 1 — World archetype.** In one paragraph, describe what kind of world this is in runtime terms. Genre, tonal register, scene-typical participant count, dominant emotional register, distinctive physical/cultural/structural features. This is not a marketing pitch — it is a description aimed at predicting how the model will fail. **Name the world's dominant genre family or families explicitly** (grimdark, horror, intrigue/mystery, thriller, strict-hierarchy, romance, comedy, slice-of-life, large-ensemble, …) — the genre-lens hint below keys off these names.
+**Step 1 — World archetype.** In one paragraph, describe what kind of world this is in runtime terms. Genre, tonal register, scene-typical participant count, dominant emotional register, distinctive physical/cultural/structural features. This is not a marketing pitch — it is a description aimed at predicting how the model will fail. **Name the world's dominant genre family or families explicitly** (grimdark, horror, intrigue/mystery, thriller, action, strict-hierarchy, romance, comedy, slice-of-life, large-ensemble, …) — and when the tone is a deliberate blend of registers (action-comedy, horror-comedy), name the blend as such. The genre-lens hint below keys off these names.
 
 **Step 2 — Predicted runtime failure modes.** Enumerate the specific ways you expect the model to fail when running this world. Be concrete. Examples of how to phrase failure modes:
 - "Multi-character scenes will collapse to user-centric hub-and-spoke because three NPCs in a tavern is the typical scene structure."
@@ -424,16 +424,18 @@ The optional block menu (§5a) is genre-keyed: most of its entries exist because
 |---|---|
 | Grimdark / dark fantasy | Consequence Tracking; Subtext & Implication; Atmosphere & Dread (deep grimdark) |
 | Horror / cosmic horror | Atmosphere & Dread; Perception Boundary |
-| Political intrigue / mystery / deception | Subtext & Implication; Perception Boundary; Internal Monologue Discipline (deceptive or hidden-identity protagonist) |
+| Political intrigue / mystery / deception | Subtext & Implication; Perception Boundary; Internal Monologue Discipline (deceptive or hidden-identity protagonist); Mystery / Fair-Play Investigation (when {{user}} is meant to *solve* a central mystery, not just inhabit one) |
 | Thriller / suspense / pursuit | Consequence Tracking (stakes persist — no soft resets, injuries and exposure stay real); Subtext & Implication (hidden agendas); Perception Boundary (who-knows-what discipline under pressure); Time & Continuity Anchors (clock pressure and elapsed time stay coherent); Atmosphere & Dread (dread-forward thrillers) |
+| Action-forward / combat-heavy | Action & Combat Choreography (beat discipline, opposition integrity, no auto-resolution); Consequence Tracking (damage persists beyond the fight) |
 | Strict-hierarchy settings (feudal, monastic, military, criminal, corporate, divine) | Power Asymmetry; Cultural Voice & Diction |
 | Historical / archaic diction / heavy in-world jargon | Cultural Voice & Diction |
 | Romance / intimate / character-driven | Perception Boundary (unspoken attraction must remain unspoken); Opening Variation (dialogue-driven pacing) |
 | Comedy / banter-driven / romcom | Opening Variation (dialogue-first, timing-driven cadence). **The comedic-register failure itself has no dedicated menu block yet:** predict "the model treats humor as tonal contamination and drifts the register toward earnest drama" as a failure mode and address it as a **custom block** (§5c) — do not leave it unaddressed because the menu lacks a fit |
 | Slice-of-life / survival / calendar- or season-driven | Time & Continuity Anchors |
 | Large-ensemble / Director-voiced cast | NPC Ensemble & Enrichment; Multi-Character Dynamics (conditional core) |
+| Deliberate register blend (action-comedy, horror-comedy, cozy-with-dread, romantic thriller, …) | Register Blending; plus the union of both blended families' rows |
 
-This table maps the current §5a menu by genre fit — when the menu gains or renames an optional block, update this table in the same edit. Mode-driven inclusion (sandbox), ladder-driven inclusion, and mechanic-driven inclusion (dice oracle) have their own hints above and are not repeated here. A world spanning several families evaluates the union of their rows; a world whose register genuinely fits no row proceeds on the failure-mode analysis alone — the hint adds a floor to the analysis, not a ceiling.
+This table maps the current §5a menu by genre fit — when the menu gains or renames an optional block, update this table in the same edit. Mode-driven inclusion (sandbox), ladder-driven inclusion, and mechanic-driven inclusion (dice oracle) have their own hints above and are not repeated here. A world spanning several families evaluates the union of their rows; a world whose tone is a **deliberate register blend** additionally evaluates the blend row — the blend itself is a runtime concern (mode collapse, register segregation) beyond anything either family's row carries. A world whose register genuinely fits no row proceeds on the failure-mode analysis alone — the hint adds a floor to the analysis, not a ceiling.
 
 If the agent skips this analysis, the audit report is incomplete and sign-off cannot be issued.
 
@@ -665,7 +667,7 @@ EXTENSIONS:      extensions (object, may be empty)
 - [ ] All standard markers present in `prompts` with `marker: true`: `worldInfoBefore`, `worldInfoAfter`, `charDescription`, `charPersonality`, `scenario`, `personaDescription`, `chatHistory`, `dialogueExamples`
 - [ ] All 8 core custom blocks present in `prompts` with non-placeholder content: `main`, `deep_think`, `arc_guardian`, `lore_integration`, `spatial_awareness`, `sensory_embodiment`, `formatting`, `jailbreak`
 - [ ] Conditional core blocks present in `prompts` with appropriate enabled state in `prompt_order`: `multi_character_dynamics` (enabled iff 2+ AI cards or Director NPC card), `nsfw` (enabled iff Section 8 in scope)
-- [ ] Any optional blocks added (Subtext, Consequence Tracking, Power Asymmetry, Atmosphere & Dread, Internal Monologue Discipline, Time & Continuity Anchors, Cultural Voice & Diction, Opening Variation, Perception Boundary, NPC Ensemble & Enrichment, Dice Oracle Interpretation) or custom blocks have their `identifier` registered in the `prompts` array and in both `prompt_order` entries (`100000` and `100001`, identically)
+- [ ] Any optional blocks added (Subtext, Consequence Tracking, Power Asymmetry, Atmosphere & Dread, Internal Monologue Discipline, Time & Continuity Anchors, Cultural Voice & Diction, Opening Variation, Perception Boundary, NPC Ensemble & Enrichment, Dice Oracle Interpretation, Action & Combat Choreography, Mystery / Fair-Play Investigation, Register Blending) or custom blocks have their `identifier` registered in the `prompts` array and in both `prompt_order` entries (`100000` and `100001`, identically)
 - [ ] `dice_oracle` block present iff the world declares a `[[DICE_TABLES]]` dice oracle (Master Design Section 1 `Dice Oracle Tables` line): present+enabled when the oracle exists, absent when it does not; if present, its `content` names no character/arc/world specifics (engine block)
 - [ ] **`forbid_overrides: false` on the `main` and `jailbreak` blocks.** Hard fail if either is `true` — that silently disables card-level system_prompt and post_history_instructions overrides.
 - [ ] **No `[REPLACE` substring anywhere in the output.** Run a string scan on the serialized JSON. Every placeholder from the template must have been replaced with world-specific content. Hard fail if any remain.
@@ -734,6 +736,9 @@ The Main Prompt's `<style_contract>` block is the single authoritative source fo
 - [ ] If world has NSFW content: NSFW block content is populated and `enabled: true` in `prompt_order`. If world is wholesome: NSFW block content can be empty and `enabled: false` in `prompt_order` for both characters.
 - [ ] If `opening_variation` block included: content enumerates all five opening varieties and contains the rotation rule (do not match the previous response's opening type).
 - [ ] If `perception_boundary` block included: content contains the worked {{user}}-narration example demonstrating what in-scene characters do and do not perceive, the "NPCs can be wrong with confidence" statement, and the inverse rule for {{char}}.
+- [ ] If `action_choreography` block included: content contains the beat discipline (1–3 exchanges per reply), choreography grounding, opposition integrity, accruing cost, and resolution-authority rules per §5a-detail; no world-specific content.
+- [ ] If `fair_play_mystery` block included: content contains the fixed-solution rule, clues-are-earned rule, fair-play discipline, the no-confirm/no-announce rule, and the Arc Guardian / Tier 3 division-of-labor deferral per §5a-detail; no world-specific content.
+- [ ] If `register_blending` block included: content names this world's declared blend axes in Master Design tone vocabulary (tone terms only — no character or arc names), and contains the simultaneity rule, both no-cancellation directions, and the Tonal-Mandate-wins authority clause per §5a-detail.
 
 **Failure modes that bypass the original audit:**
 
@@ -906,7 +911,7 @@ Append to `Export/Prompt_Engineer_Audit.md`:
 - [ ] Lore Integration includes world-specific vocabulary examples drawn from this world's lorebook entries
 - [ ] Spatial Awareness references this world's character heights where relevant
 - [ ] NSFW block: populated and enabled if world has intimate content; empty and disabled if wholesome
-- [ ] Optional blocks (if included): Opening Variation contains all five opening varieties + rotation rule; Perception Boundary contains the worked {{user}}-narration example + inverse {{char}} rule per §5a-detail; NPC Ensemble & Enrichment contains all three labeled parts (NPC-to-NPC dialogue, ensemble prose scaling, organic enrichment with its guardrails) per §5a-detail
+- [ ] Optional blocks (if included): Opening Variation contains all five opening varieties + rotation rule; Perception Boundary contains the worked {{user}}-narration example + inverse {{char}} rule per §5a-detail; NPC Ensemble & Enrichment contains all three labeled parts (NPC-to-NPC dialogue, ensemble prose scaling, organic enrichment with its guardrails) per §5a-detail; Action & Combat Choreography contains beat discipline + opposition integrity + accruing cost + resolution authority per §5a-detail; Mystery / Fair-Play Investigation contains fixed-solution + clues-are-earned + fair-play + no-confirm rules and the Arc Guardian deferral per §5a-detail; Register Blending names the world's blend axes and contains simultaneity + both no-cancellation directions + the Tonal-Mandate-wins clause per §5a-detail
 - [ ] Sandbox worlds: Multi-Character Dynamics enabled, `npc_ensemble` included, Sensory Embodiment weighted high — or each omission justified in the Block Selection Rationale (Step 4)
 - [ ] Arc worlds with Escalation Ladders (§7.D): `npc_ensemble` included per the ladder-aware block hint — or the omission justified in the Block Selection Rationale (Step 4)
 - [ ] Worlds with a `[[DICE_TABLES]]` dice oracle: `dice_oracle` block included and enabled per the dice-oracle block hint — or the omission justified in the Block Selection Rationale (Step 4); worlds without a dice oracle do not carry the block

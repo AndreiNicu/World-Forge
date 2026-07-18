@@ -13,7 +13,52 @@ numbers. Newest first.
 
 ---
 
-## 2026-07-18 — Genre-lens hint in the Block Selection Rationale
+## 2026-07-18 — Three new optional preset blocks: action choreography, fair-play mystery, register blending (#81)
+
+The genre-lens table (entry below) made the optional block menu's coverage
+gaps visible. Three families had a named runtime failure with no menu block:
+action-heavy worlds (fights summarized into a sentence, physical incoherence,
+the model ending fights unilaterally), played mysteries (solution drift,
+NPCs volunteering the answer, theories confirmed out-of-fiction), and worlds
+whose tone is a deliberate register blend, action-comedy à la Rush Hour
+(mode collapse — the humor evaporates the moment stakes rise; register
+segregation — alternating single-register scenes instead of banter-during-
+the-fight; mutual defusal — a joke resets the tension). Blends are the case
+the table's union-of-rows rule cannot fix: the blend itself fails at runtime
+in ways neither family's blocks address. All three blocks are engine-level;
+Register Blending carries one world-adapted element (the declared blend axes
+in Master Design tone vocabulary) and defers register authority to the
+active ARC_STATE / SANDBOX_STATE Tonal Mandate. Preset Resync picks all
+three up automatically via its newly-warranted-optional-blocks axis.
+
+### Added
+- **`agent_roles/05a_Block_Library.md`** — three new §5a optional menu
+  entries with matching §5a-detail content requirements: **Action & Combat
+  Choreography** (`action_choreography`: beat discipline of 1–3 exchanges
+  per reply, choreography grounding composing with Spatial Awareness,
+  opposition integrity, accruing in-fight cost composing with Consequence
+  Tracking, resolution authority), **Mystery / Fair-Play Investigation**
+  (`fair_play_mystery`: fixed solution, clues earned through investigative
+  action, fair-play discipline, withholding-is-not-stonewalling, {{user}}
+  does the solving; generic protocol deferring the world's specific
+  hidden-information content to Arc Guardian / Tier 3), and **Register
+  Blending** (`register_blending`: simultaneity rule, no-cancellation in
+  both directions, register carriers, escalation drift check, Tonal-Mandate-
+  wins authority clause).
+
+### Changed
+- **`agent_roles/05_The_Prompt_Engineer.md`** — genre-lens table updated in
+  the same edit per the CLAUDE.md coupling rule: new "Action-forward /
+  combat-heavy" and "Deliberate register blend" rows, Mystery / Fair-Play
+  added to the intrigue/mystery row, Step 1 family list gains "action" and
+  the name-the-blend instruction, closing paragraph routes blends to the
+  blend row. Pass 1 optional-block enumeration, Pass 2 per-block content
+  checks, and the sign-off optional-blocks line extended for the three new
+  blocks.
+
+---
+
+## 2026-07-18 — Genre-lens hint in the Block Selection Rationale (#81)
 
 The Prompt Engineer's optional block menu (§5a) is genre-keyed — Subtext for
 intrigue, Consequence Tracking for grimdark, Atmosphere & Dread for horror,
