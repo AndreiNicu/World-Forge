@@ -13,7 +13,7 @@ numbers. Newest first.
 
 ---
 
-## 2026-07-15 — Genre-lens hint in the Block Selection Rationale
+## 2026-07-18 — Genre-lens hint in the Block Selection Rationale
 
 The Prompt Engineer's optional block menu (§5a) is genre-keyed — Subtext for
 intrigue, Consequence Tracking for grimdark, Atmosphere & Dread for horror,
@@ -31,8 +31,14 @@ re-runs the Section 5.0b rationale).
 ### Added
 - **`agent_roles/05_The_Prompt_Engineer.md`** — new **genre-lens hint**
   subsection in Section 5.0b (after the dice-oracle hint): a genre-family →
-  menu-block mapping table with the evaluate-or-justify rule; Step 1 (World
-  Archetype) now names the world's dominant genre family/families explicitly;
+  menu-block mapping table with the evaluate-or-justify rule, covering ten
+  families (grimdark, horror, intrigue/mystery, thriller, strict-hierarchy,
+  historical/jargon, romance, comedy, slice-of-life, large-ensemble). The
+  comedy row is honest about the one menu gap: the comedic-register failure
+  ("humor drifts toward earnest drama") has no dedicated menu block, so the
+  row routes it to the §5c custom-block path rather than leaving it silently
+  unaddressed. Step 1 (World Archetype) now names the world's dominant genre
+  family/families explicitly;
   the Block-to-Failure-Mode Coverage Check (both the 5.0b format and the
   Section 6 report template) gains a genre-coverage checkbox; the sign-off
   gains a genre-lens line alongside the sandbox/ladder/dice lines.

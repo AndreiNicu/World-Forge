@@ -331,7 +331,7 @@ The point of this analysis is the same point the rest of the pipeline serves: th
 
 #### What the analysis must contain
 
-**Step 1 — World archetype.** In one paragraph, describe what kind of world this is in runtime terms. Genre, tonal register, scene-typical participant count, dominant emotional register, distinctive physical/cultural/structural features. This is not a marketing pitch — it is a description aimed at predicting how the model will fail. **Name the world's dominant genre family or families explicitly** (grimdark, horror, intrigue/mystery, strict-hierarchy, romance, slice-of-life, large-ensemble, …) — the genre-lens hint below keys off these names.
+**Step 1 — World archetype.** In one paragraph, describe what kind of world this is in runtime terms. Genre, tonal register, scene-typical participant count, dominant emotional register, distinctive physical/cultural/structural features. This is not a marketing pitch — it is a description aimed at predicting how the model will fail. **Name the world's dominant genre family or families explicitly** (grimdark, horror, intrigue/mystery, thriller, strict-hierarchy, romance, comedy, slice-of-life, large-ensemble, …) — the genre-lens hint below keys off these names.
 
 **Step 2 — Predicted runtime failure modes.** Enumerate the specific ways you expect the model to fail when running this world. Be concrete. Examples of how to phrase failure modes:
 - "Multi-character scenes will collapse to user-centric hub-and-spoke because three NPCs in a tavern is the typical scene structure."
@@ -425,9 +425,11 @@ The optional block menu (§5a) is genre-keyed: most of its entries exist because
 | Grimdark / dark fantasy | Consequence Tracking; Subtext & Implication; Atmosphere & Dread (deep grimdark) |
 | Horror / cosmic horror | Atmosphere & Dread; Perception Boundary |
 | Political intrigue / mystery / deception | Subtext & Implication; Perception Boundary; Internal Monologue Discipline (deceptive or hidden-identity protagonist) |
+| Thriller / suspense / pursuit | Consequence Tracking (stakes persist — no soft resets, injuries and exposure stay real); Subtext & Implication (hidden agendas); Perception Boundary (who-knows-what discipline under pressure); Time & Continuity Anchors (clock pressure and elapsed time stay coherent); Atmosphere & Dread (dread-forward thrillers) |
 | Strict-hierarchy settings (feudal, monastic, military, criminal, corporate, divine) | Power Asymmetry; Cultural Voice & Diction |
 | Historical / archaic diction / heavy in-world jargon | Cultural Voice & Diction |
 | Romance / intimate / character-driven | Perception Boundary (unspoken attraction must remain unspoken); Opening Variation (dialogue-driven pacing) |
+| Comedy / banter-driven / romcom | Opening Variation (dialogue-first, timing-driven cadence). **The comedic-register failure itself has no dedicated menu block yet:** predict "the model treats humor as tonal contamination and drifts the register toward earnest drama" as a failure mode and address it as a **custom block** (§5c) — do not leave it unaddressed because the menu lacks a fit |
 | Slice-of-life / survival / calendar- or season-driven | Time & Continuity Anchors |
 | Large-ensemble / Director-voiced cast | NPC Ensemble & Enrichment; Multi-Character Dynamics (conditional core) |
 
