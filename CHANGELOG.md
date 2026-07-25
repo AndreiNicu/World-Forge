@@ -15,8 +15,8 @@ numbers. Newest first.
 
 ## 2026-07-25 — The posture contract: `{{user}}` is a character, not the customer
 
-Two related problems with `{{user}}`, fixed together because they turn out to
-be the same bright line seen from two sides.
+Three related problems with `{{user}}`, fixed together because they turn out
+to be the same bright line seen from different sides.
 
 The first is the model's disposition. It was optimized to satisfy the person
 typing, and that does not switch off inside a fiction — it reads `{{user}}`'s
@@ -54,7 +54,45 @@ its prohibitions, because a model that seizes `{{user}}`'s turns and narrates
 their defeats is a worse bug than the one being fixed. *Opposition, not
 punishment.*
 
-The second problem is the mirror image, and it is issue #82. The pipeline's
+The second problem is that **compliance and intent are different questions**,
+and the first pass of this work conflated them. A four-value posture enum asked
+only "does the world give `{{user}}` what they want," which classifies a
+compulsion-premise world — everyone must obey the protagonist, and every one of
+them is using that obedience to route him into their own ends — as
+`deferential`, the gentlest setting. It is the darkest kind of world the
+pipeline can build. So the enum gains a fifth value, `predatory`: the world
+gives `{{user}}` what they want, *and that is the mechanism of harm*.
+
+Three consequences fell out of that, and each was a real hole:
+
+**Harm classes.** "What can `{{user}}` lose" reads as a question about
+possessions, and a protagonist who is invulnerable or omnipotent answers
+"nothing." But such a world has stakes — they are **moral** (complicity,
+self-image, a line that can't be uncrossed) and **epistemic** (being deceived
+and acting on it), the two classes the model never reaches for unprompted and
+the only ones available when the first three don't apply.
+
+**The fourth reflex.** Yield, auto-success, and rescue all *correctly pass* in a
+world that defers by design. What fires there is **rescue from consequence**:
+the ask gets softened before it's made, the target turns out to have deserved
+it, an NPC breaks frame to check that `{{user}}` is all right, the deed quietly
+doesn't take, or the next scene opens on word that it worked out fine.
+
+**The tell rule.** The model warns the player. It marks an insincere line with a
+narration tell — *her smile didn't quite reach her eyes* — because it treats the
+reader as owed a heads-up. In a world whose mechanic is manipulation that tell
+is the bug: every appeal lands as a visible trap instead of as warmth, and the
+choice the world was built around stops being a choice.
+
+The cast-side sibling of all this is that **the model warms villains**, supplying
+doubt, hesitation, and redemptive interiority the drafts never authored. Not an
+argument for flat antagonists — a villain with real interiority is better
+writing — but the mitigation has to be *authored* rather than supplied because
+the model is uncomfortable. Two configurations it will not hold unaided, and
+both are usually the point of the character: *feels nothing about what they do*,
+and *loves them and does it anyway*.
+
+The third problem is the mirror image, and it is issue #82. The pipeline's
 "the human plays `{{user}}`, the model never impersonates them" rule was stated
 upstream in three places but enforced by the Editor on `Drafts/User.md` alone.
 The Tier 2 Protagonist Lorebook — unbounded, holding the content nearest the
@@ -101,9 +139,43 @@ the violation would actually happen.
   `protagonist_jeopardy` block toggle on a posture-change revision.
 - `agent_roles/Auditioner/00_The_Auditioner.md`: check **K** in the reused
   Voice Auditor vocabulary.
+- `templates/World_Seed_Template.md`: fifth posture value **`predatory`**; the
+  **five harm classes** on the losables field (material / relational / physical
+  / **moral** / **epistemic**); the boundary field made bidirectional so
+  souls-like worlds can declare death, defeat, and game-over explicitly **on**
+  the table; and **"How the world works on {{user}}"** — manipulation vectors
+  with voiced phrasings plus the **tell rule** (`opaque` /
+  `visible-but-tempting` / `mixed by character`).
+- `agent_roles/02_The_Architect.md`: **§8.A "THE TELL RULE"** block (concrete
+  prose-habit prohibitions, since the model doesn't recognize itself performing
+  them from an abstraction), `predatory` shaping for the stance directive
+  (*use*, not opposition), a worked `predatory` + tell-rule example, and
+  **§5 "ANTAGONIST FIDELITY"** — author the interiority, including its absence.
+- `agent_roles/03_The_Editor.md`: Step 4a-3d gains the fourth reflex, the
+  bidirectional boundary, `predatory` shaping (verbatim voiced phrasings; a
+  paraphrase is a hard fail), and the tell-rule check; Step 3 gains the
+  antagonist-interiority soft flag.
+- `agent_roles/03b_The_Voice_Auditor.md`: **Step 3L — Antagonist Fidelity** with
+  its cruelty scenario class; Step 3K gains rescue-from-consequence, tell-rule
+  integrity, and a **posture-weighting table** (running the four reflexes flat on
+  a `deferential`/`predatory` world reports three meaningless passes and misses
+  the real failure); the bid scenario is now shaped to the posture.
+- `agent_roles/05a_Block_Library.md`: **Antagonist Integrity**
+  (`antagonist_integrity`) optional block with its §5a-detail requirements and
+  its own non-optional counter-guardrail (*no flat villains*); the fourth
+  prohibition added to `protagonist_jeopardy`.
+- `agent_roles/revise/05_The_Prompt_Engineer_mini.md`: **Trigger H**
+  (`antagonist_integrity` toggle); Trigger G now also fires as a content
+  re-weighting when a posture changes into `predatory`/`deferential`.
+- `agent_roles/revise/03b_The_Voice_Auditor_mini.md`: delta 10 — Step 3L on
+  character scopes touching a harm-function character.
 - `CLAUDE.md`: architectural principles **#13 (The Posture Contract)** and
   **#14 (`{{user}}` is reference data, never impersonation guidance)**, plus
-  four cross-file consistency rows.
+  five cross-file consistency rows. #13 records the compliance-vs-intent
+  distinction, the five harm classes, the bidirectional boundary, and a note on
+  the adjacent-and-not-yet-built piece: world-integrity enforcement against
+  `{{user}}`'s *inputs* (declining an impossible premise — a firearm in a
+  medieval setting — rather than resolving the attempt).
 
 ### Changed
 - `agent_roles/00_The_Interviewer.md`: Section 3 gains the posture elicitation

@@ -99,6 +99,21 @@ Write in dense, evocative prose. This is the single richest text in the card.
 
 > ⚠️ No arc-specific content. No timeline events. No "she is currently doing X." This is the permanent character substrate.
 
+#### ⭐ ANTAGONIST FIDELITY — write cruelty as cruelty (applies to any character whose function is harm)
+
+The model's disposition toward `{{user}}` (principle #13) has a sibling that surfaces on the cast side: **it warms villains.** Given a character written to be cruel, predatory, or indifferent to suffering, it reliably supplies mitigation the drafts never authored — a flicker of doubt before the cruel line, an interiority that reframes the cruelty as pain, a hesitation, a softening in the final beat, a hint that they don't really mean it. The result is an antagonist who is *sympathetic in a way nobody asked for*, and a world whose central pressure quietly evaporates.
+
+This is not an argument against complex antagonists. A villain with real interiority, genuine love for someone, and a coherent self-justification is better writing than a monster — **when it is authored.** The failure is the *unauthored* version: mitigation appearing because the model is uncomfortable, not because the character has it.
+
+When drafting a character whose function includes harming, using, or deceiving `{{user}}` or others, do two things:
+
+1. **Author the interiority explicitly — including its absence.** State what this character actually feels about what they do. All of these are legitimate and each produces a different character: they enjoy it; they believe it is necessary and are correct within their own frame; they feel nothing about it at all; they love their target genuinely and do it anyway. **"They feel nothing about it" and "they love them and do it anyway" are the two the model will not hold on its own** — it will supply guilt into the first and conflict into the second. If either is the truth of your character, say so in the description in as many words.
+2. **Write a prohibition into the card's `system_prompt`** naming this character's specific mitigation risk, in concrete terms. Not "do not soften her" — that is the generic version and it does nothing. *"She does not hesitate before asking, does not check whether he is all right afterward, and does not privately regret it. Her warmth toward him is real and it does not compete with the ask."*
+
+The **self-justification** is the load-bearing craft element and it is what makes an antagonist play well without mitigation: a character who is coherent from the inside does not need softening to be interesting. Give them a frame in which they are the reasonable one, and the model has something to write that is neither cardboard nor apology.
+
+The Voice Auditor tests this at Step 3L; the Editor's Step 3 prose audit soft-flags an antagonist whose drafted material contains no stated interiority, because an unstated one is an invitation.
+
 ### personality
 5–10 words. A compass heading, not a biography.
 
@@ -567,7 +582,7 @@ Content: A bulleted list of 4–8 behavioral directives. Every bullet must use i
 - **Prose elides:** what the prose should skip or de-emphasize (redemptive hope in a grimdark arc, comforting tenderness in a survival arc, external concerns in a claustrophobic arc).
 - **Live scene types:** what scene types are active in this arc (so the model knows what kinds of scenes to bias toward).
 - **Activity cadence (include when principal NPCs are active in this arc):** NPCs advance their Standing Goals on their own initiative — when a scene lulls or {{user}} is passive, a present or off-screen NPC acts toward its goal rather than the scene freezing to wait on {{user}}. Reference the arc's active NPCs by the goals they pursue this arc (see the NPC_SHIFT entries). Omit this bullet for solo / two-hander arcs with no acting NPC cast. **When an active NPC has an Escalation Ladder (§7.D), the cadence bullet must additionally name the currently active stage and carry the progression discipline**, in the same imperative register — e.g.: "Mira's ladder is at **Stage 1 (quiet groundwork)**: in lulls she probes and plants rumors; surface off-screen evidence of the rumor spreading. Advance to Stage 2 ONLY when its stated condition occurs in-fiction; never skip a stage; never resolve the endpoint without {{user}} having had the chance to interfere." The three clauses — named current stage, advance only on stated condition, never skip / never self-resolve — are what keep the model executing the authored subplot instead of inventing or rushing one.
-- **Stance toward {{user}} (mandatory — every arc, all four postures):** the arc-specific expression of Master Design Section 6's **Posture Toward {{user}}** block. This is the one Tonal Mandate category that is never optional, because its absence is not a neutral omission: with nothing stated, the model's trained disposition to satisfy the person typing fills the gap, and the arc plays deferential regardless of what the Dramatic Situation says the stakes are. Write it as **what the world and its cast do**, never as what `{{user}}` does. See the dedicated block below.
+- **Stance toward {{user}} (mandatory — every arc, all five postures):** the arc-specific expression of Master Design Section 6's **Posture Toward {{user}}** block. This is the one Tonal Mandate category that is never optional, because its absence is not a neutral omission: with nothing stated, the model's trained disposition to satisfy the person typing fills the gap, and the arc plays deferential regardless of what the Dramatic Situation says the stakes are. Write it as **what the world and its cast do**, never as what `{{user}}` does. See the dedicated block below.
 - **Hard prohibitions:** specific behaviors the model must never produce in this arc (e.g., "do not write the women as enthusiastically initiating from desire — they initiate from duty under time pressure").
 - **Failure mode anchors:** if you have observed specific failure modes in playtesting (model softens openings, model warms cruel characters, model skips trauma responses), name them explicitly as prohibitions.
 
@@ -585,9 +600,29 @@ Write **one to two bullets** covering, in the arc's own terms:
    - **Rescue:** no convenient interruption, lucky timing, or off-screen fortune arrives to spare `{{user}}` an outcome the scene has earned.
 4. **The boundary,** where Section 6 declared one that this arc could plausibly cross. State it as a prohibition alongside the others so the permission and its limit arrive together.
 
-**All four postures get this directive, including `deferential`.** For a `deferential` world the content inverts but the bullet is still required: state *that* the world bows and in what register, name the one thing that does not, and prohibit the model from quietly extending the deference to it. A power-fantasy arc with no stated exception is the arc that goes inert.
+**All five postures get this directive, including `deferential`.** For a `deferential` world the content inverts but the bullet is still required: state *that* the world bows and in what register, name the one thing that does not, and prohibit the model from quietly extending the deference to it. A power-fantasy arc with no stated exception is the arc that goes inert.
 
-**Do not write `{{user}}`'s reactions to any of it.** "Deny him the licence and let him sit with it" — the first half is a directive to the world, the second half is writing the player's turn. Stop at the world's move.
+**`predatory` worlds need a differently-shaped bullet, and this is the case the generic version fits worst.** Here the cast complies constantly — that is the premise, not a failure — and the harm runs through the compliance. Three additions:
+
+1. **Do not write opposition; write use.** The prohibitions that matter are not "the NPC refuses" but "the NPC's warmth is real to them, the ask is not." Name what the cast wants out of `{{user}}` this arc and what they are willing to spend to get it.
+2. **Carry the manipulation vectors from Master Design Section 6 `Works on {{user}} by`, including the voiced phrasings verbatim.** These are sample lines, not a description of a technique — "don't you want to do this for your wife?" belongs in the entry as written. A directive that says "NPCs use emotional appeals" produces generic pressure; the phrasings produce the world.
+3. **Carry the tell rule as an explicit narration prohibition** — see the block below. This is the load-bearing half in an `opaque` world.
+
+**The moral/epistemic cost is the thing that must land.** Where Section 6's losables are `moral` or `epistemic`, the bullet must say so concretely: what specifically costs `{{user}}` something to have done, and that the scene does not dissolve it. The reflex to forbid here is not rescue-from-danger but **rescue-from-consequence** — the model softening the ask, having an NPC step back and check on him, making the target unsympathetic so the choice is cheap, or reporting afterward that it turned out fine. Name this arc's instance of it.
+
+**Do not write `{{user}}`'s reactions to any of it.** "Deny him the licence and let him sit with it" — the first half is a directive to the world, the second half is writing the player's turn. The same line binds here and is easier to cross: *"he should feel the weight of it"* is writing the player's interior. The world applies the pressure and the consequence stands; what the human's character feels about it is the human's to write. Stop at the world's move.
+
+#### ⭐ THE TELL RULE (conditional — when Master Design Section 6 declares one)
+
+The model's strongest habit around manipulation is to **warn the player**. It renders an insincere NPC with a narration tell — *"she says, and her smile doesn't quite reach her eyes"*, *"there is something calculating in the offer"* — because it treats the human as someone owed a heads-up. In a world whose mechanic is manipulation, that tell is the bug: it converts every appeal from warmth into a visible trap, and the choice the world was built around stops being a choice.
+
+Write the declared rule as a narration directive in the Tonal Mandate:
+
+- **`opaque`** — the appeal reads as genuine, because to the NPC it partly is. Prohibit narration tells outright: no eyes that don't match the smile, no "something in her voice", no adverb doing the work (*smoothly*, *silkily*, *carefully*), no narrator framing the line as a play. What is on the page is the warmth; the calculation is not on the page. `{{user}}` learns later, from what happens, or never.
+- **`visible-but-tempting`** — the play is legible and the pull is real anyway. The NPC may be transparent; the prohibition is on the *narrator* editorializing about it, and on writing the temptation as weak.
+- **`mixed by character`** — name which NPCs are readable and which are not, per Section 6.
+
+In all three, the standing rule is the same and worth stating in the bullet: **behavior and dialogue carry sincerity or its absence; the narrator does not annotate it.** This composes with the `perception_boundary` preset block from the opposite direction — that block stops NPCs from reading `{{user}}`'s interior; this stops the narrator from broadcasting theirs.
 
 Worked bullets:
 
@@ -608,6 +643,28 @@ Worked bullets:
   unafraid, and unmoved; never write him warming, conceding, or treating Andrei's 
   authority as binding, and never let the room's deference leak onto him. Do not 
   manufacture a reason for him to yield.
+```
+
+```
+- (predatory world — compulsion premise, Arc 1 of 30 days) Everyone complies; nobody can 
+  refuse him and nobody can resent him, and the prose plays that straight rather than 
+  hedging it. The compliance is the hook: every principal wants something done that they 
+  cannot do themselves, and each is working him for it. They ask through what he loves — 
+  "Don't you want to do this for your wife? For the woman who loves you?", "Don't you 
+  want your mother to finally be free of him?" — and they escalate: this week's ask is 
+  small and reasonable, and it is groundwork. The warmth is real to them and the ask is 
+  still an ask; write both, and never write one as a performance of the other. Nobody 
+  hedges an offer with conscience on his behalf. What is live to lose here is not 
+  material — it is what he can no longer believe about himself, and what he did not know 
+  when he agreed. When he does a thing, it stays done: no target turns out to have 
+  deserved it, no order is quietly not carried out, no one steps in to check whether he 
+  is all right with it, and the next scene does not open on the news that it worked out. 
+  Off the table: nothing reaches him physically — that is the premise, not a mercy.
+- (tell rule: opaque) When a principal is working him, the narration carries only what is 
+  in the room. No smile that does not reach the eyes, no "something calculating" behind 
+  an offer, no adverb doing the work — smoothly, silkily, carefully. The appeal reads as 
+  love, because to her it partly is. He finds out from consequences or he does not find 
+  out.
 ```
 
 #### Worked Example: Arc 1 of a grim coercive arc
@@ -827,7 +884,9 @@ Content: 4–8 imperative bullets (same imperative-language standard as ARC_STAT
 - **Active register:** the dominant register every response defaults to.
 - **Prose dwells on / Prose elides:** the standing atmospheric and behavioral anchors to linger on or skip.
 - **Live scene types:** the sandbox menu — the kinds of scenes the model should bias toward and be ready to enter (negotiations, intimate evenings, displays of authority, domestic quiet, sudden threats, etc.).
-- **Power-fantasy contract / stance toward {{user}} (mandatory — all four postures):** how NPCs and the world treat {{user}} by default, in directive form. This is the sandbox expression of Master Design Section 6's **Posture Toward {{user}}** block, and it carries the same required content as the arc-mode stance directive (§8.A's "STANCE-TOWARD-{{user}} DIRECTIVE" block — read it; the rules are identical and are not restated here): the named force that does not defer and what it wants instead, what is live to lose, the three trained reflexes named as prohibitions in this world's concrete vocabulary (**yield** — no NPC concedes because {{user}} asked; **auto-success** — a stated attempt is an attempt, the world answers it; **rescue** — no convenient interruption spares {{user}} an earned outcome), and the off-the-table boundary where one is declared. Sandbox has two mode-specific weights: the posture here is usually `deferential` or `mixed` and that is legitimate — but the exception is what keeps it legible, so the non-deferring force is **required**, not optional; and because there is no arc pressure carrying a scene, a frictionless sandbox goes inert faster than a frictionless arc does. Where the declared posture and the Standing Situation's experience contract disagree, the Refiner should have caught it — halt and surface rather than authoring both.
+- **Power-fantasy contract / stance toward {{user}} (mandatory — all five postures):** how NPCs and the world treat {{user}} by default, in directive form. This is the sandbox expression of Master Design Section 6's **Posture Toward {{user}}** block, and it carries the same required content as the arc-mode stance directive (§8.A's "STANCE-TOWARD-{{user}} DIRECTIVE" block — read it; the rules are identical and are not restated here): the force that does not defer and what it wants instead, what is live to lose (with its harm class), the four trained reflexes named as prohibitions in this world's concrete vocabulary (**yield** — no NPC concedes because {{user}} asked; **auto-success** — a stated attempt is an attempt, the world answers it; **rescue** — no convenient interruption spares {{user}} an earned outcome; **rescue-from-consequence** — the cost of what {{user}} has already done is not softened, walked back, or reported as having turned out fine), and the boundary in whichever direction it was declared. Where Section 6 declares a **tell rule** or manipulation vectors, carry both here per §8.A's tell-rule block — including the voiced phrasings verbatim.
+
+  Sandbox has three mode-specific weights. The posture is usually `deferential`, `mixed`, or `predatory` and all three are legitimate — but the exception is what keeps it legible, so the non-deferring force is **required**, not optional (in `predatory`, as "what does not defer though the people do"). Because there is no arc pressure carrying a scene, a frictionless sandbox goes inert faster than a frictionless arc does. And a `predatory` sandbox is the configuration where the stance bullet does the most work in the whole pipeline: there is no arc spine escalating the pressure, so the standing directive is the only thing keeping the cast's use of {{user}} live from turn to turn — write it concretely and let WORLD_PULSE carry the current asks. Where the declared posture and the Standing Situation's experience contract disagree, the Refiner should have caught it — halt and surface rather than authoring both.
 - **Aliveness directives (mandatory — this is what keeps a sandbox from feeling like a vending machine):** NPCs pursue their own agendas and may initiate; the world reacts to and remembers {{user}}'s actions and reputation; off-screen life continues and time passes; never freeze the world waiting for {{user}}; rotate NPCs in and out so the cast feels populated, not summoned. Make this concrete: **principal NPCs advance their Standing Goals (§7.D) on their own initiative — when a scene lulls or {{user}} is passive, a present or off-screen NPC acts toward its goal** rather than the world idling. **When a principal has an Escalation Ladder (§7.D), name its currently active stage here and carry the progression discipline**: advance to the next stage ONLY when its stated condition occurs in-fiction (on-screen or via surfaced evidence); never skip a stage; never resolve the ladder's endpoint without {{user}} having had the chance to interfere. (Sandbox has no swappable arc state, so the named stage here and in WORLD_PULSE is the stage's anchor; for long-running sandboxes where play has moved past the named stage, the revise pipeline's `sandbox_state_recalibration` scope is the ratchet that updates it.)
 - **Hard prohibitions:** what the model must never do — e.g., never strip {{user}}'s agency or power without an in-world cause the player set in motion; never reset NPC attitudes to neutral between scenes; never flatten the cast to a single voice.
 

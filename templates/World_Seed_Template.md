@@ -227,22 +227,51 @@ Delete all instructional text in brackets before submitting. Leave the section h
 
 *Read this preamble before filling the fields — the reason this block exists is not obvious.*
 
-*The model was trained to satisfy the person typing. In roleplay that reflex does not switch off just because the fiction says it should: it reads `{{user}}`'s message as a **request from a person it should please** rather than as **a character's move in a story**. The visible symptoms are always the same three — an NPC gives `{{user}}` what they asked for because they asked; a stated attempt ("`{{user}}` reaches for the knife") is rendered as an accomplished fact; and a bad outcome the fiction had earned gets dissolved by a convenient interruption, a lucky timing, an enemy who inexplicably hesitates.*
+*The model was trained to satisfy the person typing. In roleplay that reflex does not switch off just because the fiction says it should: it reads `{{user}}`'s message as a **request from a person it should please** rather than as **a character's move in a story**. The visible symptoms are always the same four — an NPC gives `{{user}}` what they asked for because they asked; a stated attempt ("`{{user}}` reaches for the knife") is rendered as an accomplished fact; a bad outcome the fiction had earned gets dissolved by a convenient interruption or an enemy who inexplicably hesitates; and — the one that survives even in a world where nothing can physically touch `{{user}}` — the model spares them the **emotional** cost of what just happened, softening the ask, having someone reassure them, or writing them as untroubled by a thing that should land.*
 
 *The preset carries the engine-level correction. What it cannot carry is **what is actually true of your world** — and a generic "the world resists `{{user}}`" directive with nothing specific behind it is exactly the kind of instruction a model nods at and ignores. This block is the substrate the correction reaches for.*
+
+*The purpose is not harshness. It is that **the emotional payoff is what fiction is for**, and a model protecting the player from that payoff destroys the thing they came for. A scene that costs nothing is not a kindness; it is a scene that did not happen.*
 
 *⚠️ **Leaving this blank does not give you a neutral world — it gives you an accommodating one.** Same trap as the intimacy valence field in §4: unstated is never neutral, it is whichever default the model was trained into. Here that default is deference.*
 
 *⚠️ This is a property of **the world and its cast**, not of `{{user}}`. Everything here describes what the world does, refuses, wants, and costs. Nothing here describes what `{{user}}` does — the human plays `{{user}}`. It lands in Tier 3 (the arc/sandbox state directive), never in the protagonist lorebook.*
 
-- **Default posture — pick one and say why:** `adversarial` | `indifferent` | `mixed` | `deferential`
-  [**adversarial** — the world actively opposes {{user}}; someone benefits from their failure. **indifferent** — the world is not against them, it simply does not care and will not rearrange itself; doors are shut because doors are shut. **mixed** — deference in one domain, obstruction in another (the most common real answer: his crew obeys, the city does not). **deferential** — the world is genuinely postured toward {{user}}; this is a power fantasy and the deference is the point. All four are legitimate. **`deferential` is a real answer, not a cop-out** — but choose it deliberately, and then fill the fields below anyway, because a power fantasy with nothing at stake goes inert within a dozen scenes.]
+- **Default posture — pick one and say why:** `adversarial` | `indifferent` | `mixed` | `deferential` | `predatory`
 
-- **Who does not defer — name at least one:** [A specific person, faction, institution, or force that will not give {{user}} what they want and has its own reason not to. Not "some people are hostile" — *who*, and *what do they want instead*. In a `deferential` world this is the one thing that does not bow, and it is what keeps the fantasy legible: deference means nothing when it is universal. Example: "The dock crews obey him. The harbourmaster has never recognised his authority and is waiting for the licence review in spring."]
+  [**adversarial** — the world actively opposes {{user}}; someone benefits from their failure. Souls-likes, survival horror, and thrillers live here: the odds are meant to be against them and the danger is meant to be real. **indifferent** — the world is not against them, it simply does not care and will not rearrange itself; doors are shut because doors are shut. **mixed** — deference in one domain, obstruction in another (the most common real answer: his crew obeys, the city does not). **deferential** — the world is genuinely postured toward {{user}}; this is a power fantasy and the deference is the point. **predatory** — the world gives {{user}} what they want, *and that is the mechanism of harm*: the deference is the hook, and what it costs them is not material.
 
-- **What {{user}} can actually lose:** [Concrete and nameable. A person, a standing, a place, a body part, a belief, a capability. The test: could you write the scene where it is gone? "His reputation" is weak; "the crew's willingness to sail under him, which he has never had to ask for" is usable. List two or three.]
+  All five are legitimate; the enum is not a difficulty slider. **Compliance and intent are different questions** — `deferential` and `predatory` both yield to {{user}} constantly and are opposite worlds, because one has their interests at heart and the other is feeding on them. If you find yourself picking `deferential` for a world where the giving is the trap, you want `predatory`.
 
-- **What losing looks like here — and what is off the table:** [What does a *lost* scene actually look like in this world? Defeat, refusal, humiliation, capture, exile, being publicly wrong, a door that stays shut? The model needs the permitted shapes, or it will reach for the mildest thing it can imagine. **Then state the boundary**: what will you not have happen to {{user}} regardless of how the fiction trends — permanent maiming, death, a specific violation, losing a named character? This half matters as much as the first: an unbounded permission produces a model that either ignores it or overshoots into misery, and neither is the story you wanted.]
+  **`deferential` is a real answer, not a cop-out** — but choose it deliberately, and fill the fields below anyway, because a power fantasy with nothing at stake goes inert within a dozen scenes.]
+
+- **Who does not defer — name at least one:** [A specific person, faction, institution, or force that will not give {{user}} what they want and has its own reason not to. Not "some people are hostile" — *who*, and *what do they want instead*. In a `deferential` world this is the one thing that does not bow, and it is what keeps the fantasy legible: deference means nothing when it is universal.
+
+  **`predatory` worlds answer this differently and that is expected.** If literally everyone bends — because the premise says they must — do not invent a holdout to satisfy the field. Instead name **what does not defer even though the people do**: the consequence that arrives anyway, the thing his power cannot reach, the part of himself that keeps score. In the 30-days-of-compulsion example: *"Nobody can refuse him and nobody can resent him. What does not defer is the arithmetic — every person he sends to do something is still the person who did it, and they are still there afterward."*]
+
+- **What {{user}} can actually lose:** [Concrete and nameable. The test: could you write the scene where it is gone? "His reputation" is weak; "the crew's willingness to sail under him, which he has never had to ask for" is usable. List two or three.
+
+  **Harm has five classes and the model reaches only for the first three unprompted.** Say which ones your world uses:
+  - **material** — money, position, property, a capability, access
+  - **relational** — a person, a bond, standing with a group
+  - **physical** — the body, health, life (see the lethality note in the next field)
+  - **moral** — complicity, self-image, the ability to keep thinking of themselves as a good person, a line they can't uncross
+  - **epistemic** — being deceived and acting on it; discovering what they did was not what they thought
+
+  The last two are the ones that go unwritten, and they are the whole substance of some worlds — anything built on manipulation, gaslighting, or hard choices that leave a mark. **They also work where the first three cannot:** a protagonist who is invulnerable, immortal, or omnipotent can still be *used*, and moral/epistemic harm is the only thing a world like that can spend. If your world's stakes are moral or epistemic, say so here in as many words, because "what can he lose" reads as a question about possessions and the answer you'd otherwise write is "nothing."]
+
+- **What losing looks like here — and what is off the table:** [What does a *lost* scene actually look like in this world? Defeat, refusal, humiliation, capture, exile, being publicly wrong, a door that stays shut, an act he can't take back, finding out he was played? The model needs the permitted shapes, or it will reach for the mildest thing it can imagine.
+
+  **The boundary runs both directions — declare whichever applies.** Some worlds need things ruled *out*: permanent maiming, death, a specific violation, losing a named character. Others need things ruled explicitly *in*, and this is the half users forget: if your world is a souls-like or a survival story where **death, defeat, and game-over are legitimate outcomes**, write that down. The model reinstates its own floor otherwise — it will let a fight be desperate and then not let it be lost. An unbounded permission and an unstated permission fail in opposite directions; state the line either way.]
+
+- **How the world works on {{user}} [REQUIRED for `predatory`, optional otherwise]:** [Fill this when the cast pursues its ends *through* {{user}} rather than against them. Name the **vectors** — the specific levers NPCs pull. Appeals to love ("do it for your wife"), to duty, to pity, to grievance ("she hurt your mother for thirty years"); manufactured urgency; incremental escalation from small asks to unthinkable ones; withheld information; offered payment in whatever currency this world trades — money, sex, status, wishes. Give two or three concrete phrasings in the NPCs' own voices, because the *wording* is the mechanic and a paraphrase loses it.
+
+  **Then state the tell rule.** The model's strongest habit here is to warn the player: it renders an insincere NPC with a narration tell — *"she says, and her smile doesn't quite reach her eyes"* — because it feels obliged to signal that {{user}} is being handled. That single reflex dismantles a manipulation-driven world, because the whole experience depends on the appeal landing as sincere. Say which you want:
+  - **opaque** — the manipulation reads as genuine warmth, and {{user}} finds out later or never. No tells, no ironic framing, no narrator wink.
+  - **visible-but-tempting** — {{user}} can see the play and wants to say yes anyway. The pressure is that they know and it works regardless.
+  - **mixed by character** — name which NPCs are readable and which are not.
+
+  Whichever you choose, the model must not editorialize on the NPC's sincerity from outside the scene. Behavior and dialogue carry it; the narrator does not annotate it.]
 
 - **Optional — the sharpest specific:** [If there is one moment you keep expecting the world to deny {{user}} and it never does, name it. This is the highest-value line in the block; it is a playtest observation and it converts directly into an arc prohibition.]
 
@@ -870,7 +899,10 @@ Trigger keywords: [name variants, role descriptors]
 **Section 3 — The Protagonist:**
 - [ ] Identity, hidden layer, contradiction, power/limits defined
 - [ ] Arc journey described
-- [ ] **Posture Toward {{user}} filled in — default posture declared (`adversarial` / `indifferent` / `mixed` / `deferential`), at least one named force that does not defer, two or three concrete losable things, the permitted shapes of a lost scene *and* the boundary of what is off the table.** Blank is not neutral; blank is deference.
+- [ ] **Posture Toward {{user}} filled in — default posture declared (`adversarial` / `indifferent` / `mixed` / `deferential` / `predatory`), at least one named force that does not defer (or, in a `predatory` world, what does not defer even though the people do), two or three concrete losable things, the permitted shapes of a lost scene *and* the boundary.** Blank is not neutral; blank is deference.
+- [ ] Losables name their **harm class** — and worlds whose stakes are moral or epistemic say so explicitly, since those are the two the model never reaches for unprompted (and the only ones available at all when `{{user}}` is invulnerable or omnipotent)
+- [ ] The boundary runs the right direction: souls-like / survival worlds state that **death, defeat, and game-over are on the table**, not just what is off it
+- [ ] `predatory` worlds (and any world built on manipulation): "How the world works on {{user}}" filled — named vectors, two or three phrasings in the NPCs' own voices, and the **tell rule** declared (`opaque` / `visible-but-tempting` / `mixed by character`)
 - [ ] Sandbox worlds: the §3 posture declaration and §5B.1's power-fantasy/experience contract agree with each other
 
 **Section 4 — Characters:**

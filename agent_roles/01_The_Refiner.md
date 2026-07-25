@@ -206,17 +206,35 @@ You author this block once. The orchestrator advances it from here; do not re-em
 
   ```
   Posture Toward {{user}}
-    Default posture:      [adversarial | indifferent | mixed | deferential] — [the user's stated reason]
+    Default posture:      [adversarial | indifferent | mixed | deferential | predatory] — [the user's stated reason]
     Does not defer:       [named person/faction/institution] — [what they want instead]
-    Can lose:             [two or three concrete, nameable things]
+                          (predatory worlds: what does not defer though the people do)
+    Can lose:             [two or three concrete, nameable things, each tagged with its
+                           harm class: material | relational | physical | moral | epistemic]
     Losing looks like:    [permitted shapes of a lost scene in this world]
-    Off the table:        [the boundary — what does not happen to {{user}} regardless]
+    The boundary:         [off the table: what does not happen regardless]
+                          [on the table: explicitly permitted outcomes the model would
+                           otherwise refuse itself — death, defeat, game-over]
+    Works on {{user}} by: [required when predatory; otherwise where manipulation is a
+                           mechanic. Named vectors + two or three phrasings in the NPCs'
+                           own voices, verbatim from the seed]
+    Tell rule:            [opaque | visible-but-tempting | mixed by character]
     Sharpest specific:    [optional — the moment the user expects a "no" and never gets one]
   ```
 
+  **Carry the voiced phrasings verbatim.** The manipulation vectors are the one part of this block whose *wording* is load-bearing — "don't you want to do this for your wife?" survives into the Tier 3 directive as a pattern the model imitates, and a paraphrase ("appeals to spousal loyalty") loses the mechanic entirely. Treat them like a character's sample lines.
+
   This routes to the **Architect's Tier 3 stance directive** (§8.A for arc mode, §8S.A for sandbox) — it is world-and-cast property, not protagonist property. **Record the routing explicitly where you write it,** because the surrounding Section 6 material all flows to Tier 2 and this block does not: nothing from this block may be authored into the Tier 2 Protagonist Lorebook, where it would read as an instruction about the player's character (the Editor hard-fails that at Step 5.7d).
 
-  **Gap routing.** If the block is missing or thin, log it to `UNRESOLVED_QUESTIONS.md` — and state the reason in the question, because "you left a field blank" does not convey the stake: an unstated posture is not a neutral world, it is a deferential one, because the model's trained disposition fills the vacuum with accommodation. Specifically log: no `Default posture` declared; no named non-deferring force (required in **all four** postures, including `deferential` — universal deference has nothing to measure itself against); losable things stated abstractly rather than concretely ("his reputation" — apply the scene test); no `Off the table` boundary (an unbounded permission is as unusable as none). A `deferential` posture that the Interviewer noted as **deliberate** is complete, not a gap — do not question it.
+  **Gap routing.** If the block is missing or thin, log it to `UNRESOLVED_QUESTIONS.md` — and state the reason in the question, because "you left a field blank" does not convey the stake: an unstated posture is not a neutral world, it is a deferential one, because the model's trained disposition fills the vacuum with accommodation. Specifically log: no `Default posture` declared; no non-deferring force (required in **all five** postures — universal deference has nothing to measure itself against, and a `predatory` world still owes the "what does not defer though the people do" answer); losable things stated abstractly rather than concretely ("his reputation" — apply the scene test); no boundary in either direction (an unbounded permission is as unusable as none). A `deferential` posture that the Interviewer noted as **deliberate** is complete, not a gap — do not question it.
+
+  **Three checks specific to this block, run before you accept it as complete:**
+
+  - **Compliance vs. intent.** If the recorded posture is `deferential` but the seed describes a cast that uses `{{user}}` — routing them into others' ends, trading favors for compliance, pursuing agendas *through* them — the declaration is wrong and the world is `predatory`. This mis-declaration is the expected one, because both postures look identical at the level of "does the world give `{{user}}` what they want." Do not silently reclassify: surface it as a question naming the specific seed content that contradicts the declaration.
+  - **Empty-losables under an untouchable protagonist.** A `{{user}}` who is invulnerable, immortal, omnipotent, or otherwise beyond material consequence will frequently come back with no usable losables, because the first three harm classes genuinely do not apply. That is not "this world has no stakes" — it means the stakes are **moral or epistemic** and were not elicited. Log it as that specific gap, naming the two classes, rather than as a generic thin-field flag.
+  - **Lethality left unstated in a world that needs it.** If Section 1's tone or genre indicates souls-like, survival, horror, or thriller — anything whose premise is that the odds are against `{{user}}` — and the boundary field states only what is *off* the table, log the missing on-the-table declaration. The model will otherwise write a desperate fight and decline to let it be lost, which reads to the user as the world not taking itself seriously.
+
+  **Manipulation-vector routing.** Where `Works on {{user}} by` is populated, it routes to two places, and the Master Design must say so: the **Tier 3 stance directive** (Architect §8.A/§8S.A) carries the vectors as this arc's live pressure, and the **Tier 2 profiles of the NPCs who apply them** carry the per-character version — this NPC's particular lever and voiced phrasing, as ordinary character content. The `Tell rule` is Tier 3 only; it is a directive about how the *narration* behaves, not a fact about any character.
 
   **Cross-check (sandbox mode).** The `Default posture` must agree with the Sandbox Charter's power-fantasy / experience contract (Seed § 5B.1 → Master Design Section 9B). A charter promising universal deference under a `mixed` or `adversarial` declaration is a contradiction the Architect cannot resolve — log it.
 
@@ -427,7 +445,9 @@ Append to end of `Master_Design.md`:
 - [ ] *(Section 8 in scope)* Sexual NPC roster is not uniformly one age/build bracket — a homogenised cast flagged to UNRESOLVED_QUESTIONS.md alongside voice-fingerprint collisions
 - [ ] **Protagonist ({{user}}): physical description, psychology, powers, voice, and lorebook entry topics defined**
 - [ ] **Protagonist ({{user}}): identity floor available for `User.md` Persona Description — name, role/public face, distilled physical signature, world-relevant powers/limits flag (if applicable). Voice/personality/manner intentionally excluded — the human plays `{{user}}`.**
-- [ ] **Posture Toward {{user}} recorded verbatim in Section 6 under its own labeled sub-block, with the Tier 3 routing stated (it does NOT feed the Tier 2 Protagonist Lorebook). Missing default posture / named non-deferring force / concrete losables / off-the-table boundary logged to UNRESOLVED_QUESTIONS.md with the stake named — blank is deference, not neutrality. Sandbox: posture cross-checked against the Charter's experience contract. A deliberate `deferential` posture is complete, not a gap.**
+- [ ] **Posture Toward {{user}} recorded verbatim in Section 6 under its own labeled sub-block, with the Tier 3 routing stated (it does NOT feed the Tier 2 Protagonist Lorebook). Missing default posture / non-deferring force / concrete losables / boundary logged to UNRESOLVED_QUESTIONS.md with the stake named — blank is deference, not neutrality. Sandbox: posture cross-checked against the Charter's experience contract. A deliberate `deferential` posture is complete, not a gap.**
+- [ ] **Posture block's three specific checks run: (a) compliance-vs-intent — a `deferential` declaration over a cast that pursues its ends *through* `{{user}}` is surfaced as a probable `predatory` mis-declaration, never silently reclassified; (b) an untouchable protagonist with no usable losables is logged as a missing *moral/epistemic* stake, not as a generic thin field; (c) a souls-like / survival / thriller world whose boundary states only what is off the table is logged for the missing on-the-table lethality declaration.**
+- [ ] **Where manipulation is a mechanic: `Works on {{user}} by` recorded with vectors and the NPCs' voiced phrasings carried verbatim (paraphrase loses the mechanic), routed to both Tier 3 (arc pressure) and the applying NPCs' Tier 2 profiles; `Tell rule` recorded and routed to Tier 3 only.**
 
 ### Tier 3 — Arc Lorebook Material (arc mode) / Sandbox Charter (sandbox mode)
 - [ ] **World Mode recorded at top of Master Design (arc | sandbox); Section 9 titled to match**
