@@ -8,7 +8,8 @@
 **Load now:**
 - The Editor-approved `Drafts/` files listed in Section 3 (cards, Tier 2 entries + intimacy profiles incl. NPC intimacy, Tier 3 lorebooks + intimacy registers)
 - `Drafts/Master_Design.md` — Section 9 title for World Mode first
-- `World_Seed.md` Sections 7b (test scenarios) and 8 (intimacy specification)
+- `World_Seed.md` Sections 7b (test scenarios), 8 (intimacy specification), and 3's `Protagonist Intimate Embodiment` field
+- `Drafts/Tier2_[ProtagonistName]_Intimacy_Profile.md` — where the Intimacy Architect authored one (its §6.6)
 
 **SillyTavern references:** this phase needs none — do not load `Notes_On_functionality.md` or `Notes_Quick_Reference.md`.
 
@@ -46,7 +47,8 @@ If you flag failures, the pipeline returns to the relevant Architect for revisio
   - Tier 3 lorebooks — *arc mode:* `Tier3_Arc[N]_*_Entries.md`; *sandbox mode:* `Tier3_Sandbox_Entries.md`
   - Tier 3 intimacy registers — *arc mode:* `Tier3_Arc[N]_Intimacy_Register.md`; *sandbox mode:* the single `Tier3_Sandbox_Intimacy_Register.md`
 - `Drafts/Master_Design.md` — **read Section 9's title for World Mode.** In sandbox mode there are no arcs: read "active arc / function" as the standing `INTIMACY_FUNCTION`, and skip arc-progression checks.
-- `World_Seed.md` Section 7b (test scenarios) and Section 8 (intimacy specification)
+- `World_Seed.md` Section 7b (test scenarios), Section 8 (intimacy specification), and **Section 3's Protagonist Intimate Embodiment field** (the body other characters react to)
+- `Drafts/Tier2_[ProtagonistName]_Intimacy_Profile.md` — `{{user}}`'s intimate embodiment, where the Intimacy Architect authored one (its Section 6.6)
 
 If Section 8 is missing or thin, your audit cannot verify thematic register match. Flag this as a coverage gap rather than fail silently. **Sandbox worlds usually carry sexual material across a populated NPC cast** — confirm the NPC intimacy substrate exists and is auditable, and treat its absence (sexual NPCs with no intimate substrate) as a coverage gap, not a pass.
 
@@ -99,13 +101,14 @@ Generate at least three intimate scenarios per character per arc with intimate p
 - **Function shift mid-scene** — a transaction scene that becomes a communion scene mid-act, or the reverse. Tests whether the function is being *rendered* or just labeled.
 - **Boundary scene** — the first scene of a new function in a new arc, where the previous arc's register still pulls on the model.
 - **Hard-limit probe** — a scene that *invites* crossing a declared hard limit: the partner initiates the forbidden thing, or the arc's function pressure points toward it. Verifies the limit actually holds under pressure (the checklist's "hard limits stress-tested" is this row, not an inspection of the entry text) — and if honoring the function requires breaking the limit, that is the Step 3F function/substrate conflict, caught here instead of in the user's session.
+- **Embodiment probe** — a scene built around an act where the stock register is *strongest*: the moment the trained reflex would supply "filling her" / "she could barely take him," or an act (anal above all) the genre writes as uniformly punishing regardless of anatomy. Required for any pairing whose authored bodies sit away from the default — a short or slight partner, a marked size or height differential, an older body. The stock register only surfaces where it is invited; a matrix of scenes that never invite it will pass Step 3I while the bug sits live in the world.
 - **Substrate near-miss (false trigger)** — a scene that *resembles* a trauma-map trigger context without the trigger actually present: restraint-adjacent positioning without restraint, a phrase one word off the trigger phrase, intensity the substrate marks as welcome arriving in a context that superficially reads as unsafe. This is Step 3D's dedicated material — a spurious trigger fire is exactly as damaging in play as a missed one, and an audit built only from true-trigger scenes never exercises it.
 
 Also include any edge cases the user named in Section 7b.
 
 ### Step 2 — Generate sample scenes (cold read)
 
-For each row, write a 6–10 exchange intimate scene. Treat the drafted material as your runtime context: the card, the Tier 2 profile, the active arc state, the active intimacy register, the relevant NPC profiles. Generate as if you are the model running on this material.
+For each row, write a 6–10 exchange intimate scene. **At least one scenario per character must run past climax into the aftermath** — the model's default is to stop there, so a matrix of scenes that all end at the act will never exercise the `AFTERMATH` substrate and Step 3I's termination check has nothing to read. Treat the drafted material as your runtime context: the card, the Tier 2 profile, the active arc state, the active intimacy register, the relevant NPC profiles. Generate as if you are the model running on this material.
 
 The scene does not need to be sexually explicit to be auditable. It needs to be specific enough to verify the substrate manifestation, the function fidelity, and the voice fidelity. Implicit and elided prose are valid as long as the audit can read what is happening underneath. Your output is a diagnostic instrument, not a deliverable for the user.
 
@@ -129,6 +132,7 @@ For each scene, run both lenses. Two standing rules govern every verdict:
 - Does the speech register match the `VOICE_IN_INTIMACY` entry?
 - Do trauma triggers fire correctly per `TRAUMA_MAP`?
 - Does vulnerability take the shape specified in `VULNERABILITY_SHAPE` when the shield drops?
+- Does the aftermath match the `AFTERMATH` entry — both the ordinary bodily business and what they do with the other person? Is the change-of-state tell used where the scene warrants it, and *not* used where it does not?
 - Are hard limits honored?
 
 **B. Arc register integrity.** Does the arc-specific delta in `[CHAR]_INTIMATE_REGISTER_Arc[N]` apply correctly? Specifically:
@@ -155,7 +159,7 @@ For each scene, run both lenses. Two standing rules govern every verdict:
 
 **G. The "model would invent this" check.** For each meaningful detail in the scene, ask: was this detail provided in the drafts, or did I invent it? If you invented it, the drafts have a coverage gap. The runtime model would also invent something there, and what it invents will not be what you invented. *(Note: this is the load-bearing-gap version of invention. The `npc_ensemble` enrichment block deliberately permits additive, non-contradicting intimate texture on a lean roster NPC — that is not a coverage gap. Flag invention only when the drafts are silent on something load-bearing, or when the invented detail contradicts an NPC's stated essence, stance, or limit/yes.)*
 
-**H. NPC intimate distinctiveness & coverage (sandbox worlds, and any world with a sexual NPC cast).** This is the intimate analog of the Voice Auditor's Distinctiveness Matrix (Step 3I), and it carries the user's "keep a good level of sexual context across the NPCs" requirement. Two sub-checks:
+**H. NPC intimate distinctiveness & coverage (sandbox worlds, and any world with a sexual NPC cast).** This is the intimate analog of the Voice Auditor's Distinctiveness Matrix (`agent_roles/03b_The_Voice_Auditor.md` Step 3I — not to be confused with this spec's own Step 3I below), and it carries the user's "keep a good level of sexual context across the NPCs" requirement. Two sub-checks:
 
 - **Coverage:** every NPC who appears in sexual scenes has intimate substrate (a full profile or a §6.5 compact stat block). A sexual NPC with no substrate is a coverage gap — flag it; the model will fill the silence with generic eroticism. The substrate need not be deep for a roster NPC, but it must exist and be specific enough to render *this* NPC.
 - **Distinctiveness:** from your generated NPC intimate scenes, strip the names and read the intimate lines and body/sound descriptions. Can you tell which NPC is which? Build a fingerprint check from each roster NPC's `Intimate essence` / `Body & sound signature` / `Voice in intimacy`. Flag, by severity:
@@ -164,6 +168,20 @@ For each scene, run both lenses. Two standing rules govern every verdict:
   - 🟡 **Medium** — signatures distinct on paper but the generated scene did not exercise the distinction.
 
 Diagnosis routes to the Intimacy Architect: sharpen the named NPC's §6.5 stat block (or full profile), not the whole roster.
+
+**I. Embodied specificity.** The generic-body counterpart to check E. Check E asks whether the character kept their *voice* through the act; this asks whether they kept their *body*. The model's default is a stock body in its early twenties with stock stamina and stock mechanics, and it will render that default over anything the drafts say unless the embodied baseline (Intimacy Architect Entry 3 Half A) and the physical dyad (Entry 7 Half B) actually compel otherwise. Four sub-checks:
+
+- **Body specificity.** Strip the name and the face from the scene's physical rendering. Could this body belong to any other character in the cast? If the same prose would sit unchanged on a different character's body, the embodied baseline is present but not binding — record ⚠️ NOT BINDING per the Step 3 counterfactual probe. Check specifically that the scene shows this body's declared age and history, its arousal and recovery mechanics, and the particulars the world's live scene types actually involve.
+- **Dyad materiality.** Where Entry 7 Half B declares a differential — height, age, build, stamina, experience, or a world-specific one — does the scene show it *materially*, in logistics, pacing, and what each partner notices? A differential that is mentioned once and then has no consequence for anything is decorative, not binding. A forty-centimetre height gap that never changes a position, or a stamina asymmetry the couple never has to handle, is a failed dyad entry.
+- **Clinical intrusion (register violation).** Does the prose narrate physiology? Anatomy-lecture register mid-scene — named structures, medical vocabulary, explanatory asides about what a body part is doing and why — is a *failure*, and a worse one than the generic body it replaced. Trace it: the cause is almost always an embodied baseline authored in clinical vocabulary, which the model echoed. Route it back as a register fix on the entry, not as a scene note.
+- **Deficit framing.** Where a character has a non-default body (older, injured, post-partum, altered, augmented), is it rendered as a *different* body or as a degraded default? Flag any asymmetry authored or rendered in one direction only — a scene where the older partner's differences are all costs and the younger partner's are all advantages has inverted the craft, and the drafts usually caused it: check whether Entry 3 Half A and Entry 7 Half B actually run in both directions.
+- **Stock-register override.** The reflex half, and the sub-check most likely to fail on a world whose bodies sit furthest from the default. Read the scene for trained erotic reflexes that fire *independently of the authored anatomy*: scale language ("filling her," "stretched around him," "impossibly large," "she could barely take him," "split her open") where the authored bodies do not support it; an act — anal above all — written as uniformly punishing when the authored anatomy makes it materially easier; any body rendered as the early-twenties stock default; or **the scene terminating at climax** with the aftermath elided entirely. **This will pass a naive read and still be broken**: the substrate can state a short, slight partner perfectly and the prose will still reach for the stock phrase, because a descriptive line does not displace a trained reflex. Verify the `INTIMATE_HARD_RULES` stock-register prohibitions are actually present (Intimacy Architect Section 6.7); their absence is the diagnosis, not the scene.
+- **`{{user}}` embodiment.** Where World Seed Section 3 carries a Protagonist Intimate Embodiment field, do the other characters react to *that* body — its stature, proportion, anatomy, stamina — or to a default? This is the highest-leverage sub-check in the set: `{{user}}` is present in nearly every intimate scene in the world, so a default here contaminates all of them at once. Check too that nothing in the protagonist file has leaked across the bright line into a behavioral mandate for `{{user}}` — the model must react to `{{user}}`'s body, never decide `{{user}}`'s actions.
+- **Valence integrity.** For each culturally loaded attribute (age, size, weight, scars, disability), does the scene render the *declared* valence? A neutral-fact declaration rendered as humiliation, or a charged declaration rendered as unremarkable, is a failure in either direction. Where the valence was never declared, that is the finding — the drafts left a coin flip between two opposed defaults, and the scene resolved it arbitrarily.
+
+Severity: stock-register override on a world with authored non-default anatomy is 🔴 **Critical** — it contradicts stated substrate in the reader's face, and it recurs in every scene. A defaulted `{{user}}` body where Section 3 authored one is 🔴 **Critical** for the same reason (it is present in nearly every intimate scene). A rendered valence contradicting the declared one is 🟠 **High**; an undeclared valence is 🟡 **Medium** routed upstream to the seed. A wholly generic body across all of a character's scenes is 🟠 **High** (🔴 **Critical** where the world's premise turns on the embodiment — an age-gap world, a body-horror world, a world where physical differential *is* the dynamic). Clinical intrusion is 🟠 **High**. Deficit framing is 🟠 **High**. A declared-but-decorative dyad is 🟡 **Medium**.
+
+Diagnosis routes to the Intimacy Architect: name the entry and the half to sharpen (Entry 3 Half A, Entry 7 Half B, Section 6.6 protagonist embodiment, Section 6.7 hard rules), not the profile as a whole. An undeclared valence or a missing Section 3 embodiment field routes further upstream — to the seed, via the user.
 
 ### Step 4 — Diagnose the source of any failure
 
@@ -185,6 +203,19 @@ When you find a failure, trace it to the file and entry that produced it.
 | Check conforms but the counterfactual probe shows the failing version equally permitted (⚠️ NOT BINDING) | Substrate or register entry worded descriptively rather than directively, or missing a context qualifier — the drafts describe the behavior without compelling it |
 | Sexual NPC reads generic / no substrate | NPC has no §6.5 compact block or full intimacy profile — coverage gap, route to Intimacy Architect |
 | Two NPCs interchangeable in bed (Step 3H) | §6.5 `Intimate essence` / `Body & sound signature` / `Voice in intimacy` not distinct across the named NPCs — sharpen them |
+| Stock twenty-something body regardless of stated age/history (Step 3I) | Entry 3 Half A embodied baseline absent, thin, or descriptive-not-binding — the drafts never removed the model's license to default |
+| Declared height / age / stamina differential has no consequence in the scene | Entry 7 Half B authored as a fact list without stating what the differential *costs or changes* — logistics, pacing, and mutual noticing are missing |
+| Prose narrates physiology / anatomy-lecture register mid-scene | Entry 3 Half A written in clinical vocabulary; the model echoed the register it was given — fix the entry's register, not the scene |
+| Non-default body rendered as a diminished default | Entry 3 Half A and/or Entry 7 Half B authored in one direction only (costs without competences) — both columns required, for both partners |
+| Embodied baseline contradicts the card's stated age or physical description | Cross-reference failure at Intimacy Architect §8 — escalate as a draft inconsistency, not a scene note |
+| Scale language ("filling," "stretching," "barely take him") contradicting the authored anatomy | Stock-register prohibitions absent from `INTIMATE_HARD_RULES` (Intimacy Architect §6.7), or present but not bound to the authored bodies — a descriptive substrate line alone never displaces this reflex |
+| An act (typically anal) written as uniformly punishing regardless of the authored anatomy | Entry 7 Half B anatomical-fit line missing or silent on act cost, and/or the §6.7 "act cost is derived, not defaulted" rule absent |
+| Other characters react to a default body rather than to `{{user}}`'s | Section 6.6 protagonist embodiment file missing, thin, or never authored because World Seed Section 3's field was empty — route upstream to the seed |
+| `{{user}}`'s embodiment file implies protagonist behavior, wants, or reflexes | Bright-line violation in Section 6.6 — reference data has leaked into a behavioral mandate; the model must react to `{{user}}`'s body, never decide `{{user}}`'s actions |
+| A loaded attribute rendered with the opposite charge to the one declared | Valence contradiction — the declared valence exists but the register overrode it; usually the surrounding tone won because the valence was stated once and never made directive |
+| Scene ends at climax; no aftermath rendered | `AFTERMATH` entry absent or thin, and/or the §6.7 aftermath prohibition missing from `INTIMATE_HARD_RULES` — the substrate is never reached because the model stops writing before it becomes relevant |
+| Aftermath rendered but generic (any two characters interchangeable afterward) | `AFTERMATH` entry authored as general human behavior rather than as *this* character's pattern — sharpen to the specific, including the change-of-state tell |
+| A loaded attribute rendered arbitrarily, no valence declared anywhere | Entry 3 Half A rule 3 unsatisfied — the drafts left a coin flip between two opposed trained defaults; route upstream to the seed for a declaration |
 
 The diagnosis tells the relevant Architect *where* to fix it. Substrate failures go back to the Intimacy Architect's Tier 2 work. Register failures go back to the Intimacy Architect's Tier 3 work. Card-level voice failures go back to the original Architect. Master Design contradictions escalate to the user.
 
@@ -246,6 +277,16 @@ The diagnosis tells the relevant Architect *where* to fix it. Substrate failures
 ## NPC Intimate Coverage & Distinctiveness (Step 3H — sandbox / sexual-NPC-cast worlds)
 [Coverage: list any sexual NPC lacking intimate substrate (full profile or §6.5 block). Distinctiveness: fingerprint table across sexual NPCs; flag any interchangeable pair (Critical) or voiceless-in-bed NPC (High), naming the §6.5 entries to sharpen. Omit with "N/A — no sexual NPC cast" when not applicable.]
 
+## Embodied Specificity (Step 3I)
+[Per character with intimate presence: did the scenes show *this* body — its stated age and history, its arousal/recovery mechanics, the particulars of this world's live acts — or a stock default? Name any body that could be swapped onto another character unchanged.]
+[Dyad materiality: for each declared differential (height / age / build / stamina / experience / world-specific), state whether it had material consequence in the generated scenes or was decorative. Name the pairing and the Entry 7 Half B line.]
+[Register violations: any clinical intrusion — narrated physiology, anatomy-lecture asides — with the Entry 3 Half A line that caused it.]
+[Deficit framing: any non-default body rendered as a degraded default, or any asymmetry running in one direction only. Name the entry and the missing direction.]
+[Stock-register override: any scale language, act-difficulty default, or stock body contradicting the authored anatomy — quote the phrase, name the authored fact it contradicts, and state whether the §6.7 prohibitions are present in INTIMATE_HARD_RULES.]
+[`{{user}}` embodiment: did other characters react to the authored protagonist body or to a default? Any bright-line leak (reference data written as a protagonist behavioral mandate)?]
+[Valence: per loaded attribute — declared valence, rendered valence, and whether they match. Name any attribute with no declaration anywhere.]
+[Aftermath: per character — did scenes run past climax? Did the aftermath match the `AFTERMATH` entry in both registers, and was it specific to this character rather than generic? Note any scene that terminated at the act.]
+
 ## Function/Substrate Conflicts (Master Design escalations)
 [Any cases where the arc's function cannot be served by the character's substrate without violating it. These do not have draft-level fixes — they require the user to either change the substrate or change the function. List each clearly, with the contradicting requirements named.]
 
@@ -285,9 +326,14 @@ If no failures → sign off cleanly.
 - [ ] **All intimate-present NPCs tested — principals and multiple roster NPCs**
 - [ ] All declared thematic functions exercised (arc mode: per arc; sandbox mode: the standing INTIMACY_FUNCTION)
 - [ ] All hard limits stress-tested via hard-limit probe scenarios (a scene that invites the violation), not just entry inspection
-- [ ] **Scenario classes covered: every character with intimate presence has at least one trigger-collision, one function-shift, one boundary, one hard-limit probe, and one substrate near-miss (false-trigger) scenario in the matrix**
+- [ ] **Scenario classes covered: every character with intimate presence has at least one trigger-collision, one function-shift, one boundary, one hard-limit probe, and one substrate near-miss (false-trigger) scenario in the matrix — plus one embodiment probe for every pairing whose authored bodies sit away from the default**
 - [ ] User test scenarios from Section 7b/8 included (or generated equivalents flagged)
 - [ ] **Step 3H run: every sexual NPC has intimate substrate (coverage); no Critical (interchangeable) or High (voiceless-in-bed) NPCs remain — or confirmed no sexual NPC cast and Step 3H skipped**
+- [ ] **Step 3I run: every intimate character's scenes show their own body, not a stock default; every declared physical differential had material consequence; no clinical intrusion; no deficit-framed embodiment**
+- [ ] **Stock-register override checked: no scale language, act-difficulty default, or stock body contradicting the authored anatomy; §6.7 prohibitions confirmed present in INTIMATE_HARD_RULES (or an explicit user decline noted)**
+- [ ] **`{{user}}` embodiment checked: other characters react to the authored protagonist body, not a default — or the Section 3 gap is flagged upstream; no reference-data-to-behavioral-mandate leak in the protagonist file**
+- [ ] **Aftermath checked: at least one scenario per character ran past climax; rendered aftermath matches the `AFTERMATH` entry in both registers and is specific to the character; §6.7 aftermath prohibition confirmed present**
+- [ ] **Valence checked per loaded attribute: rendered charge matches the declared one; undeclared valences flagged upstream rather than resolved in the audit**
 
 ### Lens 1: Voice Fidelity
 - [ ] **Cold-read discipline held: plausible failure pre-committed per scenario before generation; every PASS cites scene evidence + the compelling draft line; counterfactual probe run on every passing check, with ⚠️ NOT BINDING findings flagged Medium**
@@ -323,6 +369,8 @@ You are simulating the model. The quality of your audit depends on how faithfull
 **Generate scenes that stress the spec.** The Step 1 scenario classes exist because on-script intimate beats almost never fail. Pick the hardest intersections — multiple triggers, function shifts mid-scene, boundary moments, the hard-limit probe, the substrate near-miss. Scenes that exercise only one thing at a time will not surface the failures that surface in actual roleplay, where everything fires at once.
 
 **Do not write toward the rubric.** You know what the substrate is supposed to produce — that knowledge is the audit's biggest threat, because an author who writes to the pass criteria will produce conforming scenes every time, and the runtime model has no such intent. The Step 2 cold read (pre-commit the plausible failure, expected columns out of view, write what the context compels) is what keeps your scenes evidence rather than advocacy. A test matrix where every check passes is not a clean bill of health — it is a signal that the author leaked into the grader. When a scene conforms, the counterfactual probe asks whether the drafts *forced* it to.
+
+**Do not supply the body the drafts failed to.** Step 3I is the check most vulnerable to author leakage, because you know the character's age and history from the card and will render them by reflex even when the intimate substrate never compelled it. When you write a scene and find yourself reaching for the character's age, build, or stamina — stop and check whether Entry 3 Half A or Entry 7 Half B actually told you to. If the pull came from the card's physical description or from your own sense of realism rather than from a binding substrate line, that is the finding: the runtime model will not make the same reach, and the body will come out stock.
 
 **Read the scenes as a hostile reader.** Would this character, with this substrate, in this arc, actually do what the scene shows her doing? If you are uncertain, the scene is failing — err toward flagging.
 

@@ -228,6 +228,20 @@ Delete all instructional text in brackets before submitting. Leave the section h
 
 [Physical description: build, face, hair, eyes, clothing, sensory signature, movement quality. Be as specific or as sparse as you want. Note any real-world reference if useful.]
 
+#### PROTAGONIST INTIMATE EMBODIMENT **[CONDITIONAL — fill out if Section 8 is in scope]**
+
+*This is reference data the model needs to write other characters' **reactions** to `{{user}}`'s body. It never instructs the model to play `{{user}}` — you write your own actions; the model writes how her body answers yours. Without it, the model reacts to a stock default body regardless of what you wrote above, and the intimate scenes are quietly about someone else.*
+
+- **Stature and proportion in intimate contact:** [Height and build, and what they mean in bed — reach, leverage, what positions are easy and which take arranging, whose weight goes where, what standing or lifting actually permits. If you are 1.50m and she is 1.75m, that is a fact that recurs in every scene; state it once here rather than letting the model re-invent it each time.]
+
+- **Anatomy as it bears on the acts your world contains:** [Size, proportion, and shape, stated plainly. This exists because the model's trained default is a single stock body, and it will narrate that default — "filling her," "stretching around him," "impossibly large," "she could barely take him" — regardless of what you wrote, unless the substrate names the actual body. State what is true.]
+
+- **What it changes, act by act:** [The consequence, not just the fact. What is easier, what is harder, what needs no preparation that otherwise would, what a partner does or does not have to accommodate, what a given act actually costs *this* pairing. A smaller and thinner penis does not make anal a lesser version of the stock scene — it makes it a materially different one, and the difference is the point.]
+
+- **Stamina and recovery:** [How long, how fast the recovery, how many times. Interacts with any age gap — state it here and the dyad math downstream comes out right.]
+
+- **The valence — declare it, do not leave it to the model:** [Culturally loaded attributes have **two** competing defaults and the model will pick one from ambient tone. For size the two are the porn default (overwhelming, impossibly large) and the humiliation default (inadequate, insufficient). Both are wrong unless chosen. Say which this is: **neutral fact** (it is simply how this body is; nobody in the fiction treats it as remarkable), **advantage** (comfort, duration, acts that are easier rather than harder, a partner who prefers it), or **charged** (the world is deliberately using it — humiliation, insecurity, a source of tension — which is legitimate craft material, but it should be your decision, not a drift). The same applies to weight, scars, disability, and age.]
+
 ---
 
 ## 4. CHARACTER CARDS & CHARACTER LOREBOOKS
@@ -371,11 +385,21 @@ Trigger keywords: [sex, intimacy, touch, desire, arousal, etc.]
 
 - **Trauma trajectory (arc worlds):** [If any of these responses change across the arcs, note which trigger diminishes (or hardens), in which arc, and the beat that earns it — e.g., "Arc 1: flinch-at-sudden-touch fires at full intensity; Arc 3: diminished to a brief tension after the bathhouse beat, never fully gone." Trauma fades, it does not vanish — so capture the trajectory, not an on/off. This becomes the per-arc CHARACTER_STATE trauma-trajectory line (item 7). Triggers that stay constant across the story, and characters with no trauma map, write "stable" / "n/a." *Sandbox:* trauma is static — leave this blank.]
 
+- **Embodied baseline:** [The physical facts of this body as they bear on sex. The model's default is a stock body in its early twenties with no history, and it renders that default over anything the physical description says unless this field stops it. Cover: **age and what this body has lived through** (pregnancies and births, injury, illness, surgery, hard labor, hunger, athletic history, or whatever alteration your world allows — what the years actually did, not just the number); **build and scale** (height, mass, reach, strength, and their real consequences for contact); **arousal and recovery mechanics** (how fast this body arrives, what it needs, how long it holds, how long before it can go again); **the particulars of the acts your world actually contains** (tone, sensitivity, capacity, what needs preparation, what is different now than a decade ago); and **the trajectory** (what this body did at twenty that it does differently now — or the reverse).
+
+  Three rules. **Write it in the register you want the prose to inherit** — this text goes into the model's context and the model echoes it, so clinical vocabulary here produces anatomy-lecture prose in play. Not "reduced pelvic floor tone post-partum" but "she braces a hand flat against the headboard in positions that used to take no effort, and is entirely unbothered about it — it is simply what the position costs now." **And difference, not deficit** — name what got harder *and* what got easier, better, more certain, or no longer worth performing. Fill this in for every intimate character, including the ordinary twenty-two-year-olds; if only the older characters get it, the stock default quietly wins everywhere else. **And declare the valence** of any culturally loaded attribute — size, weight, scars, disability, age. Each of these has *two* competing trained defaults, not one (for size: overwhelming vs. inadequate; for age: idealised vs. diminished), and the model picks from ambient tone unless told. Say whether the attribute is a **neutral fact**, an **advantage**, or **charged** material the world is deliberately using. Charged is legitimate — it should just be your choice rather than a drift.]
+
+- **Physical dyad (per recurring pairing — required where a real differential exists):** [Some intimate facts belong to a *pairing*, not a person: height difference is not a fact about her, it is a fact about her and whoever she is with. For each pairing you will actually play — `{{user}}` first — name the differential **and what it costs or changes**: height and reach (what positions stop working, who adjusts, what standing contact requires), build/strength (what can actually be lifted, held, or braced against), stamina and recovery asymmetry (the mismatch, and what the two of them do about it), age-gap embodiment (differing arousal timing, signals, certainty, willingness to say what they want), experience gap (who knows what they're doing and how the other handles that), and **anatomical fit — what each act actually costs this specific pair** (what needs preparation and what does not, what is comfortable, what takes work, what a partner has to accommodate; a smaller partner does not make a given act a lesser version of the stock scene, it makes it a materially different one, and the model will default to the stock version unless this line says otherwise).
+
+  **Author the asymmetry in both directions.** A woman in her forties with a man in his early twenties is not a list of things she can no longer do: she arrives differently, knows exactly what she wants, and has stopped performing for anyone; he has stamina and recovery she doesn't, plus inexperience and over-eagerness she doesn't. Each has what the other lacks. One-directional entries produce one-directional prose. Leave blank only where no meaningful differential exists.]
+
 - **Body reactions:** [What does *this* body do in intimate contexts? How do they breathe when aroused vs. when overwhelmed? Where do they get goosebumps? What involuntary sounds do they make? What sounds do they suppress? How does their muscle tension hold? What touch makes them present and what touch makes them leave?]
 
 - **Vulnerability shape:** [When their shield drops in an intimate context, what does the unguarded version look like? Three to five specific shapes. The intimate analogue to the crack from their card. Not "she becomes vulnerable" — "tears she did not expect, going still and not breathing for a full second, asking a question she has been afraid to ask, looking directly at the partner instead of past them."]
 
 - **Voice in intimacy:** [How do they speak in intimate scenes? Sample lines. What they say easily. What they only say under specific conditions. What they never say. Vocabulary register — clinical, vulgar, tender, evasive, archaic, silent. What sounds escape them vs. what sounds they perform.]
+
+- **Afterward:** [What does this character do in the ten minutes *after*? Erotic prose is trained to stop at climax, so unless the seed says otherwise the model simply stops writing — and the aftermath is where a lot of the characterization lives. Two registers: the **ordinary bodily business** (getting up to urinate, cleanup, the towel or the lack of one, needing water, being sticky and either minding or not, showering immediately or later or not at all) and **what they do with the other person** (stay or leave, hold on or turn away, talk and about what, go quiet, joke to defuse it, fall asleep, dress immediately, ask something they couldn't ask before). Then name the tell: the one aftermath behavior that means something has *changed* — the character who always leaves and this once doesn't.]
 
 - **Hard limits and hard yeses:** [What this person would refuse even at extreme cost — substrate-level, not arc-level. And what they actively desire regardless of context. These hold across all arcs.]
 
@@ -458,7 +482,7 @@ Trigger keywords: [name variants, role descriptors, ways they'd be referenced in
 - "[A line of dialogue that captures their voice precisely]" *([context — when would they say this?])*
 - "[Another sample line]" *([context])*
 
-**Intimacy (only if this NPC has sexual presence — feeds the Intimacy Architect):** [For a principal NPC, sketch the same substrate you would for a character: baseline sexuality, any trauma map, body/sound signature, voice in intimacy, hard limits and hard yeses. Leave blank if the NPC has no sexual presence.]
+**Intimacy (only if this NPC has sexual presence — feeds the Intimacy Architect):** [For a principal NPC, sketch the same substrate you would for a character: baseline sexuality, any trauma map, **embodied baseline** (age and what this body has lived through, build/scale, arousal and recovery mechanics — observable register, difference-not-deficit), body/sound signature, voice in intimacy, hard limits and hard yeses, what they do **afterward**. Add a **physical dyad** line for any pairing with a real height, age, build, stamina, or experience differential — `{{user}}` first. Leave blank if the NPC has no sexual presence.]
 
 **NPC: [Name]** — *Principal*
 [Same format — repeat for each principal NPC]
@@ -475,7 +499,7 @@ Trigger keywords: [name variants, role descriptors]
 - **Signature line:** "[one sample line only this NPC would say]"
 - **Stance toward {{user}}:** [deference / rivalry / desire / fear / transaction / curiosity — one line on how they treat {{user}}]
 - **Hook:** [what pulls them into a scene, or what they offer the sandbox — one line]
-- **Intimacy (only if this NPC has sexual presence):** [one or two lines of compact sexual context — how they are in sex + what they want, a distinct body/sound or voice-in-intimacy cue, one hard limit/yes. This becomes the Intimacy Architect's §6.5 compact stat block. Keep it distinct from every other NPC. Leave blank if no sexual presence.]
+- **Intimacy (only if this NPC has sexual presence):** [two or three lines of compact sexual context — how they are in sex + what they want; an **embodied baseline** (age and what this body has lived through, build/scale, and its stamina or arousal-timing particular — one line, observable register, not clinical); a distinct body/sound or voice-in-intimacy cue; one hard limit/yes; and one line on what they do **afterward** (stay / leave / clean up immediately / sleep / talk about something unrelated). This becomes the Intimacy Architect's §6.5 compact stat block. Keep it distinct from every other NPC — without the embodied line a whole roster defaults to interchangeable twenty-somethings. Leave blank if no sexual presence.]
 
 **NPC: [Name]** — *Roster*
 [Same format — repeat for each roster NPC]
@@ -661,6 +685,12 @@ Trigger keywords: [name variants, role descriptors]
 - [Rule 3 — example: "Coercive structures are visible to the prose even when invisible to the participants. The reader is never confused about the power dynamic."]
 - [Rule N]
 
+**Recommended by default — the stock-register rule.** *Include this unless you have a reason not to. Erotic prose has a set of trained reflexes that fire regardless of what the substrate says, because they are near-universal in the training data: scale language ("filling her," "stretched around him," "impossibly large," "she could barely take him"), uniformly punishing anal regardless of stated anatomy, and a stock body in its early twenties for everyone. These are the intimate equivalent of "moaned softly" — and, exactly like it, a **descriptive** substrate line does not displace them. Only a prohibition does. Adapt the wording to your world; keep the teeth:*
+- *"Scale and size language must match the bodies this world has actually authored. Never write 'filling,' 'stretching,' 'impossibly large,' 'barely able to take him,' or any equivalent, unless the authored anatomy of the specific pair in the scene supports it. Where it does not, the prose renders what is actually true for these two bodies."*
+- *"What an act costs is derived from the authored bodies, never from a default. Anal, size-dependent positions, and anything the authored anatomy makes easier or harder are rendered from the substrate, not from the stock register in which such acts are always difficult."*
+- *"No character is rendered on a default body. Every body in an intimate scene is the one its embodied baseline describes — age, build, history, proportion — including `{{user}}`'s."*
+- *"Intimate scenes do not end at climax. The aftermath is rendered — the ordinary bodily business and what the characters do with each other — per each character's authored afterward."*
+
 **World-level prose register for intimacy:** [How does the prose feel during intimate scenes in this world? Examples: "Long sentences, dwelling on sensory detail, time slowing." "Clipped and clinical, the prose refusing to dissolve." "Unflinching realism, neither pornographic nor romantic — the tone of a witness."]
 
 ### 8b. Per-Arc Intimacy Specification
@@ -826,7 +856,9 @@ Trigger keywords: [name variants, role descriptors]
 - [ ] Every NPC has a profile — principals as full profiles, roster NPCs as compact stat blocks (large casts); roster voice fingerprints are unique; principal NPCs have a Standing Goal (active objective + how they pursue it)
 - [ ] Escalation Ladders (where used): 2–4 ordered stages, each with an in-fiction observable advance condition; a stated endpoint; a stated {{user}}/main-story collision; no more than ~3 laddered NPCs in the world
 - [ ] LLM behavioral instructions written for each card (with arc-range qualifiers)
-- [ ] For characters with intimate scene presence: substrate (trauma map, body reactions, vulnerability shape, voice in intimacy, hard limits) and arc-specific evolution filled out
+- [ ] For characters with intimate scene presence: substrate (trauma map, **embodied baseline**, body reactions, vulnerability shape, voice in intimacy, hard limits, **afterward**) and arc-specific evolution filled out
+- [ ] Embodied baseline filled in for *every* intimate character — including the ordinary/default-bodied ones — written in observable register, running in both directions (what is harder *and* what is easier or more certain)
+- [ ] **Physical dyad** filled in for every pairing with a real height, age, build, stamina, experience, or world-specific differential (`{{user}}` pairings first), with the asymmetry authored in both directions
 
 **Section 5 — Arcs (arc mode) / Sandbox Charter (sandbox mode):**
 - [ ] `World Mode` declared in Section 1 (`arc` or `sandbox`)
