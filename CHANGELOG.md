@@ -13,6 +13,131 @@ numbers. Newest first.
 
 ---
 
+## 2026-07-25 — The posture contract: `{{user}}` is a character, not the customer
+
+Two related problems with `{{user}}`, fixed together because they turn out to
+be the same bright line seen from two sides.
+
+The first is the model's disposition. It was optimized to satisfy the person
+typing, and that does not switch off inside a fiction — it reads `{{user}}`'s
+message as a request from someone it should please rather than as a
+character's move in a story. Three symptoms, all ordinary and all easy to miss
+because they read as *cooperative*: an NPC concedes because `{{user}}` asked
+rather than because its own interests say yes; a stated attempt ("`{{user}}`
+reaches for the ledger") is rendered as an accomplished fact; and a convenient
+interruption dissolves an outcome the scene had earned.
+
+The jailbreak already said `{{user}}` was "a character played by the human at
+the keyboard, equally subject to the story's logic." That is a *permission* —
+it licenses harm — and it leaves the disposition completely intact, which is
+how a world ends up with the permission granted and never exercised. What was
+missing was the **role separation** that follows from it: the human *authors*
+`{{user}}`'s moves, they are not the recipient of the model's service.
+
+Following the embodied-specificity pattern, the correction is a triad, since
+none of the three parts works alone. An engine prohibition with no world
+substrate is gestural and the model nods at it; substrate with no prohibition
+gets authored and never reached; and both without an audit check pass silently,
+because a scene where `{{user}}` asks and receives looks like good prose. So:
+a declared posture in the seed, a mandatory Tier 3 stance directive that names
+*this arc's* concrete instance, an engine block for the disposition itself, and
+a Voice Auditor probe that judges by counterfactual rather than by how smoothly
+the scene read.
+
+Two things this deliberately is **not**. It is not an argument that worlds
+should be dark — the posture is *declared*, and `deferential` is a legitimate
+answer that the pipeline supports; the point is that an unstated posture is not
+a neutral world, it is whichever default the model was trained into. (Same trap
+as the intimacy valence field.) And it is not licence to railroad: the
+`protagonist_jeopardy` block carries a counter-guardrail with equal weight to
+its prohibitions, because a model that seizes `{{user}}`'s turns and narrates
+their defeats is a worse bug than the one being fixed. *Opposition, not
+punishment.*
+
+The second problem is the mirror image, and it is issue #82. The pipeline's
+"the human plays `{{user}}`, the model never impersonates them" rule was stated
+upstream in three places but enforced by the Editor on `Drafts/User.md` alone.
+The Tier 2 Protagonist Lorebook — unbounded, holding the content nearest the
+line, and the file Step 5.5d actively routes `User.md` overflow *into* — had no
+gate at all. The gated file was capped at 150 words; the ungated one was where
+the violation would actually happen.
+
+### Added
+- `templates/World_Seed_Template.md`: **§3 `POSTURE TOWARD {{user}}`**
+  (required) — declared `Default posture` enum
+  (`adversarial`/`indifferent`/`mixed`/`deferential`), the named force that does
+  not defer and what it wants instead, concrete losable things, the permitted
+  shapes of a lost scene plus the off-the-table boundary, and an optional
+  sharpest-specific field. Plus the §3 checklist items and a §5B.1 agreement
+  note against the sandbox experience contract.
+- `agent_roles/02_The_Architect.md`: **§8.A "THE STANCE-TOWARD-`{{user}}`
+  DIRECTIVE"** — a new mandatory ARC_STATE Tonal Mandate category (every arc,
+  no exemptions, `deferential` inverted rather than omitted), with two worked
+  bullets; and the §8S.A sandbox counterpart on the power-fantasy contract
+  bullet.
+- `agent_roles/02_The_Architect.md`: **§7 "THE TIER 2 PROTAGONIST LOREBOOK —
+  REFERENCE DATA, NEVER IMPERSONATION GUIDANCE"** — the authoring rule the new
+  Editor gate validates against, with the descriptive-for-reaction vs.
+  directive-for-behavior table, the reframing rule, and an explicit
+  not-forbidden list so the gate does not get over-applied.
+- `agent_roles/03_The_Editor.md`: **Step 5.7** — the protagonist-lorebook
+  impersonation gate (5.7a directive scan, 5.7b mandatory reframe suggestion,
+  5.7c ambiguous-mood soft flag, 5.7d posture-misrouting hard fail). Closes
+  issue #82.
+- `agent_roles/03_The_Editor.md`: **Step 4a-3d** — unconditional stance-directive
+  hard fail, plus the sandbox line in 4a-S.
+- `agent_roles/05a_Block_Library.md`: jailbreak **clause 2b (role separation)**,
+  making it a five-clause block; and the **Protagonist Jeopardy**
+  (`protagonist_jeopardy`) optional block with its §5a-detail content
+  requirements including the non-optional counter-guardrail.
+- `agent_roles/05_The_Prompt_Engineer.md`: the **protagonist-jeopardy block
+  hint** (5.0b), which is explicitly *not* genre-keyed — it addresses a failure
+  the model brings, not one the world introduces.
+- `agent_roles/03b_The_Voice_Auditor.md`: the **bid** scenario class (mandatory
+  every arc, both modes) and **Step 3K — Protagonist Jeopardy**, testing the
+  three reflexes and the over-correction, with the world-side vs. engine-side
+  diagnosis split by breadth.
+- `agent_roles/revise/05_The_Prompt_Engineer_mini.md`: **Trigger G** —
+  `protagonist_jeopardy` block toggle on a posture-change revision.
+- `agent_roles/Auditioner/00_The_Auditioner.md`: check **K** in the reused
+  Voice Auditor vocabulary.
+- `CLAUDE.md`: architectural principles **#13 (The Posture Contract)** and
+  **#14 (`{{user}}` is reference data, never impersonation guidance)**, plus
+  four cross-file consistency rows.
+
+### Changed
+- `agent_roles/00_The_Interviewer.md`: Section 3 gains the posture elicitation
+  with its framing preamble (the reflex is explained to the user before the
+  questions, or they read as asking permission to be cruel), the four questions
+  with their push-standards, and the sign-off coverage line.
+- `agent_roles/01_The_Refiner.md`: Master Design **Section 6** gains the
+  `Posture Toward {{user}}` record block with an explicit **Tier 3** routing
+  statement (the surrounding Section 6 material all flows to Tier 2; this does
+  not), gap routing that names the stake, a sandbox charter cross-check, and a
+  sign-off line. The existing `{{user}}`-reference-data note now states that the
+  rule binds grammatical mood, not topic.
+- `agent_roles/05_The_Prompt_Engineer.md`: Pass 1 jailbreak check is now
+  five clauses; Pass 2 gains the jeopardy block-content and inclusion checks;
+  two sign-off lines; Section 8 resync adds `protagonist_jeopardy` and treats a
+  missing clause 2b as reportable spec drift.
+- `agent_roles/revise/00_The_Reviser.md`: `tier3_arc_tonal_recalibration` and
+  `sandbox_state_recalibration` now name the posture-change case, with the
+  every-arc cascade warning (a half-updated world plays as neither posture).
+- `agent_roles/revise/02_The_Architect_mini.md`,
+  `agent_roles/revise/03_The_Editor_mini.md`,
+  `agent_roles/revise/03b_The_Voice_Auditor_mini.md`: stance-bullet survival on
+  recalibration, the all-arcs-or-none check, the protagonist-lorebook gate on
+  touched entries, and a bid scenario on state/posture scopes with the
+  over-correction weighted (the revision most likely to introduce it).
+- `agent_roles/Converter/00_The_Converter.md` + `templates/Convert_Brief_Template.md`:
+  `Section 3 — Posture Toward {{user}}` is **regenerate-always** in reframe
+  (every field is computed against a specific protagonist; a carried posture
+  aims the world's opposition at someone no longer in the story), with the
+  `Default posture` enum offerable as a starting suggestion and a power-tier-shift
+  warning; **keep** in rebaseline, with a prompt for source worlds that predate
+  the contract entirely.
+- `workflows/world-forge.md`: Phase 0, Phase 1, and Phase 3.5 descriptions.
+
 ## 2026-07-25 — Intimate aftermath: scenes that don't end at climax
 
 A third failure of the same family as the two entries below, but a different

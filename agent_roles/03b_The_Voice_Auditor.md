@@ -19,7 +19,7 @@
 
 **Load now:**
 - All Editor-approved files in `Drafts/`
-- `Drafts/Master_Design.md` — Section 11 (Style Contract) specifically; Section 9 title for World Mode
+- `Drafts/Master_Design.md` — Section 11 (Style Contract) specifically; Section 6's `Posture Toward {{user}}` block (Step 3K); Section 9 title for World Mode
 - `World_Seed.md` Section 7b — the user's test scenarios
 
 **SillyTavern references:** this phase needs none — do not load `Notes_On_functionality.md` or `Notes_Quick_Reference.md`. Voice fidelity is judged against the drafts, not against ST mechanics.
@@ -49,7 +49,7 @@ If you flag failures, the pipeline returns to the Architect for revision, then b
 
 ## 3. INPUT
 - All Editor-approved files in `Drafts/`
-- `Drafts/Master_Design.md` — the narrative truth being verified against. **Read Section 11 (Style Contract) specifically — Section 11c's `is_multi_perspective` and `is_multi_tense` flags determine whether the perspective-bleed check (Step 3H below) fires. Either flag being true triggers the check.**
+- `Drafts/Master_Design.md` — the narrative truth being verified against. **Read Section 11 (Style Contract) specifically — Section 11c's `is_multi_perspective` and `is_multi_tense` flags determine whether the perspective-bleed check (Step 3H below) fires. Either flag being true triggers the check. Read Section 6's `Posture Toward {{user}}` block too — it supplies the declared posture, the named non-deferring force, the losables, and the off-the-table boundary that Step 3K builds its bid scenarios against and grades them by.**
 - `World_Seed.md` Section 7b — the test scenarios the user provided
 
 If Section 7b is missing because the user did not provide test scenarios, generate three representative scenarios yourself based on the Master Design's arc beats, but flag this in the report so the user knows their pipeline is being verified against scenarios you invented rather than scenarios they intended to play.
@@ -74,8 +74,9 @@ Generate at least three test scenarios per character per arc. For a five-arc wor
 - **Near-miss (false trigger)** — a scene that *resembles* a trigger context but should NOT fire it: kindness with a visible price attached, a touch that was asked for, a situation adjacent to a trauma trigger with the trigger itself absent. Place it where a misfire would be most damaging — typically a later arc where safety is established and a survival reflex firing anyway is the bug (the offering-as-reflex case). This is Step 3E's dedicated material; an audit built only from true-trigger scenes never actually exercises the misfire check.
 - **Off-script pressure** — {{user}} acts against the scene's grain: hostile where the beat expects warmth, flippant during a dramatic beat, changing the subject, refusing the scene's premise. Real users do this constantly; the register must hold without the arc beat's support.
 - **Coverage-void probe** — a scenario deliberately aimed at a plausible situation the card, Tier 2, and active state are all silent on. This is Step 3G's dedicated material: it forces the "would the model invent this" question instead of waiting for it to arise incidentally. Finding the void is part of the work — scan for what the drafts *don't* cover, then build a scene there.
+- **Bid (protagonist jeopardy)** — `{{user}}` wants something the scene has no reason to hand them, and asks for it, takes it, or tries it. This is Step 3K's dedicated material and it is **mandatory in every mode, in every arc, for every world** — including `deferential` power-fantasy worlds, where the bid is aimed at the one force Master Design Section 6 says does not defer. Construct it deliberately: pick the NPC or obstacle whose own interests most clearly point *away* from what `{{user}}` wants, and have `{{user}}` make the ask. Include in the same scenario, or in a second bid scenario, a `{{user}}` message that **states an attempt** in the form real players write it — "*{{user}} reaches for the ledger*", "*he slips past the guard*", "*I tell her it was Marek who sold her out, and she believes me*" — so the auto-success check has material. This class exists because the audit's other classes all test whether the character is *itself*; this one tests whether the world is *not on the player's side*, and no other scenario surfaces it. An audit whose matrix contains no bid scenario cannot pass Step 3K.
 
-The lull, temptation, and cross-axis scenarios below are additional classes with their own trigger conditions.
+The lull, temptation, and cross-axis scenarios below are additional classes with their own trigger conditions. The bid class above has no trigger condition — it always applies.
 
 **When the world has principal NPCs (either mode), include at least one "lull" scenario** — {{user}} passive, saying little, handing the turn back without a prompt — so Step 3J (NPC Agency & Goal-Following) has material to test whether NPCs take initiative. **When any NPC carries a §7.D Escalation Ladder, also include one "temptation" scenario** — a scene that invites jumping to the ladder's endgame (e.g., the laddered NPC alone with exactly what they ultimately want, undefended) — so Step 3J's stage-discipline probe has material to test that the model holds the current stage.
 
@@ -203,6 +204,28 @@ Diagnosis routes to the Architect: an initiative miss points at the SANDBOX_STAT
 
 For worlds with no principal NPC cast (solo / two-hander arcs): skip Step 3J.
 
+### Step 3K — Protagonist Jeopardy (both modes; runs on every world, every arc — no exemptions)
+
+Every other check in this audit asks whether a character is faithfully *itself*. This one asks whether the world is **not on the player's side** — the thing no character-fidelity check can surface, because a perfectly-voiced NPC can still be quietly handing `{{user}}` everything they ask for.
+
+The failure this step hunts is not a drafting error the Architect made. It is the model's trained disposition to satisfy the person typing, which arrives with the model and fills any gap the drafts leave. Which is exactly why **an unremarkable-looking pass here is the default outcome and usually wrong**: a scene where `{{user}}` asks and receives reads as smooth, cooperative, well-written prose. Nothing looks broken. Run this step with the counterfactual probe in hand, not the vibe.
+
+Use the **bid scenario** from Step 1. Check:
+
+- **No yield-because-asked.** Does the NPC's answer come from its own interests, information, and mood — or from the fact that `{{user}}` wanted it? Trace the concession to the NPC's stated Standing Goal, stance, or Tier 2 psychology. An NPC that agrees, softens, or hands something over with no traceable reason of its own has yielded. **Apply the counterfactual hard here:** would these same drafts equally permit this NPC to flatly refuse? If refusal is just as compatible with the material, the compliance was yours, not the drafts' — record ⚠️ NOT BINDING even though the scene "worked."
+- **A stated attempt stayed an attempt.** Take the `{{user}}` line that states an action against resistance. Did the generated turn render it as *accomplished*, or did the world get to answer it? "*{{user}} reaches for the ledger*" followed by prose in which `{{user}}` is reading the ledger is auto-success. Failure, partial success, and success-at-a-cost are all correct outcomes; silent conversion of attempt into fact is not. Note that this check is about the **world's** response — `{{user}}` may declare their own actions freely; what they do not get to declare is the world's answer.
+- **No manufactured rescue.** Did anything arrive to spare `{{user}}` an outcome the scene had earned — a convenient interruption, a timely ally, an enemy's unexplained hesitation, a lucky misfire? Trace it: is the rescue caused by something already established in the drafts or the scene, or did it appear because the moment was going badly? The tell is a rescue with no antecedent.
+- **Stance directive is actually binding.** Does the generated turn reflect the arc's ARC_STATE / SANDBOX_STATE stance-toward-`{{user}}` directive, and specifically its named opposition? A stance bullet that the dialogue does not exercise is a bullet that is present but not binding — the same 🟡 finding as any other non-binding mandate.
+- **Inverse check — no railroading (this half is not optional).** The correction has its own overshoot, and an audit that only hunts deference will drive the Architect into it. Verify the generated turn does **not**: write `{{user}}`'s dialogue, actions, decisions, or interior state; narrate `{{user}}`'s defeat or humiliation on their behalf; construct a scene with no available out; or produce adversity that traces to no established interest in the world (hostility as texture rather than as someone's agenda). Opposition has a source with a want; punishment has an author. **Grade a railroading failure at the same severity as a deference failure** — a world that seizes the player's turns is not a fixed world.
+
+Severity guidance:
+
+- 🔴 **Critical** — an NPC concedes a load-bearing thing purely because `{{user}}` asked; or a stated attempt against real resistance is rendered as accomplished fact; or the turn writes `{{user}}`'s actions or decisions.
+- 🟠 **High** — a manufactured rescue with no antecedent; the arc's named opposition behaves as though it were not opposition; adversity with no traceable source.
+- 🟡 **Medium** — the scene passes but the counterfactual shows the drafts would equally permit the deferential version (⚠️ NOT BINDING); or the stance directive is present but unexercised.
+
+Diagnosis routes to two places, and naming the right one matters: a **world-side** failure (yield, rescue, opposition behaving as scenery) points at the ARC_STATE / SANDBOX_STATE stance directive being missing, abstract, or not naming this arc's concrete instance — route to the Architect, naming the entry. An **engine-side** failure (auto-success on stated attempts; the pattern recurring identically across every character and every arc) points at the preset instead — the `protagonist_jeopardy` block missing, or the jailbreak lacking the role-separation clause — and routes to the Prompt Engineer as a Phase 5 note. Distinguish them by breadth: a failure isolated to one arc or one NPC is world-side; a failure that reproduces uniformly across the whole matrix is engine-side, and telling the Architect to fix it will not work.
+
 ### Step 4 — Diagnose the source of any failure
 
 When a failure is found, do not just flag the dialogue. Trace it back to the specific drafted file and section that produced the failure. Common patterns:
@@ -221,6 +244,10 @@ When a failure is found, do not just flag the dialogue. Trace it back to the spe
 | Disguise inconsistency | NPC_SHIFT entry not capturing the arc transition correctly |
 | World idles until {{user}} acts; NPC acts with no goal-trace (Step 3J) | SANDBOX_STATE / ARC_STATE activity-cadence directive missing or abstract, OR principal NPC §7.D Standing Goal thin or absent |
 | Laddered NPC jumps stages or self-resolves its subplot (Step 3J stage discipline) | Cadence/aliveness bullet not naming the active stage, OR missing a progression-discipline clause (advance only on stated condition / never skip / never self-resolve) — point the Architect at the specific bullet |
+| NPC concedes because {{user}} asked, with no traceable reason of its own (Step 3K) | ARC_STATE / SANDBOX_STATE stance directive missing, abstract, or not naming this arc's concrete instance of the opposition — point the Architect at the entry. If it recurs across every character and arc, it is preset-side instead: `protagonist_jeopardy` block absent or missing its yield prohibition |
+| A stated {{user}} attempt rendered as an accomplished fact (Step 3K) | Almost always engine-side — `protagonist_jeopardy` block absent, or present without the "a stated attempt is an attempt" imperative. Surface to Prompt Engineer, not the Architect; no lorebook edit fixes this |
+| Convenient rescue with no antecedent (Step 3K) | Stance directive missing its no-rescue prohibition, OR the arc's opposition has no stated want of its own (an obstacle with no agenda gets written as scenery the model can move) |
+| Turn writes {{user}}'s actions, decisions, or defeat; scene has no available out; adversity traces to no established interest (Step 3K inverse) | Over-correction. Either the stance directive contains {{user}}-side authoring the Editor's 4a-3d should have cut, or the `protagonist_jeopardy` block shipped without its counter-guardrail — check the preset block first, since that is the systematic cause |
 | Marker drift in a turn | World Main `<style_contract>` content wrong, OR Formatting block content contradicting the contract — surface to Prompt Engineer |
 | Pronoun bleed within a turn | Overriding card's `<style_override>` block missing `{{char}}` reference, OR block directive language not strong enough — surface to Architect |
 | Omniscient interjection in 1st-person turn | World Main missing the active-speaker rule, OR cross-card context contamination from group-chat assembly — surface to Prompt Engineer |
@@ -273,6 +300,9 @@ Structure:
 ## NPC Distinctiveness Matrix (sandbox / large-roster worlds — Step 3I)
 [Fingerprint table: one row per roster NPC. Blind-line test result per NPC: attributable / ambiguous / unattributable. List any mutually-swappable pairs (Critical) and any voiceless NPCs (High), with the specific §7.E entries the Architect must sharpen. Omit this section, noting "N/A — no large roster cast," when Step 3I does not apply.]
 
+## Protagonist Jeopardy (Step 3K — every world, every arc)
+[One row per bid scenario. Columns: arc / the ask or attempt / did the NPC yield-because-asked (with the traceable reason if it conceded) / was a stated attempt auto-succeeded / was there a manufactured rescue / did the stance directive bind / any railroading (agency seizure, narrated defeat, no-win construction, sourceless adversity). Record ⚠️ NOT BINDING where the scene passed but the counterfactual shows the drafts equally permit the deferential rendition. Close with the world-side vs. engine-side split: which findings route to the Architect (named ARC_STATE / SANDBOX_STATE stance entry) and which route to the Prompt Engineer as a Phase 5 note (uniform across the whole matrix = preset-side).]
+
 ## Coverage Gaps Detected
 [List of details the auditor had to invent because drafts were silent. Each entry: what was missing, in which file/section, what should be added]
 
@@ -308,11 +338,13 @@ If no failures → sign off cleanly.
 - [ ] All NPCs voiced in test scenarios
 - [ ] User test scenarios from Section 7b included (or generated equivalents flagged)
 - [ ] **Scenario classes covered: every AI-played character has at least one trigger-collision, one near-miss (false-trigger), one off-script, and one coverage-void scenario in the matrix**
+- [ ] **Bid scenario present in every arc (every world, both modes, including `deferential` worlds where the bid targets the named non-deferring force), and at least one bid states an attempt against resistance in the form a real player writes it**
 - [ ] **Axis-mixed worlds (`is_multi_perspective: true` OR `is_multi_tense: true`): at least one cross-axis scenario per arc included; OR confirmed both flags `false` in Master Design Section 11c and Step 3H skipped**
 - [ ] **Sandbox / large-roster worlds: Step 3I Distinctiveness Matrix run; no Critical (mutually-swappable) or High (voiceless) roster NPCs remain; OR confirmed no large roster cast and Step 3I skipped**
 - [ ] **Sandbox worlds: standing register checked against SANDBOX_STATE (incl. aliveness directives — NPCs act on their own, world is reactive); arc-only checks (3D, disguise) skipped**
 - [ ] **Worlds with principal NPCs: Step 3J run — in a lull, NPCs take initiative and their moves trace to stated Standing Goals; OR confirmed no principal NPC cast and Step 3J skipped**
 - [ ] **Worlds with laddered NPCs: stage-trace verified (moves belong to the named active stage) and the temptation scenario run (model holds the stage, no jumping or self-resolving); OR confirmed no Escalation Ladders authored**
+- [ ] **Step 3K run on every arc (no exemptions): no yield-because-asked, no auto-succeeded attempts, no manufactured rescues, stance directive exercised — each judged against the counterfactual, not against how smooth the scene read. Inverse half also verified: no agency seizure, no narrated `{{user}}` defeat, no no-win construction, no sourceless adversity. Findings split world-side (Architect) vs. engine-side (Prompt Engineer, Phase 5).**
 
 ### Behavioral Fidelity
 - [ ] **Cold-read discipline held: plausible failure pre-committed per scenario before generation; every PASS cites dialogue evidence + the compelling draft line; counterfactual probe run on every passing check, with ⚠️ NOT BINDING findings flagged Medium**

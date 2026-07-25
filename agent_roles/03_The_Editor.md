@@ -72,7 +72,7 @@ Check for all required files before reading a single word of content.
 - `Drafts/Card_[CharName].md` — one per character card
 - `Drafts/User.md` — `{{user}}` Persona Description text (mandatory for any world with a named `{{user}}` protagonist; see Step 5.5 below)
 - `Drafts/Tier1_World_Entries.md` — single file, all Tier 1 entries
-- `Drafts/Tier2_[CharName]_Entries.md` — one per major character AND one per significant NPC (including the Tier 2 Protagonist Lorebook for `{{user}}`)
+- `Drafts/Tier2_[CharName]_Entries.md` — one per major character AND one per significant NPC (including the Tier 2 Protagonist Lorebook for `{{user}}`, which gets the additional impersonation gate at Step 5.7)
 - Tier 3 lorebook — *arc mode:* `Drafts/Tier3_Arc[N]_[Title]_Entries.md`, one per arc; *sandbox mode:* a single `Drafts/Tier3_Sandbox_Entries.md` (and NO per-arc files)
 - `Drafts/Instructions_[CardName].md` — one per card
 
@@ -214,6 +214,24 @@ Then verify the directive is not dangling: every objective the cadence points at
 
 Worlds with no laddered NPCs skip this step entirely — a flat Standing Goal is the default and fully valid.
 
+#### 4a-3d — Stance toward `{{user}}` (unconditional hard fail — every arc)
+
+Every ARC_STATE Tonal Mandate MUST carry a **stance-toward-`{{user}}`** directive: the arc-specific expression of Master Design Section 6's `Posture Toward {{user}}` block, per the Architect's "THE STANCE-TOWARD-`{{user}}` DIRECTIVE" block in §8.A.
+
+Unlike the activity cadence (4a-3b), this check has **no exempting case**. Solo arcs, two-handers, wholesome arcs, and `deferential` power-fantasy arcs all require it. The reason is that its absence is not a neutral omission: with nothing stated, the model's trained disposition to satisfy the person typing supplies the arc's stance by default, and the arc plays accommodating no matter what the Dramatic Situation claims the stakes are. An arc that states no stance has one anyway.
+
+Verify, per arc:
+
+- [ ] **Present.** One or two bullets addressing the world's posture toward `{{user}}` in this arc. Missing entirely = hard reject.
+- [ ] **Traceable to Section 6.** The arc's named opposition is the Section 6 non-deferring force (or a stated arc-specific instance of it), and any losable named is drawn from Section 6's list. An arc inventing an opposition that appears nowhere in the Master Design = hard reject; route it back through the Refiner rather than letting the Architect author world-posture unilaterally.
+- [ ] **All three reflexes named as prohibitions, in this arc's concrete vocabulary.** Yield (no NPC concedes because `{{user}}` asked), auto-success (a stated attempt is an attempt; the world answers it), rescue (no convenient interruption/timing/fortune spares `{{user}}` an earned outcome). Fewer than three named = hard reject. **Abstract restatement of the generic rule is a fail, not a pass** — "the world does not soften outcomes for {{user}}" is the preset's `protagonist_jeopardy` block's job and is already covered there. The bullet's whole value is naming *this arc's* instance: which NPC, which document, which door.
+- [ ] **Boundary carried where Section 6 declared one that this arc could cross.** Stated as a prohibition alongside the others. A permission shipped without its declared limit = hard reject.
+- [ ] **`deferential` arcs: the directive is present and inverted, not omitted.** It must state the register of the deference, name the one force that does not bow, and prohibit extending the deference to it. A `deferential` arc whose stance bullet says only "the world defers to {{user}}" = hard reject — that is the trained default with a sentence wrapped around it, and it buys nothing.
+
+**Reject on `{{user}}`-side authoring.** The directive is a directive to the world and its cast. Any clause that specifies what `{{user}}` does, feels, or decides in response ("deny him the licence and let him sit with it") = hard reject on that clause; the world's move is the whole directive. Cite the clause and cut at the boundary.
+
+**Soft flags:** a stance bullet identical across every arc (the posture is not being expressed *in this arc's* situation — it has been pasted); a bullet naming an opposition with no stated want of its own (an obstacle with no agenda flattens into scenery); more than two bullets spent on stance (it is one Tonal Mandate category among six-plus, and crowding out register/dwells/elides costs more than it buys).
+
 #### 4a-4 — Soft-flag check: Tonal Mandate quality
 
 For each bullet in the Tonal Mandate, evaluate:
@@ -248,6 +266,7 @@ When `World Mode` is `sandbox`, the Tier 3 lorebook has no ARC_STATE. Validate t
 - [ ] Tonal Mandate contains 4–8 bulleted directives, each using imperative language (resist, dominates, never default to, dwells on, elides, do not, must, never, always). Fewer than 4, or descriptive-only bullets = hard reject.
 - [ ] Tonal Mandate includes the **aliveness directives** — at minimum: NPCs pursue their own agendas / may initiate, the world reacts to and remembers {{user}}, and the world is never frozen waiting for {{user}}. Missing the aliveness contract = hard reject (a sandbox without it plays as an inert menu).
 - [ ] Tonal Mandate names the **live scene types** (the model's bias menu). Missing = hard reject.
+- [ ] Tonal Mandate carries the **stance-toward-`{{user}}` directive** (the power-fantasy/experience contract in directive form), meeting the full 4a-3d bar: traceable to Master Design Section 6, all three reflexes (yield / auto-success / rescue) named as prohibitions in this world's concrete vocabulary, the named non-deferring force present, and the off-the-table boundary where declared. Missing, or present only as an abstract restatement, = hard reject. **This applies to `deferential` sandboxes too, inverted** — a sandbox whose stance bullet says only that the world defers is the trained default with a sentence around it. Also hard-reject a Standing Situation whose experience contract contradicts the Section 6 declared posture (a charter promising universal deference under a `mixed`/`adversarial` declaration) — surface the contradiction rather than picking a side.
 - [ ] Every principal NPC has a §7.D **Standing Goal** for the aliveness/cadence directive to act on. A principal NPC with no Standing Goal anywhere = hard reject (the directive has nothing to point at). Whether the aliveness directive names the goals concretely (referencing Standing Goals + the lull-trigger) vs. abstractly is a 4a-4-style soft flag, not a hard fail.
 - [ ] Laddered principals (if any): the aliveness bullet names each active ladder stage and carries the progression discipline (advance only on stated condition, never skip, never self-resolve the endpoint), and a WORLD_PULSE entry names the in-motion stages. Missing = hard reject (sandbox stage-state is soft — these two anchors are all that holds it). Ladder format integrity itself is checked per Step 4a-3c, which applies in both modes.
 - [ ] Exactly one SANDBOX_STATE entry exists (not multiple, not zero). At least one WORLD_PULSE entry exists at position 4. Otherwise = hard reject.
@@ -669,6 +688,73 @@ For every card NOT listed in Section 11b: the card's `extensions.world_forge.sty
 
 The Editor does not modify cards; it only flags. Recommended corrections appear in the Step 6 critique with exact field values and the specific Master Design line they should match.
 
+### Step 5.7 — Protagonist Lorebook Impersonation Gate (`Drafts/Tier2_[ProtagonistName]_Entries.md`)
+
+Step 5.5c gates `Drafts/User.md` against impersonation content. This step applies the same bright line to the **Tier 2 Protagonist Lorebook** — the other half of the paired protagonist artifacts, and the half where the violation is far more likely. `User.md` is capped at 150 words; this lorebook is unbounded, holds the content nearest the line (psychology, hidden layer, powers, arc trajectory, relationship stances), and Step 5.5d actively routes `User.md` overflow into it. A gate on the small file alone is not a gate.
+
+Runs for any world with a named `{{user}}` protagonist. If the world has no protagonist lorebook (abstract / open-ended `{{user}}`), skip this step.
+
+The rule the Architect authors against is Section 7's **"THE TIER 2 PROTAGONIST LOREBOOK — REFERENCE DATA, NEVER IMPERSONATION GUIDANCE"** block in `02_The_Architect.md`. Audit against it.
+
+**The discriminator is grammatical mood and subject, not topic.** Every topic in World Seed Section 3 is legitimate content in this file. What fails is a sentence that tells the model *what `{{user}}` does* rather than *what is true about `{{user}}` that others perceive and respond to*. Do not flag content for being about `{{user}}`'s psychology, history, powers, body, or relationships — that is the file's job.
+
+#### 5.7a — Directive-for-behavior scan (hard fail)
+
+Read every entry's `content` field. Hard reject on any of:
+
+- [ ] **A behavioral mandate with `{{user}}` (or the protagonist's name) as the acting subject** in the imperative or the generalizing present-of-habit, stated as what happens rather than as what others observe. *"Andrei goes still under pressure and lets the silence work."* *"He never raises his voice."* *"Andrei deflects with humour when the subject turns personal."*
+- [ ] **A trigger-response pair with `{{user}}` as the responder** — any "when X happens, `{{user}}` does Y" / "if pressed, he Zs" construction. This is the exact structure the pipeline authors into `{{char}}` cards; in a card it is correct, here it makes the model write the player's turns.
+- [ ] **Dialogue-style or voice prescription for `{{user}}`** — speech patterns, diction, accent, verbal tics, sentence rhythm, what they say or how they say it.
+- [ ] **Second-person or "you are" framing** anywhere in the entry.
+- [ ] **Engine instructions** — "do not act for `{{user}}`", narration/formatting/perspective rules. Those live in the preset Main Prompt (principle #2) and are never duplicated into lorebook content.
+
+The diagnostic phrase list from 5.5c applies here **with two deliberate relaxations**, because this file's legitimate content differs from a 150-word identity floor:
+
+- `"always "` / `"never "` do **not** hard-fail on their own — they appear constantly in legitimate world-facing reference ("the guild never extends credit to outsiders", "his name always reaches a room before he does"). They hard-fail only when the sentence's acting subject is `{{user}}`. Soft-flag every other occurrence.
+- `"voice"`, `"tone"`, `"register"`, `"speak"` soft-flag rather than hard-fail — "his voice carries in a room built for whispers" is a perception fact; "he speaks in clipped, precise sentences" is a voice prescription. Read the sentence and decide.
+
+Everything else in 5.5c's hard-fail list (second-person framing, `"speech pattern"`, `"sentence structure"`, `"accent"`, `"mannerism"`, `"manner of speech"`, `"rhetorical"`, `"trigger-response"`, engine-rule phrases) hard-fails unchanged.
+
+For each hard fail:
+
+```
+HARD FAIL (5.7a): Tier2_[ProtagonistName]_Entries.md — entry "[comment]"
+  Offending passage: "[quote the sentence]"
+  Class: [behavioral mandate / trigger-response pair / voice prescription /
+          second-person framing / engine instruction]
+  Required: reframe into the perception frame (what others see, expect, assume,
+            or plan around) per Architect Section 7, or delete.
+```
+
+#### 5.7b — Reframe suggestion (accompanies every 5.7a hard fail)
+
+A bare rejection here reliably produces a second-round deletion of legitimate material — the Architect strips the fact rather than reframing it, and the world loses reference data it needed. With every 5.7a citation, supply the reframed alternative:
+
+| Rejected | Reframed |
+|---|---|
+| "Andrei goes still under pressure and lets the silence work." | "Andrei is physically still under pressure. People read it as either composure or contempt, and both readings are common." |
+| "If someone mentions the fire, Andrei changes the subject." | "Andrei will not speak about the fire. Those close to him have learned to stop asking." |
+| "He commands respect from the dock crews." | "The dock crews obey him; the harbourmaster does not recognise his authority. Expect deference from one and obstruction from the other." |
+
+The Architect is not required to use your phrasing — the requirement is that the fact survives in the perception frame. Flag a second-round *deletion* of a fact you asked to be reframed as a new soft flag: the material was load-bearing or it would not have been written.
+
+#### 5.7c — Ambiguous-mood soft flag
+
+Some sentences sit on the line: a stated disposition that could be read either way ("Andrei is guarded with strangers"). These pass — a disposition is reference data — but surface the ones that are one verb away from a mandate:
+
+```
+SOFT FLAG (5.7c): Tier2_[ProtagonistName]_Entries.md — entry "[comment]"
+  Passage: "[quote]"
+  Verify: disposition others perceive (legitimate) or behavior the model will
+          enact on the player's behalf (must be reframed)?
+```
+
+#### 5.7d — Posture content misrouting (hard fail)
+
+Master Design Section 6's **Posture Toward `{{user}}`** block is world-and-cast property, not protagonist property, and belongs in Tier 3 (ARC_STATE / SANDBOX_STATE stance directive — Step 4a-3d). Hard reject any directive drawn from it that has landed in the protagonist lorebook: *"the world does not soften outcomes for Andrei"*, *"NPCs must not defer to him"*, *"deny him the easy exit"*. These are engine/arc directives wearing a Tier 2 costume, and in this file they also read as instructions about the player's character.
+
+Descriptive facts the opposition acts **on** stay legitimate here: *"His writ does not run north of the river"* is protagonist reference data. *"Never let him succeed north of the river"* is a Tier 3 directive. Cite the Tier 3 entry it should move to.
+
 ### Step 6 — Issue Critique & Directives
 Produce `Drafts/Editor_Critique_[Round N].md`. Be specific: cite exact passages, entry names, or sections that fail. State exactly what must change.
 
@@ -742,6 +828,7 @@ Post-history: [checklist results + word count]
 - All Tier 3 entries: arc mode — ARC_STATE complete with hidden info rules; sandbox mode — SANDBOX_STATE complete ✓
 - **Arc mode: all ARC_STATE entries: two-subsection structure (Dramatic Situation + Tonal Mandate), 4–8 imperative directive bullets ✓**
 - **Arc mode: arcs with active principal NPCs have an ARC_STATE activity-cadence directive (Step 4a-3b); it is not dangling — every objective maps to an NPC §7.D Standing Goal or NPC_SHIFT active-goal line ✓**
+- **Both modes: every ARC_STATE / SANDBOX_STATE Tonal Mandate carries a stance-toward-`{{user}}` directive (Step 4a-3d / 4a-S) — traceable to Master Design Section 6, all three reflexes (yield / auto-success / rescue) named as prohibitions in concrete vocabulary, boundary carried where declared, `deferential` worlds inverted rather than omitted, no `{{user}}`-side authoring ✓**
 - **Escalation Ladders (both modes, where authored): format integrity passed (ordered 2–4 stages, observable conditions, endpoint, collision); cadence/aliveness names the active stage + progression discipline; no dangling stages (Step 4a-3c); >3 laddered NPCs soft-flagged ✓**
 - **Arc mode: relational-stance lines (CHARACTER_STATE item 6 / NPC_SHIFT) are delta not restatement; Master-Design-flagged evolving relationships have stance-line coverage in the arcs where they drift (or the gap is soft-flagged) ✓**
 - **Arc mode: trauma-trajectory lines (CHARACTER_STATE item 7) are delta not restatement; characters whose trauma evolves have item-7 coverage in the arcs where it fades (or the gap is soft-flagged) ✓**
@@ -756,6 +843,7 @@ Post-history: [checklist results + word count]
 - **All non-default rationales: reference Notes_On_functionality, name the goal, explain why default fails ✓**
 - **All Position Rationale soft flags reviewed and resolved (or carried forward as user-acknowledged) ✓**
 - **`User.md` present, structurally valid, ≤150 words, no voice/personality/engine content, lorebook filename matches Tier 2 Protagonist draft ✓**
+- **Tier 2 Protagonist Lorebook (Step 5.7): no behavioral mandates, trigger-response pairs, voice prescriptions, second-person framing, or engine instructions with `{{user}}` as subject; every hard fail issued with a reframed alternative; no Section 6 posture directives misrouted into the file ✓**
 - All LLM instructions: checklists passed ✓
 - **All cards: `system_prompt` and `post_history_instructions` start with `{{original}}` ✓**
 - **All cards: no engine-instruction contamination (hard-fail phrase scan passed — no exemption for `<style_override>` blocks; metadata-only contract enforced) ✓**

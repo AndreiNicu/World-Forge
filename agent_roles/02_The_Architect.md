@@ -404,6 +404,30 @@ Every Tier 2 character/NPC entry (and every entry in an aggregated NPC lorebook)
 
 > The `{{user}}` protagonist is a **persona**, never an NPC — never give `{{user}}` an `NPC —` entry.
 
+### ⭐ THE TIER 2 PROTAGONIST LOREBOOK — REFERENCE DATA, NEVER IMPERSONATION GUIDANCE (binding)
+
+`Drafts/Tier2_[ProtagonistName]_Entries.md` is the one Tier 2 file whose subject is **not** played by the model. Section 5.5 states this rule for `User.md`; **it applies with equal force here, and this is the file where it is most often broken** — `User.md` is capped at 150 words, while this lorebook is unbounded and holds exactly the content that drifts across the line (psychology, hidden layer, powers, arc trajectory, relationship stances). The Editor hard-fails violations at Step 5.7.
+
+The human writes `{{user}}`'s dialogue, actions, and reactions. This lorebook exists so that **`{{char}}` and the NPCs react to `{{user}}` correctly** — it is the model's reference data *about* a character it does not play.
+
+**The test is grammatical mood and subject, not topic.** Every topic in Section 3 of the World Seed is legitimate content here. What decides pass/fail is whether the sentence tells the model *what `{{user}}` does* or *what is true about `{{user}}` that others perceive and respond to*.
+
+| ✅ Descriptive-for-reaction (write this) | ❌ Directive-for-behavior (never write this) |
+|---|---|
+| "Andrei is physically still under pressure. People read it as either composure or contempt, and both readings are common." | "Andrei goes still under pressure and lets the silence work." |
+| "Andrei's authority is unofficial — the dockworkers obey him, the harbourmaster does not recognise it. Expect deference from one and obstruction from the other." | "When challenged on his authority, Andrei stays calm and reminds them who they answer to." |
+| "Andrei will not speak about the fire. Anyone who raises it gets the subject changed; those close to him have learned to stop asking." | "If someone mentions the fire, Andrei changes the subject." |
+
+The right-hand column is a **trigger-response pair with `{{user}}` as the responder** — the same structure the pipeline authors into character cards for `{{char}}`. In a card it is correct; here it makes the model start writing the player's turns for them.
+
+**Reframing rule.** When Section 3 material is naturally phrased as behavior, invert it into the perception frame before writing: *what do others see, expect, assume, or plan around?* A habit becomes a reputation; a reflex becomes something people have learned to read; a limit becomes what the world knows it can and cannot demand. The reframe is nearly always possible and it is strictly more useful to the model, because it names the reaction the model actually has to produce.
+
+**Also forbidden here** (same list as Section 5.5, same reasons): second-person / "you are" framing; voice, dialogue style, speech patterns, accent, or rhetorical habits; engine instructions ("do not act for `{{user}}`" — that lives in the preset Main Prompt).
+
+**Not forbidden here** — do not over-correct. `{{user}}`'s psychology, hidden layer, history, powers and limits, physical description, and relationship stances all belong in this file in full depth, written descriptively. The protagonist's intimate embodiment profile (§6.6 of the Intimacy Architect) is governed by the same bright line and is likewise legitimate content.
+
+> **Where the world's posture toward `{{user}}` goes — not here.** Section 3's `Posture Toward {{user}}` block (what the world will refuse them, who does not defer, what they can lose, what losing looks like) is a property of the **world and its cast**, not of `{{user}}`. It is authored into Tier 3 as an ARC_STATE / SANDBOX_STATE stance directive (Section 8.A / 8S.A) and does not belong in this lorebook. Facts about `{{user}}` that the opposition acts *on* — a limit, a vulnerability, a public liability — are legitimate here, stated descriptively; the directive that the world *uses* them is Tier 3's.
+
 **Every character lorebook must contain these entry types:**
 
 ### A. Physical Description Entry
@@ -543,8 +567,48 @@ Content: A bulleted list of 4–8 behavioral directives. Every bullet must use i
 - **Prose elides:** what the prose should skip or de-emphasize (redemptive hope in a grimdark arc, comforting tenderness in a survival arc, external concerns in a claustrophobic arc).
 - **Live scene types:** what scene types are active in this arc (so the model knows what kinds of scenes to bias toward).
 - **Activity cadence (include when principal NPCs are active in this arc):** NPCs advance their Standing Goals on their own initiative — when a scene lulls or {{user}} is passive, a present or off-screen NPC acts toward its goal rather than the scene freezing to wait on {{user}}. Reference the arc's active NPCs by the goals they pursue this arc (see the NPC_SHIFT entries). Omit this bullet for solo / two-hander arcs with no acting NPC cast. **When an active NPC has an Escalation Ladder (§7.D), the cadence bullet must additionally name the currently active stage and carry the progression discipline**, in the same imperative register — e.g.: "Mira's ladder is at **Stage 1 (quiet groundwork)**: in lulls she probes and plants rumors; surface off-screen evidence of the rumor spreading. Advance to Stage 2 ONLY when its stated condition occurs in-fiction; never skip a stage; never resolve the endpoint without {{user}} having had the chance to interfere." The three clauses — named current stage, advance only on stated condition, never skip / never self-resolve — are what keep the model executing the authored subplot instead of inventing or rushing one.
+- **Stance toward {{user}} (mandatory — every arc, all four postures):** the arc-specific expression of Master Design Section 6's **Posture Toward {{user}}** block. This is the one Tonal Mandate category that is never optional, because its absence is not a neutral omission: with nothing stated, the model's trained disposition to satisfy the person typing fills the gap, and the arc plays deferential regardless of what the Dramatic Situation says the stakes are. Write it as **what the world and its cast do**, never as what `{{user}}` does. See the dedicated block below.
 - **Hard prohibitions:** specific behaviors the model must never produce in this arc (e.g., "do not write the women as enthusiastically initiating from desire — they initiate from duty under time pressure").
 - **Failure mode anchors:** if you have observed specific failure modes in playtesting (model softens openings, model warms cruel characters, model skips trauma responses), name them explicitly as prohibitions.
+
+#### ⭐ THE STANCE-TOWARD-{{user}} DIRECTIVE (mandatory in every ARC_STATE)
+
+Master Design Section 6 carries a `Posture Toward {{user}}` block: a declared posture, a named force that does not defer, concrete losable things, the permitted shapes of a lost scene, and the off-the-table boundary. That block is **world-and-cast property**. It is authored here, in Tier 3, and nowhere else — never into the Tier 2 Protagonist Lorebook (Editor Step 5.7d hard-fails that) and never into the preset (which carries the world-agnostic engine half in the `protagonist_jeopardy` block).
+
+Write **one to two bullets** covering, in the arc's own terms:
+
+1. **This arc's opposition.** Who or what will not give `{{user}}` what they want *in this arc*, and what they want instead. Take the named non-deferring force from Section 6 and put it in this arc's situation — the harbourmaster is the same obstacle in Arc 1 and Arc 4, but in Arc 1 he is stalling a licence and in Arc 4 he is testifying.
+2. **What is live to lose here,** drawn from Section 6's losables, narrowed to the ones this arc actually puts in reach.
+3. **The three reflexes, named as prohibitions** — in this arc's concrete vocabulary, not as abstractions. These are the specific trained behaviors the arc must forbid:
+   - **Yield:** an NPC does not concede, agree, or hand over because `{{user}}` asked. Name the arc's most likely instance.
+   - **Auto-success:** a stated attempt by `{{user}}` is an attempt. The arc's opposition gets to answer it.
+   - **Rescue:** no convenient interruption, lucky timing, or off-screen fortune arrives to spare `{{user}}` an outcome the scene has earned.
+4. **The boundary,** where Section 6 declared one that this arc could plausibly cross. State it as a prohibition alongside the others so the permission and its limit arrive together.
+
+**All four postures get this directive, including `deferential`.** For a `deferential` world the content inverts but the bullet is still required: state *that* the world bows and in what register, name the one thing that does not, and prohibit the model from quietly extending the deference to it. A power-fantasy arc with no stated exception is the arc that goes inert.
+
+**Do not write `{{user}}`'s reactions to any of it.** "Deny him the licence and let him sit with it" — the first half is a directive to the world, the second half is writing the player's turn. Stop at the world's move.
+
+Worked bullets:
+
+```
+- The harbourmaster does not defer and does not bluff: he wants the licence review to 
+  reach spring with Andrei's name still unattached to it, and he will stall, misfile, 
+  and be politely unavailable to get there. He does not concede a point because Andrei 
+  presses him — pressure buys a longer silence, never the signature. If Andrei states 
+  that he takes a document, the document is where the harbourmaster left it. Nothing 
+  interrupts a scene that is going badly for Andrei; no messenger arrives, no rival 
+  conveniently blunders. What is live to lose this arc: the crew's willingness to sail 
+  under him. Off the table: nobody dies over the licence.
+```
+
+```
+- (deferential world, Arc 2) The syndicate bows and keeps bowing — Andrei's word moves 
+  rooms, and the prose does not hedge it. The exception is the Bishop, who is polite, 
+  unafraid, and unmoved; never write him warming, conceding, or treating Andrei's 
+  authority as binding, and never let the room's deference leak onto him. Do not 
+  manufacture a reason for him to yield.
+```
 
 #### Worked Example: Arc 1 of a grim coercive arc
 
@@ -763,11 +827,11 @@ Content: 4–8 imperative bullets (same imperative-language standard as ARC_STAT
 - **Active register:** the dominant register every response defaults to.
 - **Prose dwells on / Prose elides:** the standing atmospheric and behavioral anchors to linger on or skip.
 - **Live scene types:** the sandbox menu — the kinds of scenes the model should bias toward and be ready to enter (negotiations, intimate evenings, displays of authority, domestic quiet, sudden threats, etc.).
-- **Power-fantasy contract:** how NPCs and the world treat {{user}} by default — the directive form of the Standing Situation's contract.
+- **Power-fantasy contract / stance toward {{user}} (mandatory — all four postures):** how NPCs and the world treat {{user}} by default, in directive form. This is the sandbox expression of Master Design Section 6's **Posture Toward {{user}}** block, and it carries the same required content as the arc-mode stance directive (§8.A's "STANCE-TOWARD-{{user}} DIRECTIVE" block — read it; the rules are identical and are not restated here): the named force that does not defer and what it wants instead, what is live to lose, the three trained reflexes named as prohibitions in this world's concrete vocabulary (**yield** — no NPC concedes because {{user}} asked; **auto-success** — a stated attempt is an attempt, the world answers it; **rescue** — no convenient interruption spares {{user}} an earned outcome), and the off-the-table boundary where one is declared. Sandbox has two mode-specific weights: the posture here is usually `deferential` or `mixed` and that is legitimate — but the exception is what keeps it legible, so the non-deferring force is **required**, not optional; and because there is no arc pressure carrying a scene, a frictionless sandbox goes inert faster than a frictionless arc does. Where the declared posture and the Standing Situation's experience contract disagree, the Refiner should have caught it — halt and surface rather than authoring both.
 - **Aliveness directives (mandatory — this is what keeps a sandbox from feeling like a vending machine):** NPCs pursue their own agendas and may initiate; the world reacts to and remembers {{user}}'s actions and reputation; off-screen life continues and time passes; never freeze the world waiting for {{user}}; rotate NPCs in and out so the cast feels populated, not summoned. Make this concrete: **principal NPCs advance their Standing Goals (§7.D) on their own initiative — when a scene lulls or {{user}} is passive, a present or off-screen NPC acts toward its goal** rather than the world idling. **When a principal has an Escalation Ladder (§7.D), name its currently active stage here and carry the progression discipline**: advance to the next stage ONLY when its stated condition occurs in-fiction (on-screen or via surfaced evidence); never skip a stage; never resolve the ladder's endpoint without {{user}} having had the chance to interfere. (Sandbox has no swappable arc state, so the named stage here and in WORLD_PULSE is the stage's anchor; for long-running sandboxes where play has moved past the named stage, the revise pipeline's `sandbox_state_recalibration` scope is the ratchet that updates it.)
 - **Hard prohibitions:** what the model must never do — e.g., never strip {{user}}'s agency or power without an in-world cause the player set in motion; never reset NPC attitudes to neutral between scenes; never flatten the cast to a single voice.
 
-> The Editor (Step 4a, sandbox variant) hard-fails a `SANDBOX_STATE` entry missing either subsection, missing the aliveness directives, or whose Tonal Mandate has fewer than 4 imperative bullets.
+> The Editor (Step 4a, sandbox variant) hard-fails a `SANDBOX_STATE` entry missing either subsection, missing the aliveness directives, missing the stance-toward-{{user}} directive, or whose Tonal Mandate has fewer than 4 imperative bullets.
 
 > **Relationship & belief memory in sandbox.** Sandbox has no arcs, so there is no per-arc CHARACTER_STATE/NPC_SHIFT relational drift (the arc-mode mechanism). Its equivalent is *standing accumulation*: the aliveness directives above already require the world to react to and **remember** {{user}}'s actions and reputation and to **never reset NPC attitudes to neutral between scenes**. That is the sandbox relationship-state contract — attitudes and beliefs persist and compound across play rather than resetting. Keep any standing stances among principals (and toward {{user}}) in the principal §7.D profiles; do not invent per-arc state.
 
@@ -1012,12 +1076,14 @@ Append to your submission note before handing to The Editor:
 - [ ] **Roster NPC voice fingerprints are unique — no two roster NPCs swappable from a single line (distinctiveness rule)**
 - [ ] **NPC/Character Identity Convention upheld (NPC Memory Contract): one canonical name per character used verbatim in every comment; canonical names unique across the cast (no slug collision); em-dash comment form; recognized facets use the controlled vocabulary; one character per entry (interchangeable extras marked `Shared roster entry`); `{{user}}` never authored as an NPC**
 - [ ] All entries have trigger keys
+- [ ] **Tier 2 Protagonist Lorebook: every passage is descriptive-for-reaction, not directive-for-behavior — no behavioral mandates, trigger-response pairs, or voice prescriptions with `{{user}}` as the acting subject; no second-person framing; no engine instructions; no Section 6 posture directives (those are Tier 3)**
 - [ ] **Every entry has a Position Rationale field — marked "DEFAULT" or justified per Notes_On_functionality**
 
 ### Tier 3 — Sandbox Lorebook Entries (sandbox mode only — skip if arc mode)
 - [ ] Exactly one `Tier3_Sandbox_Entries.md`, no per-arc files
 - [ ] **SANDBOX_STATE entry (CONSTANT, no key) uses the two-subsection structure: `**Standing Situation:**` followed by `**Tonal Mandate (binding behavioral directive — applies to every response):**`**
 - [ ] **SANDBOX_STATE Tonal Mandate has 4–8 imperative bullets and includes the aliveness directives (NPCs act on their own, world reacts/remembers, never freezes, rotate the cast), made concrete by referencing principal Standing Goals + the lull-trigger (when a scene lulls, an NPC advances its goal)**
+- [ ] **SANDBOX_STATE Tonal Mandate carries the stance-toward-{{user}} directive (the experience contract in directive form) meeting the §8.A bar: named non-deferring force + its own want, what is live to lose, all three reflexes (yield / auto-success / rescue) prohibited in this world's concrete vocabulary, off-the-table boundary where declared. Required in `deferential` sandboxes too, inverted. Agrees with the Standing Situation's experience contract and Master Design Section 6.**
 - [ ] **Laddered principals (sandbox): SANDBOX_STATE aliveness bullet names each active ladder stage + carries the progression discipline (advance only on stated condition, never skip, never self-resolve the endpoint); WORLD_PULSE names the in-motion stages**
 - [ ] At least one WORLD_PULSE entry (position 4, sustained, never resolved)
 - [ ] No CHARACTER_STATE / NPC_SHIFT / DRAMATIC_BEAT / arc-trigger entries present
@@ -1027,7 +1093,8 @@ Append to your submission note before handing to The Editor:
 - [ ] ARC_STATE entry for every arc (CONSTANT, no key)
 - [ ] **ARC_STATE content uses the mandatory two-subsection structure: `**Dramatic Situation:**` followed by `**Tonal Mandate (binding behavioral directive — applies to every response in this arc):**`**
 - [ ] **ARC_STATE Tonal Mandate contains 4–8 bulleted directives using imperative language (resist, dominates, never default to, dwells on, elides, do not, must, never, always)**
-- [ ] **ARC_STATE Tonal Mandate covers active register, prose dwells on, prose elides, live scene types, activity cadence (when principal NPCs are active in the arc), and hard prohibitions where relevant**
+- [ ] **ARC_STATE Tonal Mandate covers active register, prose dwells on, prose elides, live scene types, activity cadence (when principal NPCs are active in the arc), stance toward {{user}} (every arc, no exemptions), and hard prohibitions where relevant**
+- [ ] **ARC_STATE stance-toward-{{user}} directive present in EVERY arc: traceable to Master Design Section 6 (opposition + losables), all three reflexes (yield / auto-success / rescue) named as prohibitions in this arc's concrete vocabulary rather than restated abstractly, boundary carried where declared, `deferential` arcs inverted rather than omitted, no clause specifying what {{user}} does in response**
 - [ ] ARC_STATE contains {{char}} and NPC knowledge rules (not {{user}} knowledge restrictions)
 - [ ] ARC_STATE names dramatic goals
 - [ ] CHARACTER_STATE item 6 (relational stance) present for each character whose load-bearing relationship drifts this arc — current stance + the beat that moved it + the operative belief; static relationships not restated

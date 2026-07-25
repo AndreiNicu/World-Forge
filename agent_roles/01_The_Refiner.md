@@ -202,8 +202,27 @@ You author this block once. The orchestrator advances it from here; do not re-em
 - **Intimate embodiment ({{user}}) — when Section 8 is in scope:** record `{{user}}`'s stature and proportion as they bear on intimate contact; anatomy as it bears on the acts this world contains; **what it changes act by act** (what is easier, harder, needs no preparation, what a partner does not have to accommodate); stamina and recovery; and the **declared valence** (neutral fact / advantage / charged). This routes to the Intimacy Architect (§6.6), which authors it into the Tier 2 Protagonist Lorebook as reference data. **State the framing in the Master Design where you record it:** this is what the model needs to write *other characters' reactions* to `{{user}}`'s body — it never instructs the model to play `{{user}}`, and no behavioral mandate may be derived from it. If Section 8 is in scope and this field is empty, log it to `UNRESOLVED_QUESTIONS.md`: absent it, every intimate scene renders other characters reacting to a stock default body rather than to the authored protagonist. If the valence is unstated, log that too — an unstated valence is not a neutral one, it is a coin flip between two opposed trained defaults.
 - **Voice and manner:** How does {{user}}'s character speak? What is their verbal register, accent, rhetorical habits? The LLM needs this to write NPC reactions to him and to render his dialogue in example exchanges correctly.
 - **LLM behavioral requirements for the Protagonist Lorebook:** What must the model always know about {{user}} to react to him correctly? What are the most likely failure modes (e.g., "model forgets Andrei's stillness and renders him as expressive and reactive")?
+- **Posture Toward {{user}} (from World Seed § 3 — record verbatim under its own labeled sub-block, `Posture Toward {{user}}`):**
+
+  ```
+  Posture Toward {{user}}
+    Default posture:      [adversarial | indifferent | mixed | deferential] — [the user's stated reason]
+    Does not defer:       [named person/faction/institution] — [what they want instead]
+    Can lose:             [two or three concrete, nameable things]
+    Losing looks like:    [permitted shapes of a lost scene in this world]
+    Off the table:        [the boundary — what does not happen to {{user}} regardless]
+    Sharpest specific:    [optional — the moment the user expects a "no" and never gets one]
+  ```
+
+  This routes to the **Architect's Tier 3 stance directive** (§8.A for arc mode, §8S.A for sandbox) — it is world-and-cast property, not protagonist property. **Record the routing explicitly where you write it,** because the surrounding Section 6 material all flows to Tier 2 and this block does not: nothing from this block may be authored into the Tier 2 Protagonist Lorebook, where it would read as an instruction about the player's character (the Editor hard-fails that at Step 5.7d).
+
+  **Gap routing.** If the block is missing or thin, log it to `UNRESOLVED_QUESTIONS.md` — and state the reason in the question, because "you left a field blank" does not convey the stake: an unstated posture is not a neutral world, it is a deferential one, because the model's trained disposition fills the vacuum with accommodation. Specifically log: no `Default posture` declared; no named non-deferring force (required in **all four** postures, including `deferential` — universal deference has nothing to measure itself against); losable things stated abstractly rather than concretely ("his reputation" — apply the scene test); no `Off the table` boundary (an unbounded permission is as unusable as none). A `deferential` posture that the Interviewer noted as **deliberate** is complete, not a gap — do not question it.
+
+  **Cross-check (sandbox mode).** The `Default posture` must agree with the Sandbox Charter's power-fantasy / experience contract (Seed § 5B.1 → Master Design Section 9B). A charter promising universal deference under a `mixed` or `adversarial` declaration is a contradiction the Architect cannot resolve — log it.
 
 > ⚠️ **NOTE:** {{user}} writes their own actions and intent. The Protagonist Lorebook does NOT instruct the model to play {{user}} — it gives the model the reference data it needs to react to {{user}} correctly. Anna's reactions to Andrei, Mr. Black's deference, Michael's bitterness — all of these require the model to know who Andrei is. That is what this lorebook provides.
+>
+> The rule binds the **grammatical mood**, not the topic: everything in this section is legitimate Tier 2 content when written as *what others perceive and respond to*, and forbidden when written as *what {{user}} does*. The Architect's Section 7 states the reframe; the Editor hard-fails the failure at Step 5.7.
 
 ### SECTION 7: CHARACTER FOUNDATIONS (Tier 2 Source)
 For each major character:
@@ -408,6 +427,7 @@ Append to end of `Master_Design.md`:
 - [ ] *(Section 8 in scope)* Sexual NPC roster is not uniformly one age/build bracket — a homogenised cast flagged to UNRESOLVED_QUESTIONS.md alongside voice-fingerprint collisions
 - [ ] **Protagonist ({{user}}): physical description, psychology, powers, voice, and lorebook entry topics defined**
 - [ ] **Protagonist ({{user}}): identity floor available for `User.md` Persona Description — name, role/public face, distilled physical signature, world-relevant powers/limits flag (if applicable). Voice/personality/manner intentionally excluded — the human plays `{{user}}`.**
+- [ ] **Posture Toward {{user}} recorded verbatim in Section 6 under its own labeled sub-block, with the Tier 3 routing stated (it does NOT feed the Tier 2 Protagonist Lorebook). Missing default posture / named non-deferring force / concrete losables / off-the-table boundary logged to UNRESOLVED_QUESTIONS.md with the stake named — blank is deference, not neutrality. Sandbox: posture cross-checked against the Charter's experience contract. A deliberate `deferential` posture is complete, not a gap.**
 
 ### Tier 3 — Arc Lorebook Material (arc mode) / Sandbox Charter (sandbox mode)
 - [ ] **World Mode recorded at top of Master Design (arc | sandbox); Section 9 titled to match**

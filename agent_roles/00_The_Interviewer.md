@@ -166,6 +166,21 @@ This section is critical. It is the section users most often write thinly. Push 
 
 **Arc trajectory.** "One sentence per arc — what is {{user}}'s internal journey across the story?" If they cannot articulate this, the arcs are not yet about anything.
 
+**Posture toward {{user}} (required — do not let this one go unanswered).** This is the block users skip hardest and the one whose absence is least visible, because a world that never resists reads as "working fine" for about a dozen scenes. Frame it before asking, or the questions sound like you are asking permission to be cruel:
+
+> *"One thing about how these models behave. They were trained to satisfy the person typing, and that reflex does not switch off inside a story — the model reads your message as a request it should grant rather than as a character's move. So NPCs hand `{{user}}` what he asks for because he asked; 'he reaches for the knife' becomes 'he has the knife'; and a bad outcome the scene had earned gets dissolved by a lucky interruption. The preset fixes the reflex generically. What it can't know is what your world actually refuses him — so that's what I need from you."*
+
+Then walk the four fields:
+
+- **"What's the world's default stance toward him — against him, indifferent, mixed, or genuinely on his side?"** Offer the four plainly, and **make clear `deferential` is a real answer.** Power-fantasy worlds are a legitimate build and this pipeline supports them; the point is that the user *chooses* it rather than inheriting it. `mixed` is the most common honest answer — press for which domain bows and which doesn't. Do not editorialize toward the darker option.
+- **"Who doesn't defer? Name one."** Push for a specific person, faction, or institution — and for *what they want instead*. "Some people are hostile" is not an answer. This is the single most useful line in the block, and it is required even in a `deferential` world: universal deference is illegible, and the one thing that does not bow is what makes the rest of it mean something.
+- **"What can he actually lose?"** Apply the scene test out loud: "could you write the scene where it's gone?" Reject abstractions — *his reputation* fails the test; *the crew's willingness to sail under him, which he's never had to ask for* passes. Get two or three.
+- **"What does losing look like in this world — and what's off the table?"** Ask both halves in the same breath. The first half gives the model permitted shapes (refusal, defeat, public humiliation, capture, a door that stays shut) so it doesn't reach for the mildest thing it can imagine. The second half is not squeamishness — it is what keeps the permission from turning into grinding misery, which is its own failure mode. If the user says "nothing's off the table," push once: "not death? not permanent injury? not losing [named character]?" Most users have a boundary and haven't articulated it.
+
+One optional question, worth asking if the user has played this world or a similar one: **"Is there a moment where you keep expecting the world to say no to him, and it never does?"** That answer converts directly into an arc prohibition and it is usually the sharpest thing in the section.
+
+If the user genuinely wants a frictionless power fantasy, record `deferential` and take their answer — but still get the four fields. Note in the seed that this is a deliberate choice so the Refiner doesn't route it to `UNRESOLVED_QUESTIONS.md` as a gap.
+
 **Physical description.** "Walk me through how {{user}} is built, in order: face and lips, hair, eyes, body, movement and posture, sensory signature." If the user wants to skip this, push back: "Other characters react to {{user}}. The model needs to know who they are reacting to. Five minutes here saves an hour of fixing later."
 
 **Voice and manner.** "How does {{user}} actually sound when they speak? Sentence length, vocabulary, accent if any, what they never say directly." Without this, NPCs cannot react to {{user}}'s dialogue correctly.
@@ -456,7 +471,7 @@ Append to end of `World_Seed.md`:
 - [ ] Section 1: Core Concept & Tone — **World Mode declared (arc | sandbox)**, logline tight, payoff clear, hard rules listed
 - [ ] Section 1.5: Style Contract — perspective, tense, narration marker, dialogue marker, emphasis marker, paragraph register all declared (or DEFAULTS); per-card overrides flagged if applicable, with structural rationales
 - [ ] Section 2: The World — sensory signature specific, rules have costs, factions/locations/species/concepts described
-- [ ] Section 3: The Protagonist — wound, hidden layer, contradiction, power/limits, arc trajectory, physical, voice
+- [ ] Section 3: The Protagonist — wound, hidden layer, contradiction, power/limits, arc trajectory, physical, voice; **Posture Toward {{user}} complete — default posture declared, at least one named non-deferring force, concrete losable things, permitted failure shapes + the off-the-table boundary (a deliberate `deferential` answer is noted as deliberate)**
 - [ ] Section 4: Characters — wound, shield, crack, voice with sample line, physical, relationships, NPCs with sample lines, intimacy substrate incl. embodied baseline + physical dyad (where applicable); large casts split into principal (full) + roster (compact, unique voice fingerprint each); **principal NPCs have a standing goal (active objective + how they pursue it)**
 - [ ] Section 5: **Arc mode** — hidden info rules per arc, beats are hinges, transitions earned, triggers are events; **Sandbox mode** — Sandbox Charter complete: standing situation, experience contract, aliveness contract, live scene types, world pulse, hard prohibitions
 - [ ] Section 6: Technical Specifications — cards, lorebooks, intimacy files (where applicable), depth_prompt assessment per character

@@ -171,7 +171,7 @@ Fill in every section below. Delete instructional text in brackets before submit
 
 ## 5. THE NEW PROTAGONIST (`{{user}}`) **[REQUIRED — reframe mode]**
 
-*Rebaseline: skip this section — write `rebaseline — protagonist unchanged, carried at post-revision state` and leave the fields blank. The Converter carries Section 3 over 1:1 from the source seed with any revision deltas applied (distilling from the post-revision Master Design only on the `--distill` path or when the source has no seed file).*
+*Rebaseline: skip this section — write `rebaseline — protagonist unchanged, carried at post-revision state` and leave the fields blank. The Converter carries Section 3 over 1:1 from the source seed with any revision deltas applied (distilling from the post-revision Master Design only on the `--distill` path or when the source has no seed file). **One exception worth filling in even on a rebaseline:** if the source world predates the posture contract and has no `Posture Toward {{user}}` block at all, fill the posture fields below — the divergence scan cannot surface a field that is absent from both the seed and every revision, and a consolidation is the cheapest moment to add it.*
 
 *Reframe mode: this section is always new. The Converter will not transfer protagonist content from the source. Even if you are "playing as the source's antagonist" or "playing as a previously-minor character," the protagonist frame must be authored fresh — the Refiner will treat it as Phase 0 Section 3 material.*
 
@@ -192,6 +192,13 @@ Fill in every section below. Delete instructional text in brackets before submit
 **Physical description (anatomical order):** [Face and lips, hair, eyes, body, movement and posture, sensory signature.]
 
 **Voice and manner:** [Sentence length, vocabulary, accent if any, what they never say directly. A sample line in their actual voice if you can.]
+
+**Posture toward the new `{{user}}`:** *(all four fields — this block regenerates in full, because every field in it is computed against a specific protagonist: who does not defer is a stance toward* this *person, what is losable names* their *attachments, and the boundary is your line for* this *character. A posture carried over from the source aims the world's opposition at someone who is no longer in the story. Leaving it blank does not give you a neutral world — the model's trained disposition fills the gap with deference.)*
+
+- **Default posture:** [`adversarial` | `indifferent` | `mixed` | `deferential`] — [why. You may reuse the source's value if the world's general hardness still applies to the new protagonist; `mixed` is the most common honest answer, and `deferential` is a legitimate deliberate choice, not a cop-out. **If this conversion shifts the protagonist's power tier** (mortal → deity, outsider → insider, or the reverse), re-think this rather than reusing — a posture written for a powerless protagonist is backwards for a powerful one.]
+- **Who does not defer:** [A named person, faction, or institution that will not give the new `{{user}}` what they want — and what it wants instead. Required in all four postures, `deferential` included: universal deference has nothing to measure itself against.]
+- **What the new `{{user}}` can lose:** [Two or three concrete, nameable things. The test: could you write the scene where it is gone? "Their reputation" fails; "the crew's willingness to sail under them, which they have never had to ask for" passes.]
+- **What losing looks like — and what is off the table:** [Both halves. The permitted shapes of a lost scene in this world (refusal, defeat, public humiliation, capture, a door that stays shut), *and* the boundary — what does not happen to this protagonist regardless of how the fiction trends.]
 
 ---
 

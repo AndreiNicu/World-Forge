@@ -223,6 +223,29 @@ Delete all instructional text in brackets before submitting. Leave the section h
 
 **{{user}}'s Arc:** [One sentence per arc describing the protagonist's internal journey. Example: "Arc 1: Denial. Arc 2: Confrontation. Arc 3: Loss. Arc 4: Reconstruction."]
 
+#### POSTURE TOWARD {{user}} **[REQUIRED]**
+
+*Read this preamble before filling the fields — the reason this block exists is not obvious.*
+
+*The model was trained to satisfy the person typing. In roleplay that reflex does not switch off just because the fiction says it should: it reads `{{user}}`'s message as a **request from a person it should please** rather than as **a character's move in a story**. The visible symptoms are always the same three — an NPC gives `{{user}}` what they asked for because they asked; a stated attempt ("`{{user}}` reaches for the knife") is rendered as an accomplished fact; and a bad outcome the fiction had earned gets dissolved by a convenient interruption, a lucky timing, an enemy who inexplicably hesitates.*
+
+*The preset carries the engine-level correction. What it cannot carry is **what is actually true of your world** — and a generic "the world resists `{{user}}`" directive with nothing specific behind it is exactly the kind of instruction a model nods at and ignores. This block is the substrate the correction reaches for.*
+
+*⚠️ **Leaving this blank does not give you a neutral world — it gives you an accommodating one.** Same trap as the intimacy valence field in §4: unstated is never neutral, it is whichever default the model was trained into. Here that default is deference.*
+
+*⚠️ This is a property of **the world and its cast**, not of `{{user}}`. Everything here describes what the world does, refuses, wants, and costs. Nothing here describes what `{{user}}` does — the human plays `{{user}}`. It lands in Tier 3 (the arc/sandbox state directive), never in the protagonist lorebook.*
+
+- **Default posture — pick one and say why:** `adversarial` | `indifferent` | `mixed` | `deferential`
+  [**adversarial** — the world actively opposes {{user}}; someone benefits from their failure. **indifferent** — the world is not against them, it simply does not care and will not rearrange itself; doors are shut because doors are shut. **mixed** — deference in one domain, obstruction in another (the most common real answer: his crew obeys, the city does not). **deferential** — the world is genuinely postured toward {{user}}; this is a power fantasy and the deference is the point. All four are legitimate. **`deferential` is a real answer, not a cop-out** — but choose it deliberately, and then fill the fields below anyway, because a power fantasy with nothing at stake goes inert within a dozen scenes.]
+
+- **Who does not defer — name at least one:** [A specific person, faction, institution, or force that will not give {{user}} what they want and has its own reason not to. Not "some people are hostile" — *who*, and *what do they want instead*. In a `deferential` world this is the one thing that does not bow, and it is what keeps the fantasy legible: deference means nothing when it is universal. Example: "The dock crews obey him. The harbourmaster has never recognised his authority and is waiting for the licence review in spring."]
+
+- **What {{user}} can actually lose:** [Concrete and nameable. A person, a standing, a place, a body part, a belief, a capability. The test: could you write the scene where it is gone? "His reputation" is weak; "the crew's willingness to sail under him, which he has never had to ask for" is usable. List two or three.]
+
+- **What losing looks like here — and what is off the table:** [What does a *lost* scene actually look like in this world? Defeat, refusal, humiliation, capture, exile, being publicly wrong, a door that stays shut? The model needs the permitted shapes, or it will reach for the mildest thing it can imagine. **Then state the boundary**: what will you not have happen to {{user}} regardless of how the fiction trends — permanent maiming, death, a specific violation, losing a named character? This half matters as much as the first: an unbounded permission produces a model that either ignores it or overshoots into misery, and neither is the story you wanted.]
+
+- **Optional — the sharpest specific:** [If there is one moment you keep expecting the world to deny {{user}} and it never does, name it. This is the highest-value line in the block; it is a playtest observation and it converts directly into an arc prohibition.]
+
 #### PROTAGONIST PHYSICAL DESCRIPTION **[OPTIONAL but recommended]**
 *If you want the AI to render {{user}}'s appearance consistently, describe it here. This becomes a Tier 2 lorebook entry. If left blank, the AI will not describe {{user}}'s appearance unprompted.*
 
@@ -581,7 +604,7 @@ Trigger keywords: [name variants, role descriptors]
 
 **{{user}}'s standing & power:** [Who is {{user}} in this world and what is their position/power? In a power-fantasy sandbox this is central — the world is postured toward them in a specific way. Be concrete about what {{user}} can do and how the world treats them by default.]
 
-**The power-fantasy / experience contract:** [How does the world treat {{user}} by default — deference, fear, desire, opportunity, danger? What is the *feeling* the sandbox is built to deliver? This sets how NPCs and the world react before any specific scene.]
+**The power-fantasy / experience contract:** [How does the world treat {{user}} by default — deference, fear, desire, opportunity, danger? What is the *feeling* the sandbox is built to deliver? This sets how NPCs and the world react before any specific scene. **This must agree with §3's `Default posture` declaration** — if you wrote `deferential` there, this is where you describe what that deference feels like; if you wrote `mixed`, say which domains bow and which don't. A sandbox is the mode where an unexamined "everyone loves {{user}}" default does the most damage, because there is no arc pressure to carry a scene that has gone inert.]
 
 ### 5B.2 — Tonal Mandate (how the world must be played)
 
@@ -847,6 +870,8 @@ Trigger keywords: [name variants, role descriptors]
 **Section 3 — The Protagonist:**
 - [ ] Identity, hidden layer, contradiction, power/limits defined
 - [ ] Arc journey described
+- [ ] **Posture Toward {{user}} filled in — default posture declared (`adversarial` / `indifferent` / `mixed` / `deferential`), at least one named force that does not defer, two or three concrete losable things, the permitted shapes of a lost scene *and* the boundary of what is off the table.** Blank is not neutral; blank is deference.
+- [ ] Sandbox worlds: the §3 posture declaration and §5B.1's power-fantasy/experience contract agree with each other
 
 **Section 4 — Characters:**
 - [ ] Every AI-played character has: psychological core, shield, crack, voice pattern, opening scenario, first message, example exchanges
