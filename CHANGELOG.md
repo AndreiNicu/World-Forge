@@ -13,6 +13,93 @@ numbers. Newest first.
 
 ---
 
+## 2026-07-25 — Embodied specificity: the generic-body defense for intimate scenes
+
+The pipeline's founding observation is that the model collapses characters to
+a default unless something compels otherwise — hence voice entries, voice
+fingerprints, and the Voice Auditor. That collapse applies to *bodies* just as
+much as to voices, and nothing in the pipeline addressed it: absent a
+compelling substrate, every character in an intimate scene gets rendered on a
+stock body in its early twenties, with stock stamina and stock mechanics, no
+matter what the card's physical description says. A woman in her forties who
+has carried two children reads identically to a twenty-year-old.
+
+The fix is not a physiology reference — the model already knows what age,
+childbirth, injury, and build do to a body. The fix is removing its license to
+ignore that knowledge, which is an elicitation-and-directive problem, the same
+shape as every other collapse this pipeline defends against.
+
+The change also closes a structural gap: half of what makes an intimate
+pairing specific is not a property of either character. Height differential,
+stamina asymmetry, and age-gap embodiment are properties of a *dyad*, and no
+per-character field can hold them. `[CHAR]_INTIMACY_RELATIONSHIP_DELTAS`
+(previously optional and purely psychological) becomes the home for them and
+is now required wherever a real differential exists.
+
+Three rules ship with it, because the naive version of this feature makes
+output worse: substrate is authored in **observable register, not clinical
+vocabulary** (the entry reaches the model's context and the model echoes it —
+clinical input produces anatomy-lecture prose); embodiment is authored as
+**difference, not deficit**, in both directions and for both partners (a
+non-default body is different, not a degraded copy — and the younger partner's
+inexperience is an asymmetry running the other way); and **every** intimate
+character gets a baseline, including unremarkable default-bodied ones, or the
+field becomes "the aging field" and the stock default silently reasserts
+itself for everyone else.
+
+### Added
+- `agent_roles/06_The_Intimacy_Architect.md`: Entry 3 (`BODY_REACTIONS`) split
+  into two mandatory halves — **Half A embodied baseline** (age and what the
+  body has lived through, build and scale, arousal and recovery mechanics, the
+  particulars of the world's live acts, trajectory) and **Half B reaction
+  set** (the previous content), with the three governing rules stated inline.
+  Entry 7 gains **Half B physical dyad** and moves from "Optional entries" to
+  "Conditional entries" — required wherever a height, age, build, stamina,
+  experience, or world-specific differential exists. §6.5 roster stat block
+  gains an `Embodied baseline` line. Four craft notes and two
+  never-goes-in-a-profile rules added; §8 gains an embodied-consistency
+  cross-check; sign-off gains three items.
+- `agent_roles/03d_The_Intimacy_Auditor.md`: new **Step 3I — Embodied
+  specificity**, the generic-body counterpart to Step 3E's generic-voice
+  check, with four sub-checks (body specificity, dyad materiality, clinical
+  intrusion, deficit framing) and severity guidance. Six diagnosis-table rows,
+  a report section, a sign-off item, and a §8 note on not supplying the body
+  the drafts failed to.
+- `templates/World_Seed_Template.md`: §4 `Embodied baseline` and
+  `Physical dyad` fields; embodied/dyad content added to both NPC intimacy
+  fields (principal and roster); three §4 checklist items.
+- `agent_roles/00_The_Interviewer.md`: two new Section 4 elicitation questions
+  (embodied baseline asked *before* the reaction questions; the physical dyad
+  as an explicitly pairing-level question), each with register and direction
+  pushback; NPC intimacy paragraph notes age/build/history as the cheapest
+  differentiators on a large roster.
+- `agent_roles/01_The_Refiner.md`: Section 7 `Embodied baseline` and
+  `Physical dyad` recording bullets with `UNRESOLVED_QUESTIONS.md` routing for
+  gaps, deficit-only entries, and consequence-free dyads; three sign-off items;
+  homogenised-sexual-roster flag in the NPC intimacy routing paragraph.
+
+### Changed
+- `agent_roles/revise/02b_The_Intimacy_Architect_mini.md`: new foundational
+  delta 3a (embodiment is substrate; the parent's three rules bind); both
+  halves added to the new-profile draft list plus a physical-dyad line; two new
+  cross-cascade cases — a changed age/history/build makes every dyad involving
+  that character **stale**, and a new or replaced partner leaves a pairing with
+  no dyad at all; two sign-off items.
+- `agent_roles/revise/03d_The_Intimacy_Auditor_mini.md`: new foundational
+  delta 3c running the parent's Step 3I on the affected slice, with stale
+  dyads called out as the revision-specific failure; audit and sign-off lines.
+- `agent_roles/Converter/00_The_Converter.md`: three preservation-matrix rows
+  separating the two — `Embodied baseline` **preserves** (a body survives a
+  protagonist swap), `Physical dyad` against `{{user}}` **strips + marks**
+  (the pairing's other half was replaced), dyads between preserved characters
+  preserve; Step 6 Section 4 authoring rule and marker; Step 4 question 5 note;
+  Section 9 rebaseline inversion row (`{{user}}` dyads carry — same person).
+- `templates/Convert_Brief_Template.md`: §4e reminder bullets mirroring the
+  matrix split, and the rebaseline inversion paragraph.
+- `CLAUDE.md`: cross-file consistency row for the embodied-specificity seam.
+
+---
+
 ## 2026-07-18 — Three new optional preset blocks: action choreography, fair-play mystery, register blending (#81)
 
 The genre-lens table (entry below) made the optional block menu's coverage

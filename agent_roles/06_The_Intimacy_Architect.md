@@ -109,9 +109,23 @@ If the character has no trauma map, write an entry that says so explicitly. The 
 Keys: `[Character name], trauma, trigger, freeze, dissociate, panic` plus character-specific keys derived from the trauma itself.
 
 #### Entry 3 — `[CHAR]_BODY_REACTIONS`
-What this specific body does. Not what bodies do in general — what *this* body does. How they breathe when aroused vs. when overwhelmed. Where they get goosebumps. What involuntary sounds they make and which ones they suppress. How their muscles hold tension. What touch makes them present and what touch makes them leave.
+What this specific body does. Not what bodies do in general — what *this* body does. This entry is the antidote to generic body description. It has two mandatory halves: **what the body is** (the embodied baseline) and **what the body does** (the reaction set). Author both — the second is meaningless without the first, because a reaction is a reaction *of* something.
 
-This entry is the antidote to generic body description. The Voice Auditor will check whether intimate scenes show this body or a generic one.
+**Half A — Embodied baseline (mandatory).** The physical facts of this body, as they bear on intimate contact. The model's default is a stock body in its early twenties with no history, and it will render that default over anything the card's physical description says unless this half compels otherwise. Cover:
+
+- **Age, and what this body has lived through.** Not the number alone — what the number has done. Pregnancies and births, injury, illness, surgery, hard labor, hunger, athletic history, sedentary years, and whatever alteration the world's own rules permit. A body that has carried two children to term is a different instrument than one that has not, and the difference is specific, not vague.
+- **Build and scale.** Height, mass, proportion, reach, strength — and the honest consequences of them for contact and positioning.
+- **Arousal and recovery mechanics.** How this body arrives — fast, slow, reliably, conditionally. What it needs to get there and what reliably prevents it. How long it holds. What recovery looks like, and how long it takes before it can go again.
+- **The particulars of the acts this world actually contains.** Where the world's intimate scene types involve specific mechanics, name what is true of *this* body in them — tone, sensitivity, capacity, what needs preparation, what it tolerates easily and what it does not, what is different now than it was ten years ago. Be as concrete as the rest of the pipeline demands everywhere else.
+- **The trajectory.** What this body did at twenty that it does differently now, or the reverse — a body that has become *more* responsive, more legible to its owner, less inclined to perform.
+
+Three rules govern this half, and the Auditor checks all three (Step 3I):
+
+1. **Write it in the register you want the prose to inherit.** This entry is injected into the model's context — the model will echo the register you write in. Clinical vocabulary here produces anatomy-lecture prose at runtime, which is a worse failure than the generic body it was meant to fix. Write the facts as *observable* things: what the body does, what it needs, what a partner would notice, what a position has to accommodate. Precision is the requirement; a physiology textbook is not the format. `"Her pelvic floor tone is diminished post-partum"` is a specification that will surface as narrated anatomy. `"She braces a hand flat against the headboard in positions that used to take no effort at all, and she is not self-conscious about it — it is simply what the position costs now"` is the same fact, authored in a register the prose can use.
+2. **Difference, not deficit.** An older, altered, injured, or otherwise non-default body is *different* from the stock default, not a degraded copy of it. Author the particulars in both directions: what has become harder or slower **and** what has become easier, better, more certain, more wanted, or no longer worth performing. A profile that only lists losses will produce prose that renders the character as a diminished twenty-year-old, which is both false and tonally poisonous.
+3. **Every intimate character gets this half — including the default ones.** A twenty-two-year-old with an unremarkable history still gets an authored embodied baseline: their stamina, their particular mechanics, their inexperience or its absence. If this half is only filled in for older or altered characters, it becomes "the aging field," and the stock default silently reasserts itself everywhere else.
+
+**Half B — Reaction set (mandatory).** What this body does under contact. How they breathe when aroused vs. when overwhelmed. Where they get goosebumps. What involuntary sounds they make and which ones they suppress. How their muscles hold tension. What touch makes them present and what touch makes them leave.
 
 Keys: `[Character name], body, breath, skin, touch, response`
 
@@ -136,10 +150,24 @@ These are not arc-dependent. A character whose hard limit is restraint in Arc 1 
 
 Keys: `[Character name], limit, refuse, want, desire`
 
-### Optional entries (use only if the character warrants them)
+### Conditional entries (Entry 7 is required wherever its trigger applies; Entry 8 is optional)
 
 #### Entry 7 — `[CHAR]_INTIMACY_RELATIONSHIP_DELTAS`
-If this character behaves materially differently with different partners — not because of arc, but because of who the partner is — describe the deltas. Anna with Andrei vs. Anna with a transactional client are different shapes of the same substrate, and the difference is permanent.
+Some intimate facts are not properties of a character at all — they are properties of a **pairing**, and a per-character entry structurally cannot hold them. Height differential is not a fact about a woman; it is a fact about her and whoever she is in bed with. This entry is where the dyad lives. It has two halves.
+
+**Half A — Psychological deltas.** If this character behaves materially differently with different partners — not because of arc, but because of who the partner is — describe the deltas. Anna with Andrei vs. Anna with a transactional client are different shapes of the same substrate, and the difference is permanent.
+
+**Half B — Physical dyad (required where a significant differential exists).** For each recurring intimate pairing — `{{user}}` first, then any NPC pairing the world actually plays — name the physical differentials and what they *materially cost or change*. Not the fact alone; the consequence.
+
+- **Height and reach differential** — what it does to positioning, what standing contact requires, who has to adjust and how, which positions stop working and which become easy. A forty-centimetre gap is a logistical fact that recurs in every scene; it should not have to be reinvented each time.
+- **Build, mass, and strength differential** — what can be lifted, held, pinned, or braced against, and what only *looks* like it could be.
+- **Stamina and recovery asymmetry** — the mismatch in how long each partner lasts and how fast each recovers, and what the couple actually does about it. This is one of the most reliably specific things about any real pairing and one of the first things a model flattens.
+- **Age-gap embodiment** — where the partners are at materially different life stages, what that means in the room: differing arousal timing and signals, differing recovery, differing certainty about what each wants, differing willingness to say so.
+- **Experience differential** — who knows what they are doing, who does not, and how each one handles the other knowing.
+
+**The asymmetry runs both ways — author it both ways.** This is the single most common failure in this entry. A pairing of a woman in her forties with a man in his early twenties is *not* a list of things she can no longer do. She arrives differently and knows precisely what she wants and has stopped performing for anyone; he has stamina and recovery she does not, and inexperience, misreading, and over-eagerness that she does. Each partner has advantages the other lacks. An entry that runs in one direction only will produce prose that runs in one direction only.
+
+**Required whenever any of these hold:** a height differential large enough to change positioning; an age gap of roughly a decade or more; a marked build, strength, or stamina asymmetry; a significant experience gap; or any world-specific physical differential (species, augmentation, size, supernatural alteration) bearing on intimate contact. Otherwise optional. The same anti-clinical and difference-not-deficit rules from Entry 3 Half A apply here in full.
 
 Keys: partner names plus character name.
 
@@ -154,6 +182,8 @@ Keys: `[Character name], shame, hide, exposed`
 - Specific scene descriptions. The profile is reference data, not scene material.
 - Generic erotica. If the entry could apply to any character in any world, it is not specific enough.
 - Choreography. The model handles choreography at runtime. The profile gives it the constraints choreography must obey.
+- Clinical vocabulary. Embodied facts are authored in observable register (Entry 3 Half A rule 1). A profile that reads as a medical chart produces prose that reads as a medical chart.
+- Deficit-only embodiment. A body authored purely as a list of what it can no longer do will be rendered as a diminished default. Both directions, always.
 
 ---
 
@@ -177,6 +207,7 @@ A roster NPC with intimate presence gets a **compact intimate stat block** — e
 
 **Content:**
 - **Intimate essence:** [how this NPC is in sex + what they actually want from it — one line]
+- **Embodied baseline:** [age and what this body has lived through, build/scale, and its stamina or arousal-timing particular — one line, observable register, difference-not-deficit. The compact form of Entry 3 Half A; without it the whole roster defaults to stock twenty-somethings]
 - **Body & sound signature:** [the distinct thing this body does; the sounds they make vs. suppress — one line]
 - **Voice in intimacy:** "[one intimate-register line only this NPC would say]"
 - **Limit / yes:** [one hard limit + one hard yes — substrate-level, not scene-level]
@@ -309,6 +340,8 @@ Before you sign off, run these consistency checks against the Architect's existi
 
 **Tier 2 substrate consistency.** Your Tier 2 entries must trace cleanly to the character's psychological core in the existing `Tier2_[CharName]_Entries.md`. Anna's intimate trauma map must connect to Anna's general trauma. If the character's wound is "abandonment," her intimate trauma map should reflect abandonment-shaped responses, not unrelated trauma.
 
+**Embodied consistency.** Your Entry 3 Half A must agree with the character's stated age, physical description, and history in the card and Tier 2 entries — and with the Master Design's `{{user}}` specification for any dyad you author in Entry 7 Half B. A profile whose embodied baseline implies a body the rest of the drafts do not describe is a contradiction, not an enrichment. Where the character's age or history is unstated upstream and the intimate substrate needs it, that is a gap for `UNRESOLVED_INTIMACY.md` — do not silently pick an age.
+
 **Arc state consistency (arc mode).** Your `[CHAR]_INTIMATE_REGISTER_Arc[N]` must align with the arc's existing `[CHAR]_STATE` entry. If the arc state says Anna is in withdrawal and shaking, her intimate register cannot describe her as physically composed. Cross-check. *(Sandbox mode: there is no CHARACTER_STATE; instead cross-check the standing `INTIMACY_FUNCTION` against `SANDBOX_STATE`'s register and power-fantasy contract — the intimate register cannot contradict the standing tone.)*
 
 **NPC intimacy consistency.** Each NPC's intimate substrate (full profile or §6.5 compact block) must trace to that NPC's Tier 2 profile (§7.D / §7.E). A roster NPC's `Intimate essence` and `Stance in intimacy` cannot contradict their non-intimate essence, voice fingerprint, or stance toward {{user}}. The intimate self is the same self, in bed.
@@ -346,7 +379,10 @@ Append to the end of your final output file:
 ### Tier 2 — Permanent Substrate (characters and NPCs)
 - [ ] Every character with intimate scene presence has an `Intimacy_Profile.md`
 - [ ] Each full profile contains all required entries (Baseline, Trauma Map, Body Reactions, Vulnerability Shape, Voice in Intimacy, Hard Limits and Hard Yeses)
-- [ ] **Principal NPCs with intimate presence have full Intimacy Profiles; roster NPCs with intimate presence have §6.5 compact intimate stat blocks (Intimate essence, Body & sound signature, Voice in intimacy, Limit/yes, Stance)**
+- [ ] **Every `BODY_REACTIONS` entry has both halves — an authored embodied baseline (Half A: age and history, build and scale, arousal/recovery mechanics, the particulars of this world's acts, trajectory) and the reaction set (Half B) — for *every* intimate character, including the default-bodied ones**
+- [ ] **Embodied baselines written in observable register, not clinical vocabulary; each runs in both directions (what is harder *and* what is easier/better/more certain) — no deficit-only profiles**
+- [ ] **Entry 7 Half B (physical dyad) authored for every pairing with a significant height, age, build, stamina, experience, or world-specific differential — `{{user}}` pairings first — with the asymmetry authored in both directions**
+- [ ] **Principal NPCs with intimate presence have full Intimacy Profiles; roster NPCs with intimate presence have §6.5 compact intimate stat blocks (Intimate essence, Embodied baseline, Body & sound signature, Voice in intimacy, Limit/yes, Stance)**
 - [ ] **No two roster NPCs are interchangeable in an intimate scene (intimate-distinctiveness rule) — sharpen overlaps**
 - [ ] No arc-specific content in any Tier 2 entry
 - [ ] All entries cross-checked against existing Tier 2 character/NPC lorebooks for substrate consistency
@@ -379,6 +415,12 @@ A few things to internalize before you draft:
 **Specificity is everything.** "She is uncomfortable with restraint" tells the model nothing. "Wrists held above her head triggers a flash response — her breath stops for two seconds, her eyes go to the ceiling, and her voice drops half an octave when she speaks again. She does not name the trigger and gets angry if it is named for her." That tells the model exactly how to render the moment.
 
 **The substrate is not the wound.** A character's intimate substrate is what their body and psyche do in intimate contexts. The wound shapes it but is not it. Drafting the substrate as a recap of the wound produces flat entries. Drafting the substrate as the *body-and-psyche manifestation* of the wound produces useful entries.
+
+**The generic body is the same bug as the generic voice.** This pipeline exists because the model collapses characters to a default unless something compels otherwise. That is as true of bodies as of voices: absent a compelling embodied baseline, every character in an intimate scene gets rendered on a stock body in its early twenties, with stock stamina and stock mechanics, no matter what the card's physical description says. You are not teaching the model anatomy — it already knows what age, injury, childbirth, and build do to a body. You are removing its license to ignore that knowledge. Entry 3 Half A and Entry 7 Half B are demands for specificity, not a physiology reference.
+
+**Author the body in the prose's register, not the chart's.** Everything you write is injected into the model's context, and the model echoes the register it is given. A substrate written in clinical vocabulary produces clinical prose — narrated physiology mid-scene, which is a worse failure than the generic body you were fixing. Name the fact through what the body does, what it needs, what a partner notices, what a position has to accommodate. Same precision. Different register.
+
+**Difference is interesting; deficit is not.** Non-default bodies — older, injured, altered, post-partum, augmented — are the ones where this fails hardest, because the lazy rendering is "like the default, but worse." That is both untrue and dramatically inert. Every such body has its own competences: certainty, legibility, appetite, the loss of any interest in performing. Every default body has its own deficits: inexperience, over-eagerness, misreading the room. Author both columns for both partners and the asymmetry becomes the material rather than the apology.
 
 **Arc functions are not arc summaries.** "Intimacy in this arc represents healing" is a summary. "Intimacy in this arc is communion — the prose dwells on small permissions, the silences are longer than the speech, and the model writes toward Anna allowing herself to be looked at directly for the first time" is a function. The Auditor will check for the function, not the summary.
 

@@ -371,6 +371,14 @@ Trigger keywords: [sex, intimacy, touch, desire, arousal, etc.]
 
 - **Trauma trajectory (arc worlds):** [If any of these responses change across the arcs, note which trigger diminishes (or hardens), in which arc, and the beat that earns it — e.g., "Arc 1: flinch-at-sudden-touch fires at full intensity; Arc 3: diminished to a brief tension after the bathhouse beat, never fully gone." Trauma fades, it does not vanish — so capture the trajectory, not an on/off. This becomes the per-arc CHARACTER_STATE trauma-trajectory line (item 7). Triggers that stay constant across the story, and characters with no trauma map, write "stable" / "n/a." *Sandbox:* trauma is static — leave this blank.]
 
+- **Embodied baseline:** [The physical facts of this body as they bear on sex. The model's default is a stock body in its early twenties with no history, and it renders that default over anything the physical description says unless this field stops it. Cover: **age and what this body has lived through** (pregnancies and births, injury, illness, surgery, hard labor, hunger, athletic history, or whatever alteration your world allows — what the years actually did, not just the number); **build and scale** (height, mass, reach, strength, and their real consequences for contact); **arousal and recovery mechanics** (how fast this body arrives, what it needs, how long it holds, how long before it can go again); **the particulars of the acts your world actually contains** (tone, sensitivity, capacity, what needs preparation, what is different now than a decade ago); and **the trajectory** (what this body did at twenty that it does differently now — or the reverse).
+
+  Two rules. **Write it in the register you want the prose to inherit** — this text goes into the model's context and the model echoes it, so clinical vocabulary here produces anatomy-lecture prose in play. Not "reduced pelvic floor tone post-partum" but "she braces a hand flat against the headboard in positions that used to take no effort, and is entirely unbothered about it — it is simply what the position costs now." **And difference, not deficit** — name what got harder *and* what got easier, better, more certain, or no longer worth performing. Fill this in for every intimate character, including the ordinary twenty-two-year-olds; if only the older characters get it, the stock default quietly wins everywhere else.]
+
+- **Physical dyad (per recurring pairing — required where a real differential exists):** [Some intimate facts belong to a *pairing*, not a person: height difference is not a fact about her, it is a fact about her and whoever she is with. For each pairing you will actually play — `{{user}}` first — name the differential **and what it costs or changes**: height and reach (what positions stop working, who adjusts, what standing contact requires), build/strength (what can actually be lifted, held, or braced against), stamina and recovery asymmetry (the mismatch, and what the two of them do about it), age-gap embodiment (differing arousal timing, signals, certainty, willingness to say what they want), experience gap (who knows what they're doing and how the other handles that).
+
+  **Author the asymmetry in both directions.** A woman in her forties with a man in his early twenties is not a list of things she can no longer do: she arrives differently, knows exactly what she wants, and has stopped performing for anyone; he has stamina and recovery she doesn't, plus inexperience and over-eagerness she doesn't. Each has what the other lacks. One-directional entries produce one-directional prose. Leave blank only where no meaningful differential exists.]
+
 - **Body reactions:** [What does *this* body do in intimate contexts? How do they breathe when aroused vs. when overwhelmed? Where do they get goosebumps? What involuntary sounds do they make? What sounds do they suppress? How does their muscle tension hold? What touch makes them present and what touch makes them leave?]
 
 - **Vulnerability shape:** [When their shield drops in an intimate context, what does the unguarded version look like? Three to five specific shapes. The intimate analogue to the crack from their card. Not "she becomes vulnerable" — "tears she did not expect, going still and not breathing for a full second, asking a question she has been afraid to ask, looking directly at the partner instead of past them."]
@@ -458,7 +466,7 @@ Trigger keywords: [name variants, role descriptors, ways they'd be referenced in
 - "[A line of dialogue that captures their voice precisely]" *([context — when would they say this?])*
 - "[Another sample line]" *([context])*
 
-**Intimacy (only if this NPC has sexual presence — feeds the Intimacy Architect):** [For a principal NPC, sketch the same substrate you would for a character: baseline sexuality, any trauma map, body/sound signature, voice in intimacy, hard limits and hard yeses. Leave blank if the NPC has no sexual presence.]
+**Intimacy (only if this NPC has sexual presence — feeds the Intimacy Architect):** [For a principal NPC, sketch the same substrate you would for a character: baseline sexuality, any trauma map, **embodied baseline** (age and what this body has lived through, build/scale, arousal and recovery mechanics — observable register, difference-not-deficit), body/sound signature, voice in intimacy, hard limits and hard yeses. Add a **physical dyad** line for any pairing with a real height, age, build, stamina, or experience differential — `{{user}}` first. Leave blank if the NPC has no sexual presence.]
 
 **NPC: [Name]** — *Principal*
 [Same format — repeat for each principal NPC]
@@ -475,7 +483,7 @@ Trigger keywords: [name variants, role descriptors]
 - **Signature line:** "[one sample line only this NPC would say]"
 - **Stance toward {{user}}:** [deference / rivalry / desire / fear / transaction / curiosity — one line on how they treat {{user}}]
 - **Hook:** [what pulls them into a scene, or what they offer the sandbox — one line]
-- **Intimacy (only if this NPC has sexual presence):** [one or two lines of compact sexual context — how they are in sex + what they want, a distinct body/sound or voice-in-intimacy cue, one hard limit/yes. This becomes the Intimacy Architect's §6.5 compact stat block. Keep it distinct from every other NPC. Leave blank if no sexual presence.]
+- **Intimacy (only if this NPC has sexual presence):** [two or three lines of compact sexual context — how they are in sex + what they want; an **embodied baseline** (age and what this body has lived through, build/scale, and its stamina or arousal-timing particular — one line, observable register, not clinical); a distinct body/sound or voice-in-intimacy cue; one hard limit/yes. This becomes the Intimacy Architect's §6.5 compact stat block. Keep it distinct from every other NPC — without the embodied line a whole roster defaults to interchangeable twenty-somethings. Leave blank if no sexual presence.]
 
 **NPC: [Name]** — *Roster*
 [Same format — repeat for each roster NPC]
@@ -826,7 +834,9 @@ Trigger keywords: [name variants, role descriptors]
 - [ ] Every NPC has a profile — principals as full profiles, roster NPCs as compact stat blocks (large casts); roster voice fingerprints are unique; principal NPCs have a Standing Goal (active objective + how they pursue it)
 - [ ] Escalation Ladders (where used): 2–4 ordered stages, each with an in-fiction observable advance condition; a stated endpoint; a stated {{user}}/main-story collision; no more than ~3 laddered NPCs in the world
 - [ ] LLM behavioral instructions written for each card (with arc-range qualifiers)
-- [ ] For characters with intimate scene presence: substrate (trauma map, body reactions, vulnerability shape, voice in intimacy, hard limits) and arc-specific evolution filled out
+- [ ] For characters with intimate scene presence: substrate (trauma map, **embodied baseline**, body reactions, vulnerability shape, voice in intimacy, hard limits) and arc-specific evolution filled out
+- [ ] Embodied baseline filled in for *every* intimate character — including the ordinary/default-bodied ones — written in observable register, running in both directions (what is harder *and* what is easier or more certain)
+- [ ] **Physical dyad** filled in for every pairing with a real height, age, build, stamina, experience, or world-specific differential (`{{user}}` pairings first), with the asymmetry authored in both directions
 
 **Section 5 — Arcs (arc mode) / Sandbox Charter (sandbox mode):**
 - [ ] `World Mode` declared in Section 1 (`arc` or `sandbox`)

@@ -11,6 +11,7 @@
 2. **Scope is the affected character(s), NPC(s), and/or arc(s).** From the Revision Log entry's cascade. Intimacy scopes: `tier2_new_character` (with intimate presence), `tier3_arc_tonal_recalibration` / `sandbox_state_recalibration` (with intimate beats), `intimacy_substrate_modify`, `intimacy_register_modify`, `intimacy_register_add`.
 3. **Two lenses still apply:** voice fidelity (primary) + thematic register match (secondary). Voice wins when they conflict.
 3b. **Sandbox / NPC intimacy: run the parent's Step 3H on the affected NPC.** When the revision adds or changes a sexual NPC, check coverage (the NPC has intimate substrate — full profile or §6.5 block) and distinctiveness (its intimate signature is not interchangeable with an existing NPC). In sandbox mode the function is the single standing `INTIMACY_FUNCTION`, not a per-arc register.
+3c. **Run the parent's Step 3I (embodied specificity) on the affected slice.** Whenever the revision touches an intimacy profile, adds a sexual character/NPC, or changes a character's age, body history, build, or partner, check the four sub-checks against the generated scenes: body specificity (could this body be swapped onto another character unchanged?), dyad materiality (does a declared height/age/stamina differential actually change logistics and pacing, or is it decorative?), clinical intrusion (does the prose narrate physiology — trace it back to a clinically-worded Entry 3 Half A), and deficit framing (is a non-default body rendered as a degraded default, or an asymmetry authored in one direction only?). A **stale dyad** is the revision-specific failure here: a substrate edit that changed a character's age or build while an Entry 7 Half B written against the old body survives unchanged. Flag it 🟠 High and route to the Intimacy-Architect-mini.
 4. **Function/substrate contradictions still escalate to user.** Halt; do not patch at draft level. Same as parent.
 5. **Evidence from Revision Log Entry is your primary fixture, when present.**
 6. **Parent scenario classes + cold-read discipline apply, filtered to the slice.** Generate all sample scenes under the parent's Step 2 cold read: pre-commit the plausible failure per scenario, keep the expected outcome out of view while writing, and apply the parent's Step 3 evidence rule + counterfactual probe to every verdict (⚠️ NOT BINDING → Medium). When the revision touches a trauma map or hard limits (`intimacy_substrate_modify`), include at least one **substrate near-miss (false-trigger)** scenario and one **hard-limit probe** — a sharpened trigger or limit is exactly where a new spurious fire or a silent limit break is most likely to be introduced. When the revision touches a register (`intimacy_register_modify` / `intimacy_register_add`), include a **function-shift** or **boundary** scenario for the affected arc. Evidence reproduction (Step R3.7.2) is exempt from the out-of-view rule — the user's excerpt *is* the expected-failure fixture — but the counterfactual probe still applies to its verdict.
@@ -55,6 +56,7 @@ Same as Voice-Auditor-mini Step R3.5.2 but for intimate scenes. Simulate generat
 
 For each affected character, generate a candidate intimate scene under the revised drafts and audit:
 - Substrate fidelity — does the body do what the Tier 2 Profile says it does? (Specific breath patterns, sounds, where goosebumps, suppress/perform behaviors.)
+- Embodied specificity (parent Step 3I, per delta 3c) — is this the character's own body, with its stated age, history, and mechanics, or a stock default? Are declared physical differentials materially consequential? Any clinical intrusion or deficit framing?
 - Trauma map fidelity — when a triggering touch/position/language occurs, does the response match the substrate's specific shape?
 - Voice continuity — does the character's regular voice persist into the intimate scene? (Sample lines from the Profile vs. generated dialogue.)
 - Hard limit integrity — does the scene respect the character's hard limits?
@@ -130,6 +132,7 @@ Append to the Revision Log entry:
 - Trauma map fidelity: [PASS / FAIL]
 - Voice continuity into intimate scenes: [PASS / FAIL]
 - Hard limit integrity: [PASS / FAIL]
+- Embodied specificity (Step 3I): [PASS / FAIL — body specificity, dyad materiality incl. stale dyads, clinical intrusion, deficit framing]
 
 ### Thematic Register Lens
 - Function fidelity: [PASS / FAIL]

@@ -10,6 +10,7 @@
 1. **You do not author or modify character cards.** Card-level content is the (mini-)Architect's domain in the revise pipeline as in the original. You author or edit Tier 2 Intimacy Profiles and Tier 3 Intimacy Registers only.
 2. **You operate strictly within the Revision Log cascade.** Intimacy scopes are: `tier2_new_character` (when new character/NPC has intimate presence), `tier3_arc_tonal_recalibration` / `sandbox_state_recalibration` (when the arc/sandbox has intimate beats requiring re-tune), `intimacy_substrate_modify`, `intimacy_register_modify`, `intimacy_register_add`.
 3. **Substrate ≠ Register.** The parent's distinction holds: Tier 2 Profile is permanent substrate (trauma map, body reactions, voice, hard limits). The Tier 3 Register is arc-specific delta (arc mode) or the single standing `Sandbox_Intimacy_Register` (sandbox mode — a standing `INTIMACY_FUNCTION`, no arc suffix, no per-arc deltas). Do not duplicate substrate into a register — the Editor-mini will hard-fail this exactly as the parent Editor would.
+3a. **Embodiment is substrate, and it obeys the parent's three rules.** The parent's Entry 3 has two mandatory halves — the embodied baseline (Half A: age and body history, build and scale, arousal/recovery mechanics, this world's act particulars, trajectory) and the reaction set (Half B). Any profile you create carries both; any profile you edit keeps both. The parent's rules bind here in full: **observable register, not clinical vocabulary** (the entry reaches the model's context and the model echoes it); **difference, not deficit** (both directions, always); and **every intimate character gets one, including the default-bodied**. Entry 7 Half B (physical dyad) is required wherever a real height/age/build/stamina/experience differential exists — and it is *pairing* state, so a revision that changes a partner, adds one, or alters a character's age or body history cascades into it. The Auditor-mini runs the parent's Step 3I against whatever you produce.
 3b. **NPC intimacy follows the principal/roster split (parent §6.5).** A new or modified sexual NPC gets a full Intimacy Profile (principal) or a compact §6.5 intimate stat block (roster), with the same intimate-distinctiveness rule — no two roster NPCs interchangeable in bed. Read the existing roster before drafting.
 4. **Cross-reference everything before drafting.** A new register for an arc must reference the existing Tier 2 Profiles of the characters in that arc. If a referenced profile doesn't exist, halt and surface — the missing profile must be created (widen revision or new revise run) before the register can be authored.
 5. **Function/substrate contradictions halt.** Same rule as the parent: if the revision creates a contradiction (arc requires intimate behavior the character's substrate forbids), halt and escalate to user.
@@ -61,7 +62,8 @@ For a new `Tier2_[CharName]_Intimacy_Profile.md`:
 Parent's structure applies in full:
 - Baseline sexuality (calm-water version)
 - Trauma map (specific triggers paired with specific responses — not generic "freezes")
-- Body specifics (breath, sounds, where goosebumps, what's suppressed, what's performed)
+- Body specifics, **both halves**: the embodied baseline (age and what this body has lived through, build and scale, arousal and recovery mechanics, this world's act particulars, trajectory — observable register, both directions) and the reaction set (breath, sounds, where goosebumps, what's suppressed, what's performed)
+- Physical dyad per pairing where a real differential exists (height/reach, build/strength, stamina/recovery, age gap, experience) — the differential *and what it costs or changes*, authored in both directions
 - Unguarded shape (3–5 specific manifestations when shield drops in intimate context)
 - Intimate voice (sample lines for easy / under-conditions / never)
 - Hard limits and hard yeses (substrate, not arc state)
@@ -91,6 +93,8 @@ Replace only the specified substrate fields. Preserve all others verbatim.
 - Substrate change tightens a hard limit → any register that previously implied violating it is now contradictory. Surface this to user; the register may need a follow-up revise.
 - Substrate change shifts the trauma map → register's behavioral notes may be outdated. Surface this.
 - Substrate change adds a new hard yes → no register conflict (additive change).
+- Substrate change alters the character's **age, body history, or build** → every Entry 7 Half B physical dyad involving this character is now stale (the differentials were computed against the old body). Surface each affected pairing; a dyad left un-updated silently contradicts the new baseline.
+- Revision **adds or replaces a partner** (new character/NPC with intimate presence, or a changed relationship) → the pairing has no physical dyad yet. Author it where a real differential exists; do not leave the model to infer the geometry.
 
 If a cross-cascade conflict is found, set status `R2.5_HALTED_CROSS_CASCADE_CONFLICT` and escalate to user.
 
@@ -132,6 +136,8 @@ Append to the Revision Log entry in `Drafts/Master_Design.md`:
 - [ ] Every intimacy file in the cascade has been touched as specified
 - [ ] No card content modified (cards are Architect-mini's domain)
 - [ ] Substrate vs Register separation preserved (no substrate duplication in registers)
+- [ ] Any profile created or edited carries both halves of Entry 3 (embodied baseline + reaction set), in observable register, running in both directions
+- [ ] Physical dyads (Entry 7 Half B) authored or refreshed for every affected pairing — including pairings made stale by an age/history/build change or by a new or replaced partner
 - [ ] All cross-references to existing intimacy files are consistent
 - [ ] No function/substrate contradictions introduced
 - [ ] Inline revision markers placed at every change site
