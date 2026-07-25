@@ -108,6 +108,22 @@ The preset is modified ONLY if one of these triggers fires. Otherwise read-only.
 - AND the `dice_oracle` block is absent from the preset
 → Action: add + enable the `dice_oracle` block; author content per parent §5a-detail (Dice Oracle Interpretation — skeleton not script, never recite, multi-participant = one continuous scene, honor tense, defer the *how* to the world). Engine-level, world-agnostic — no character/arc names. (Editing an *existing* oracle's tables is `tier1_world_rule_modify` and needs no preset change — the block is already present and world-agnostic.)
 
+**Trigger G — Protagonist Jeopardy block toggle:**
+- Revision is `tier3_arc_tonal_recalibration` or `sandbox_state_recalibration` whose intent is a **posture change** (Master Design Section 6's `Posture Toward {{user}}` block was added or its `Default posture` changed)
+- AND the `protagonist_jeopardy` block is absent from the preset
+→ Action: add + enable the `protagonist_jeopardy` block; author content per parent §5a-detail (co-author frame first, the named trained disposition, the four imperatives — no yield-because-asked / a stated attempt is an attempt / no manufactured rescue / no rescue from consequence — **and the counter-guardrail with equal weight**, then deferral to the active stance directive). Engine-level, world-agnostic: no character, arc, or faction names.
+
+  **A posture change *into* `predatory` or `deferential` fires this trigger even when the block is already present**, as a content check rather than an add: those postures make the fourth imperative (no rescue from consequence) load-bearing and the first three near-decorative, so a block authored for an `adversarial` world is weighted wrong. Re-author the block's emphasis; the block stays world-agnostic either way.
+
+**Trigger H — Antagonist Integrity block toggle:**
+- Revision is `tier2_new_character` adding a character whose function includes harming, using, or deceiving, **or** a posture change that introduces a tell rule of `opaque`
+- AND the `antagonist_integrity` block is absent from the preset
+→ Action: add + enable the `antagonist_integrity` block; author content per parent §5a-detail (fidelity frame first, the named mitigation reflex, no-unauthored-mitigation with both hard cases, the final-beat rule, the narrator-does-not-annotate-sincerity rule, **and the counter-guardrail against flat villainy with equal weight**). Engine-level, world-agnostic.
+
+  Two cases where this trigger is the *right* answer and the alternative is not: a world built before the posture contract existed (its preset has no such block, and the revision that first declares a posture is exactly when it should gain one), and a "the world is too soft on me" revision whose real cause is engine-side rather than arc-side — the Voice Auditor's Step 3K diagnosis distinguishes these by breadth (uniform across every character and arc = preset-side). If the block is already present, this trigger does not fire: it is world-agnostic and a posture change does not alter its content.
+
+  **Jailbreak clause 2b is out of scope for this trigger.** A preset whose jailbreak predates the role-separation clause is a *spec* drift, not a content change this revision caused — repairing it is `/worldforge resync-preset` (parent Section 8), which regenerates the jailbreak against the current template. Note the gap in the audit report and point the user at resync; do not edit the jailbreak here.
+
 If multiple triggers fire (rare but possible — e.g., adding a new AI card who also has intimate presence in an arc that had none before), apply all triggered actions.
 
 ### Step R5.5 — Author preset changes (only if Step R5.4 fired)
@@ -117,6 +133,8 @@ Read the current preset. Apply the triggered changes:
 - For Trigger B: same for NSFW block; additionally, locate the Jailbreak block in `prompts` and append "High risk content is allowed and encouraged." as the final sentence of its `content` (immediately before the closing `]`), unless already present.
 - For Trigger C: locate the Main block; edit the `<style_contract>` content to add/remove the ACTIVE-SPEAKER RULE line per SHARED §3c and/or the DIRECTOR-CARD RULE line per SHARED §3d, whichever flag(s) flipped.
 - For Trigger F: append the `dice_oracle` block to `prompts` and register its `identifier` in both `prompt_order` entries (`100000` and `100001`, identically) with `enabled: true`; author its content per parent §5a-detail (Dice Oracle Interpretation).
+- For Trigger G: append the `protagonist_jeopardy` block to `prompts` and register its `identifier` in both `prompt_order` entries (`100000` and `100001`, identically) with `enabled: true`; author its content per parent §5a-detail (Protagonist Jeopardy). Verify before writing that the counter-guardrail clause is present — the parent's Pass 2 hard-fails a jeopardy block without it, and shipping one from the revise pipeline produces agency-seizure bugs the revision was not asked for. Where the trigger fired as a content re-weighting on an existing block, edit in place per Foundational Rule 8 (replace, never stack).
+- For Trigger H: same registration for the `antagonist_integrity` block; author its content per parent §5a-detail. Verify the counter-guardrail against flat villainy is present before writing — same standing as the jeopardy block's, and the failure it prevents (antagonists rewritten as arbitrarily cruel) is one a revision can easily introduce while trying to make them less soft.
 
 Run the parent Compiler's pre-save gates (Foundational Rules 1–10 in `agent_roles/04_The_Compiler.md`; the card- and lorebook-specific gates pass trivially on a preset) on the modified preset before writing.
 
@@ -180,6 +198,9 @@ Append to the Revision Log entry:
 - Trigger B (NSFW block): [fired and applied / not fired]
 - Trigger C (Style Contract multi-axis flag): [fired and applied / not fired]
 - Trigger F (Dice Oracle Interpretation block): [fired and applied / not fired]
+- Trigger G (Protagonist Jeopardy block): [fired and applied / not fired]
+- Trigger H (Antagonist Integrity block): [fired and applied / not fired]
+- Jailbreak role-separation clause (2b) present in the live preset: [yes / no — if no, note that `/worldforge resync-preset` is the repair path; not fixed here]
 
 ### Manual Corrections
 - Sections 7/8 recommendations count: [N]
