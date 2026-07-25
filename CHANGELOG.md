@@ -15,39 +15,49 @@ numbers. Newest first.
 
 ## 2026-07-25 — `contracts/BODY_CYCLES.md` draft (no pipeline behavior change)
 
-Records a design agreement for a seam that does not exist yet: recurring,
-date-anchored body states (a menstrual cycle, a species' estrus, a lunar turn)
-derived from the Scene Tracker's day counter.
+Records a design agreement for a seam that does not exist yet: recurring body
+states (a menstrual cycle, a species' estrus, a lunar turn) tracked by the
+Scene Tracker as **supplementary per-chat state**, seeded once from the world.
 
-The motivating constraint is why this is a contract rather than an agent
-change. A cycle is state that advances with the *calendar*, not with the story
-— which is none of the three tiers. The cheap implementation (state the
-parameters in a lorebook and let the model compute the phase from the injected
-day) does not work: models are unreliable at sustained modular arithmetic over
-a running counter, and the failure is silent and self-compounding. A world
-that tracks nothing is coherent; one that tracks wrongly is not. So the
-arithmetic belongs to the consumer, which already owns the day counter — and
-that makes the producer half inert until the extension side is written.
+Ownership was the whole design question, and two candidate owners were
+rejected. The **model** cannot own it: the cheap version states the parameters
+in a lorebook and lets the model compute the phase from an injected day, but
+models are unreliable at sustained modular arithmetic over a running counter,
+and the failure is silent and self-compounding. A world that tracks nothing is
+coherent; one that tracks wrongly is not. The **producer** cannot own it
+either: a world file is authored once and played for months across many chats,
+so anything that advances per-chat is chat state with no coherent value to
+write at build time.
+
+That leaves the Scene Tracker, alongside the state it already tracks by
+default (health, location, clothing, mood) — which makes this carrier a
+**seed**, read once onto a pristine scene record exactly like
+`[[WORLD_CALENDAR]]`, not a payload re-derived every turn. The producer
+supplies only two things: the phase shape plus where the character starts, and
+a terse one-line behavioral index per phase.
 
 Specified generically (author-defined phases, not a fixed
 follicular/ovulatory/luteal vocabulary) so fantasy and non-human biologies fit
-the same mechanism, and so the consumer needs no domain knowledge. The carrier
-injects **state only**; per-phase behavior stays authored substrate in the
-lorebook, with the injected phase label acting as the keyword that fires it.
+the same mechanism and the consumer needs no domain knowledge. Phases carry
+**durations rather than day ranges**, which makes gaps and overlaps
+structurally impossible — no tiling to validate, no day that can fall outside
+a phase.
 
 **Nothing in the pipeline changes.** No agent spec references the document, and
-producers must not emit a `[[BODY_CYCLES]]` carrier — one that nothing reads
-would cost tokens and maintenance for no runtime effect. Seven open questions
-(§7) must be settled before it becomes binding, several of which need the
-extension's code to answer; one of them asks whether the carrier is warranted
-at all versus a play-time UI feature.
+producers must not emit the carrier. Suppression (pregnancy, contraception,
+illness, magic), irregularity, and `{{user}}` cycles are deferred to the
+tracker by design, with the path to a later producer-declared suppression
+vocabulary noted so it reuses this seed rather than inventing a parallel
+mechanism.
 
 ### Added
-- `contracts/BODY_CYCLES.md` — draft contract: carrier flags (enabled + inert,
-  reusing the `[[WORLD_CALENDAR]]` convention), per-character payload with
-  stable slug ids (reusing the `MEMORY_CONTRACT.md` §4 id space), phase
-  derivation, graceful degradation, a not-yet-in-force producer checklist, and
-  the open-questions list.
+- `contracts/BODY_CYCLES.md` — draft contract: carrier flags and pristine-record
+  seeding semantics (both reusing the `[[WORLD_CALENDAR]]` convention),
+  per-character payload with stable slug ids (reusing the `MEMORY_CONTRACT.md`
+  §4 id space), duration-based phases with per-phase behavioral indices,
+  graceful degradation, a not-yet-in-force producer checklist, the deferred
+  list, and one open design question (whether a second supplementary state
+  should collapse this into a generic `[[TRACKED_STATE]]` carrier).
 
 ### Changed
 - `contracts/README.md` — index row for the draft, plus a note defining what
