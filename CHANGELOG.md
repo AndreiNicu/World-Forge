@@ -13,6 +13,47 @@ numbers. Newest first.
 
 ---
 
+## 2026-07-25 — `contracts/BODY_CYCLES.md` draft (no pipeline behavior change)
+
+Records a design agreement for a seam that does not exist yet: recurring,
+date-anchored body states (a menstrual cycle, a species' estrus, a lunar turn)
+derived from the Scene Tracker's day counter.
+
+The motivating constraint is why this is a contract rather than an agent
+change. A cycle is state that advances with the *calendar*, not with the story
+— which is none of the three tiers. The cheap implementation (state the
+parameters in a lorebook and let the model compute the phase from the injected
+day) does not work: models are unreliable at sustained modular arithmetic over
+a running counter, and the failure is silent and self-compounding. A world
+that tracks nothing is coherent; one that tracks wrongly is not. So the
+arithmetic belongs to the consumer, which already owns the day counter — and
+that makes the producer half inert until the extension side is written.
+
+Specified generically (author-defined phases, not a fixed
+follicular/ovulatory/luteal vocabulary) so fantasy and non-human biologies fit
+the same mechanism, and so the consumer needs no domain knowledge. The carrier
+injects **state only**; per-phase behavior stays authored substrate in the
+lorebook, with the injected phase label acting as the keyword that fires it.
+
+**Nothing in the pipeline changes.** No agent spec references the document, and
+producers must not emit a `[[BODY_CYCLES]]` carrier — one that nothing reads
+would cost tokens and maintenance for no runtime effect. Seven open questions
+(§7) must be settled before it becomes binding, several of which need the
+extension's code to answer; one of them asks whether the carrier is warranted
+at all versus a play-time UI feature.
+
+### Added
+- `contracts/BODY_CYCLES.md` — draft contract: carrier flags (enabled + inert,
+  reusing the `[[WORLD_CALENDAR]]` convention), per-character payload with
+  stable slug ids (reusing the `MEMORY_CONTRACT.md` §4 id space), phase
+  derivation, graceful degradation, a not-yet-in-force producer checklist, and
+  the open-questions list.
+
+### Changed
+- `contracts/README.md` — index row for the draft, plus a note defining what
+  draft status means: no consumer, no agent reference, producers do not emit.
+---
+
 ## 2026-07-25 — The posture contract: `{{user}}` is a character, not the customer
 
 Three related problems with `{{user}}`, fixed together because they turn out
