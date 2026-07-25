@@ -399,6 +399,8 @@ Trigger keywords: [sex, intimacy, touch, desire, arousal, etc.]
 
 - **Voice in intimacy:** [How do they speak in intimate scenes? Sample lines. What they say easily. What they only say under specific conditions. What they never say. Vocabulary register — clinical, vulgar, tender, evasive, archaic, silent. What sounds escape them vs. what sounds they perform.]
 
+- **Afterward:** [What does this character do in the ten minutes *after*? Erotic prose is trained to stop at climax, so unless the seed says otherwise the model simply stops writing — and the aftermath is where a lot of the characterization lives. Two registers: the **ordinary bodily business** (getting up to urinate, cleanup, the towel or the lack of one, needing water, being sticky and either minding or not, showering immediately or later or not at all) and **what they do with the other person** (stay or leave, hold on or turn away, talk and about what, go quiet, joke to defuse it, fall asleep, dress immediately, ask something they couldn't ask before). Then name the tell: the one aftermath behavior that means something has *changed* — the character who always leaves and this once doesn't.]
+
 - **Hard limits and hard yeses:** [What this person would refuse even at extreme cost — substrate-level, not arc-level. And what they actively desire regardless of context. These hold across all arcs.]
 
 **Arc-specific evolution (delta from substrate):**
@@ -480,7 +482,7 @@ Trigger keywords: [name variants, role descriptors, ways they'd be referenced in
 - "[A line of dialogue that captures their voice precisely]" *([context — when would they say this?])*
 - "[Another sample line]" *([context])*
 
-**Intimacy (only if this NPC has sexual presence — feeds the Intimacy Architect):** [For a principal NPC, sketch the same substrate you would for a character: baseline sexuality, any trauma map, **embodied baseline** (age and what this body has lived through, build/scale, arousal and recovery mechanics — observable register, difference-not-deficit), body/sound signature, voice in intimacy, hard limits and hard yeses. Add a **physical dyad** line for any pairing with a real height, age, build, stamina, or experience differential — `{{user}}` first. Leave blank if the NPC has no sexual presence.]
+**Intimacy (only if this NPC has sexual presence — feeds the Intimacy Architect):** [For a principal NPC, sketch the same substrate you would for a character: baseline sexuality, any trauma map, **embodied baseline** (age and what this body has lived through, build/scale, arousal and recovery mechanics — observable register, difference-not-deficit), body/sound signature, voice in intimacy, hard limits and hard yeses, what they do **afterward**. Add a **physical dyad** line for any pairing with a real height, age, build, stamina, or experience differential — `{{user}}` first. Leave blank if the NPC has no sexual presence.]
 
 **NPC: [Name]** — *Principal*
 [Same format — repeat for each principal NPC]
@@ -497,7 +499,7 @@ Trigger keywords: [name variants, role descriptors]
 - **Signature line:** "[one sample line only this NPC would say]"
 - **Stance toward {{user}}:** [deference / rivalry / desire / fear / transaction / curiosity — one line on how they treat {{user}}]
 - **Hook:** [what pulls them into a scene, or what they offer the sandbox — one line]
-- **Intimacy (only if this NPC has sexual presence):** [two or three lines of compact sexual context — how they are in sex + what they want; an **embodied baseline** (age and what this body has lived through, build/scale, and its stamina or arousal-timing particular — one line, observable register, not clinical); a distinct body/sound or voice-in-intimacy cue; one hard limit/yes. This becomes the Intimacy Architect's §6.5 compact stat block. Keep it distinct from every other NPC — without the embodied line a whole roster defaults to interchangeable twenty-somethings. Leave blank if no sexual presence.]
+- **Intimacy (only if this NPC has sexual presence):** [two or three lines of compact sexual context — how they are in sex + what they want; an **embodied baseline** (age and what this body has lived through, build/scale, and its stamina or arousal-timing particular — one line, observable register, not clinical); a distinct body/sound or voice-in-intimacy cue; one hard limit/yes; and one line on what they do **afterward** (stay / leave / clean up immediately / sleep / talk about something unrelated). This becomes the Intimacy Architect's §6.5 compact stat block. Keep it distinct from every other NPC — without the embodied line a whole roster defaults to interchangeable twenty-somethings. Leave blank if no sexual presence.]
 
 **NPC: [Name]** — *Roster*
 [Same format — repeat for each roster NPC]
@@ -687,6 +689,7 @@ Trigger keywords: [name variants, role descriptors]
 - *"Scale and size language must match the bodies this world has actually authored. Never write 'filling,' 'stretching,' 'impossibly large,' 'barely able to take him,' or any equivalent, unless the authored anatomy of the specific pair in the scene supports it. Where it does not, the prose renders what is actually true for these two bodies."*
 - *"What an act costs is derived from the authored bodies, never from a default. Anal, size-dependent positions, and anything the authored anatomy makes easier or harder are rendered from the substrate, not from the stock register in which such acts are always difficult."*
 - *"No character is rendered on a default body. Every body in an intimate scene is the one its embodied baseline describes — age, build, history, proportion — including `{{user}}`'s."*
+- *"Intimate scenes do not end at climax. The aftermath is rendered — the ordinary bodily business and what the characters do with each other — per each character's authored afterward."*
 
 **World-level prose register for intimacy:** [How does the prose feel during intimate scenes in this world? Examples: "Long sentences, dwelling on sensory detail, time slowing." "Clipped and clinical, the prose refusing to dissolve." "Unflinching realism, neither pornographic nor romantic — the tone of a witness."]
 
@@ -853,7 +856,7 @@ Trigger keywords: [name variants, role descriptors]
 - [ ] Every NPC has a profile — principals as full profiles, roster NPCs as compact stat blocks (large casts); roster voice fingerprints are unique; principal NPCs have a Standing Goal (active objective + how they pursue it)
 - [ ] Escalation Ladders (where used): 2–4 ordered stages, each with an in-fiction observable advance condition; a stated endpoint; a stated {{user}}/main-story collision; no more than ~3 laddered NPCs in the world
 - [ ] LLM behavioral instructions written for each card (with arc-range qualifiers)
-- [ ] For characters with intimate scene presence: substrate (trauma map, **embodied baseline**, body reactions, vulnerability shape, voice in intimacy, hard limits) and arc-specific evolution filled out
+- [ ] For characters with intimate scene presence: substrate (trauma map, **embodied baseline**, body reactions, vulnerability shape, voice in intimacy, hard limits, **afterward**) and arc-specific evolution filled out
 - [ ] Embodied baseline filled in for *every* intimate character — including the ordinary/default-bodied ones — written in observable register, running in both directions (what is harder *and* what is easier or more certain)
 - [ ] **Physical dyad** filled in for every pairing with a real height, age, build, stamina, experience, or world-specific differential (`{{user}}` pairings first), with the asymmetry authored in both directions
 

@@ -13,6 +13,62 @@ numbers. Newest first.
 
 ---
 
+## 2026-07-25 — Intimate aftermath: scenes that don't end at climax
+
+A third failure of the same family as the two entries below, but a different
+kind: not a wrong body, a **missing scope**. Erotic prose is trained to
+terminate at orgasm, so the ordinary ten minutes afterward — getting up,
+cleanup, needing to urinate, the towel, staying or leaving, what gets said —
+simply never gets written. Intimate scenes read as ending in a fade rather
+than in a bed with two real people in it.
+
+The aftermath is also disproportionately characterizing. Two people can be
+identical during sex and completely different afterward, and the afterward is
+usually the more revealing half — the character who showers immediately versus
+the one who doesn't care, the one who stays versus the one who dresses and
+goes. None of that had a home in the profile.
+
+It needed both halves, for the reason the previous entry established: a new
+substrate entry alone would be authored and never reached, because the model
+stops writing before it becomes relevant. So the aftermath joins the §6.7
+trained reflexes with its own prohibition, and the Auditor's scene generation
+now requires at least one scenario per character to run past climax — without
+that, a test matrix passes while the substrate is never exercised.
+
+### Added
+- `agent_roles/06_The_Intimacy_Architect.md`: **Entry 6b — `[CHAR]_AFTERMATH`**
+  (required), covering both registers — the ordinary bodily business and what
+  they do with the other person — plus the change-of-state tell: the one
+  aftermath behavior that signals something has shifted, the extension of
+  `VULNERABILITY_SHAPE`'s job past the end of the scene. Inserted with
+  sub-numbering per the editing protocol; Entries 7 and 8 keep their numbers.
+  **Termination at climax** added as the fourth trained reflex in §6.7 with its
+  own prohibition. §6.5 roster stat block gains an `Afterward` line. Three
+  sign-off items.
+- `agent_roles/03d_The_Intimacy_Auditor.md`: aftermath check in Step 3A
+  (substrate fidelity, both registers + correct use of the tell); scene
+  termination added to the Step 3I stock-register override; **Step 2 now
+  requires at least one scenario per character to run past climax**; two
+  diagnosis rows (no aftermath rendered / aftermath rendered but generic);
+  report section and sign-off item.
+- `templates/World_Seed_Template.md`: §4 `Afterward` field for characters and
+  both NPC intimacy fields; the aftermath rule added to §8a's recommended
+  stock-register rules; §4 checklist updated.
+- `agent_roles/00_The_Interviewer.md`: Section 4 aftermath question with the
+  change-of-state follow-up and the mechanical reason stated; roster NPC line.
+- `agent_roles/01_The_Refiner.md`: Section 7 `Afterward` recording bullet
+  noting why it is substrate rather than prose texture; NPC routing line.
+
+### Changed
+- `agent_roles/revise/02b_The_Intimacy_Architect_mini.md`: aftermath added to
+  the new-profile draft list; delta 3a-i covers the aftermath prohibition.
+- `agent_roles/revise/03d_The_Intimacy_Auditor_mini.md`: delta 3c runs the
+  aftermath sub-check and requires a past-climax scenario when an `AFTERMATH`
+  entry is touched.
+- `CLAUDE.md`: cross-file row extended.
+
+---
+
 ## 2026-07-25 — `{{user}}` embodiment, the stock-register prohibition, act cost, and valence
 
 Follow-up to the entry below, closing the gaps it left. Testing the embodied

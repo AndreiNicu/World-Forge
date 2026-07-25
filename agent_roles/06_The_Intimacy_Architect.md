@@ -154,6 +154,20 @@ These are not arc-dependent. A character whose hard limit is restraint in Arc 1 
 
 Keys: `[Character name], limit, refuse, want, desire`
 
+#### Entry 6b — `[CHAR]_AFTERMATH`
+What this character does in the ten minutes after. Erotic prose is trained to end at climax, so unless something says otherwise the model simply stops writing — and the aftermath is where a great deal of the characterization actually lives. Two people can be identical during and completely different afterward, and the afterward is usually the more revealing half.
+
+Cover both registers:
+
+- **The ordinary bodily business.** Getting up to urinate, cleanup, the towel or the lack of one, needing water, being sticky and either minding or not, the shower — immediately, later, or not at all. This is the texture the model elides entirely, and its absence is what makes intimate scenes read as ending in a fade rather than in a bed with two real people in it. Name what *this* character does, not what people do.
+- **What they do with the other person.** Stay or leave. Hold on or turn away. Talk, and about what — the act, something unrelated, business. Go quiet. Make a joke to defuse it. Fall asleep. Dress immediately. Ask a question they could not ask before. Whether they can be looked at now.
+
+Then name the tell: **the one aftermath behavior that means something has changed.** The character who always leaves and this once does not. The character who always talks and this once has nothing to say. This gives the model a way to render a shift in state without narrating it — which is the same job `VULNERABILITY_SHAPE` does inside the scene, extended past its end.
+
+Aftermath is substrate, not arc state: *how* she leaves may change per arc (that is a Tier 3 register note), but *that leaving is her pattern* is permanent. Where an arc changes the pattern itself, that is a delta for the register, and the register must say so explicitly.
+
+Keys: `[Character name], after, afterward, aftermath, cleanup, sleep`
+
 ### Conditional entries (Entry 7 is required wherever its trigger applies; Entry 8 is optional)
 
 #### Entry 7 — `[CHAR]_INTIMACY_RELATIONSHIP_DELTAS`
@@ -216,6 +230,7 @@ A roster NPC with intimate presence gets a **compact intimate stat block** — e
 - **Body & sound signature:** [the distinct thing this body does; the sounds they make vs. suppress — one line]
 - **Voice in intimacy:** "[one intimate-register line only this NPC would say]"
 - **Limit / yes:** [one hard limit + one hard yes — substrate-level, not scene-level]
+- **Afterward:** [what this NPC does in the ten minutes after — stays / leaves / cleans up immediately / sleeps / talks about something unrelated — one line. The compact form of Entry 6b; without it every roster NPC's scene ends at climax identically]
 - **Stance in intimacy toward {{user}}:** [appetite / restraint / dominance / submission / transaction / tenderness — one line]
 ```
 
@@ -254,6 +269,7 @@ Erotic prose carries trained reflexes that fire **independently of stated anatom
 - **Scale language.** "Filling her," "stretched around him," "impossibly large," "she could barely take him," "split her open." This fires regardless of what the substrate says the bodies are.
 - **Uniform act difficulty.** Anal in particular is written as reliably punishing and difficult no matter what anatomy has been authored — the difficulty is a genre convention, decoupled from the bodies in the scene.
 - **The stock body.** Everyone renders as an early-twenties default.
+- **Termination at climax.** The scene stops at orgasm. The ordinary ten minutes afterward — getting up, cleanup, needing to urinate, the towel, staying or leaving, what gets said — simply does not get written, because erotic prose is trained to end there. This is why intimate scenes read as ending in a fade rather than in a bed with two real people in it, and it is why Entry 6b exists: the substrate names what the character does afterward, and the prohibition makes the model actually write it.
 
 These are the intimate equivalent of "moaned softly," and — exactly like it — **a descriptive substrate line does not displace them.** A profile that carefully states a short, slight partner will still produce "she could barely take him" unless something *prohibits* it. This is precisely the case the Auditor's counterfactual probe exists to catch: the drafts equally permit the failing version.
 
@@ -261,7 +277,8 @@ So the fix is the pipeline's standard one — convert descriptive into directive
 
 1. **Every world with intimate content carries the stock-register rules in `INTIMATE_HARD_RULES`** (Section 7 Entry 4, arc mode; Section 7S Entry 3, sandbox), sourced from World Seed §8a's recommended rules. If the seed omitted them, author them anyway from the §8a defaults and note the addition — this is the one place you add a hard rule the seed did not name, because its absence is a known runtime failure rather than an authorial choice. If the user explicitly declined them, honor that and note it.
 2. **Bind them to the authored bodies, not to a generic prohibition.** "Never write scale language" is weak and over-broad. "Scale and size language must match the bodies this pairing has actually authored; where the authored anatomy does not support it, the prose renders what is true for these two bodies" is enforceable and leaves the language available where it *is* accurate.
-3. **State act cost as derived, not defaulted.** What an act costs comes from the authored bodies and the Entry 7 Half B anatomical-fit line — never from the register in which such acts are always difficult.
+3. **Require the aftermath.** "Intimate scenes do not end at climax; the aftermath is rendered — the ordinary bodily business and what the characters do with each other — per each character's Entry 6b." Without this the aftermath substrate is authored and never reached, because the model stops writing before it becomes relevant.
+4. **State act cost as derived, not defaulted.** What an act costs comes from the authored bodies and the Entry 7 Half B anatomical-fit line — never from the register in which such acts are always difficult.
 
 The Auditor checks all three (Step 3I). A world whose bodies are furthest from the default — a short or slight `{{user}}`, an older partner, any authored anatomy the stock register overwrites — is exactly where this matters most and exactly where it is most often skipped.
 
@@ -427,14 +444,15 @@ Append to the end of your final output file:
 
 ### Tier 2 — Permanent Substrate (characters and NPCs)
 - [ ] Every character with intimate scene presence has an `Intimacy_Profile.md`
-- [ ] Each full profile contains all required entries (Baseline, Trauma Map, Body Reactions, Vulnerability Shape, Voice in Intimacy, Hard Limits and Hard Yeses)
+- [ ] Each full profile contains all required entries (Baseline, Trauma Map, Body Reactions, Vulnerability Shape, Voice in Intimacy, Hard Limits and Hard Yeses, **Aftermath**)
+- [ ] **Every `AFTERMATH` entry covers both registers (ordinary bodily business + what they do with the other person) and names the one aftermath behavior that signals a change of state**
 - [ ] **Every `BODY_REACTIONS` entry has both halves — an authored embodied baseline (Half A: age and history, build and scale, arousal/recovery mechanics, the particulars of this world's acts, trajectory) and the reaction set (Half B) — for *every* intimate character, including the default-bodied ones**
 - [ ] **Embodied baselines written in observable register, not clinical vocabulary; each runs in both directions (what is harder *and* what is easier/better/more certain) — no deficit-only profiles**
 - [ ] **Entry 7 Half B (physical dyad) authored for every pairing with a significant height, age, build, stamina, experience, or world-specific differential — `{{user}}` pairings first — with the asymmetry authored in both directions, and the anatomical-fit line stating what each act costs this pair**
 - [ ] **Valence declared for every culturally loaded attribute (age, size, weight, scars, disability) — neutral fact / advantage / charged — carried verbatim from the seed; unstated valences flagged, never silently resolved**
 - [ ] **`{{user}}` intimate embodiment authored (Section 6.6) whenever World Seed Section 3 carries the field — with the reference-data-not-instruction bright line restated at the top of the file, and nothing in it readable as a behavioral mandate for the protagonist**
-- [ ] **Stock-register prohibitions present in `INTIMATE_HARD_RULES` (Section 6.7) — scale language bound to the authored bodies, act cost derived not defaulted, no character on a default body — or an explicit user decline noted**
-- [ ] **Principal NPCs with intimate presence have full Intimacy Profiles; roster NPCs with intimate presence have §6.5 compact intimate stat blocks (Intimate essence, Embodied baseline, Body & sound signature, Voice in intimacy, Limit/yes, Stance)**
+- [ ] **Stock-register prohibitions present in `INTIMATE_HARD_RULES` (Section 6.7) — scale language bound to the authored bodies, act cost derived not defaulted, no character on a default body, aftermath rendered rather than the scene ending at climax — or an explicit user decline noted**
+- [ ] **Principal NPCs with intimate presence have full Intimacy Profiles; roster NPCs with intimate presence have §6.5 compact intimate stat blocks (Intimate essence, Embodied baseline, Body & sound signature, Voice in intimacy, Limit/yes, Afterward, Stance)**
 - [ ] **No two roster NPCs are interchangeable in an intimate scene (intimate-distinctiveness rule) — sharpen overlaps**
 - [ ] No arc-specific content in any Tier 2 entry
 - [ ] All entries cross-checked against existing Tier 2 character/NPC lorebooks for substrate consistency
