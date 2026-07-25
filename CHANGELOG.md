@@ -13,6 +13,92 @@ numbers. Newest first.
 
 ---
 
+## 2026-07-25 — `{{user}}` embodiment, the stock-register prohibition, act cost, and valence
+
+Follow-up to the entry below, closing the gaps it left. Testing the embodied
+baseline against a concrete case — a short, slightly-built `{{user}}` paired
+with a taller partner — exposed four things the first pass did not handle.
+
+**`{{user}}` had no intimate substrate anywhere in the pipeline.** The Intimacy
+Architect authors profiles for the cast the model *plays*; the protagonist was
+never in scope, and the only place `{{user}}`'s body appeared in an intimate
+context was the physical dyad, authored from the character's side. So every
+intimate scene in every world had the model writing characters' reactions to a
+stock default body regardless of what Section 3 said. The Tier 2 Protagonist
+Lorebook was always the right home — nothing had ever been routed to it.
+
+**Facts alone do not displace trained reflexes.** This is the load-bearing
+insight of this pass. Erotic prose carries reflexes that fire *independently of
+stated anatomy*: scale language ("filling her," "stretched around him," "she
+could barely take him"), anal written as uniformly punishing regardless of the
+anatomy authored, and a stock early-twenties body for everyone. A profile can
+state a short, slight partner perfectly and the prose will still reach for the
+stock phrase. These are the intimate equivalent of "moaned softly," and like it
+they need a *prohibition*, not a description — which is exactly what the
+Auditor's own counterfactual probe would have said about the previous pass.
+
+**Size changes what acts cost**, and the dyad field enumerated positioning,
+pacing, and noticing without ever signalling act cost as a consequence to
+author — leaving the highest-value inference to a model whose default prices
+every act identically.
+
+**And loaded attributes have two competing defaults, not one.** The previous
+difference-not-deficit rule was shaped by the older-woman case, where the
+failure runs one way. For size the two defaults are *overwhelming* and
+*inadequate*; for age, *idealised* and *diminished*. Both are wrong unless
+chosen, so the author now declares the valence — neutral fact, advantage, or
+charged. Charged is legitimate craft; unstated is a coin flip resolved
+differently in every scene.
+
+### Added
+- `agent_roles/06_The_Intimacy_Architect.md`: **Section 6.6 — `{{user}}`
+  intimate embodiment**, a Tier 2 protagonist intimacy profile pairing with the
+  Protagonist Lorebook, carrying the bright line that it is reference data for
+  other characters' reactions and never an instruction to play `{{user}}`.
+  **Section 6.7 — the stock-register prohibition**, stating why descriptive
+  substrate loses to a trained reflex and requiring the prohibitions in
+  `INTIMATE_HARD_RULES` (authored from §8a defaults if the seed omitted them).
+  Entry 3 Half A gains a fourth rule (valence declaration); Entry 7 Half B
+  gains the anatomical-fit bullet; draft order, objective, arc and sandbox
+  hard-rule entries, and four sign-off items updated.
+- `agent_roles/03d_The_Intimacy_Auditor.md`: four new Step 3I sub-checks —
+  stock-register override, `{{user}}` embodiment, valence integrity, and (in
+  Step 1) an **embodiment probe** scenario class that invites the stock
+  register so the check has material. Six diagnosis rows, severity guidance
+  (stock-register override and defaulted `{{user}}` body are Critical), input
+  list, report section, and three sign-off items.
+- `templates/World_Seed_Template.md`: §3 **Protagonist Intimate Embodiment**
+  block (stature and proportion, anatomy, what it changes act by act, stamina
+  and recovery, valence); §8a **recommended stock-register rules** with three
+  drop-in prohibitions; anatomical-fit clause on the §4 physical dyad; valence
+  clause on the §4 embodied baseline.
+- `agent_roles/00_The_Interviewer.md`: Section 3 intimate-embodiment
+  elicitation with its framing preamble and the valence question; Section 8
+  stock-register rule proposed by default with the mechanic explained;
+  anatomical-fit and valence added to the Section 4 dyad and baseline questions.
+- `agent_roles/01_The_Refiner.md`: Section 6 `{{user}}` intimate embodiment
+  recording with the reference-data framing and gap routing; anatomical fit and
+  valence added to the dyad and baseline bullets.
+
+### Changed
+- `workflows/world-forge.md`: Phase 2.5 output list gains the protagonist
+  intimacy profile; phase table row names §6.6 and §6.7.
+- `agent_roles/03_The_Editor.md`: protagonist intimacy profile added to the
+  per-entry validation file list.
+- `agent_roles/revise/02b_The_Intimacy_Architect_mini.md`: delta 3a-i
+  (`{{user}}` embodiment in scope under `intimacy_substrate_modify`, bright
+  line binding, stock-register rules preserved or authored); a `{{user}}` body
+  change as the widest cross-cascade in the intimacy set; two sign-off items.
+- `agent_roles/revise/03d_The_Intimacy_Auditor_mini.md`: delta 3c extended with
+  the stock-register, `{{user}}` embodiment, and valence sub-checks.
+- `agent_roles/Converter/00_The_Converter.md` +
+  `templates/Convert_Brief_Template.md`: matrix rows for the protagonist
+  embodiment (regenerates with Section 3; kept in rebaseline) and the
+  stock-register hard rules (preserve — they bind whatever bodies exist).
+- `CLAUDE.md`: cross-file row extended to cover the four additions.
+
+---
+
 ## 2026-07-25 — Embodied specificity: the generic-body defense for intimate scenes
 
 The pipeline's founding observation is that the model collapses characters to

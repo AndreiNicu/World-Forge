@@ -262,7 +262,7 @@ This step exists because position choices are easy to make incorrectly without a
 
 #### 4.5a — Presence check (hard fail)
 
-For every entry across all draft files (Tier1_World_Entries.md, Tier2_[CharName]_Entries.md, Tier2_[CharName]_Intimacy_Profile.md, Tier2_NPC_Intimacy_Roster.md, Tier3_Arc[N]_*_Entries.md / Tier3_Sandbox_Entries.md, Tier3_Arc[N]_Intimacy_Register.md / Tier3_Sandbox_Intimacy_Register.md):
+For every entry across all draft files (Tier1_World_Entries.md, Tier2_[CharName]_Entries.md, Tier2_[CharName]_Intimacy_Profile.md, Tier2_[ProtagonistName]_Intimacy_Profile.md, Tier2_NPC_Intimacy_Roster.md, Tier3_Arc[N]_*_Entries.md / Tier3_Sandbox_Entries.md, Tier3_Arc[N]_Intimacy_Register.md / Tier3_Sandbox_Intimacy_Register.md):
 
 - [ ] The entry has a `Position Rationale:` field present
 - [ ] The field's value is either "DEFAULT" or a non-empty rationale sentence
