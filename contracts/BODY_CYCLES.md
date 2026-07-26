@@ -1,32 +1,48 @@
 # Body Cycles Contract — `[[BODY_CYCLES]]`
 
-**Status:** 🚧 **Draft / proposal — consumer not yet written** · **Version:** 0 (unstable) · **Last updated:** 2026-07-25
+**Status:** Established (consumer only) · **Version:** 1 · **Last updated:** 2026-07-25
 
-> **This contract is not implemented.** Unlike `MEMORY_CONTRACT.md`,
-> `WORLD_FORGE_SYNC.md`, and `DICE_ORACLE.md` — each of which documents a seam
-> the `world-forge` / `npc-memory` extensions **already read** — nothing consumes
-> `[[BODY_CYCLES]]` today. It is written down so the producer and consumer sides
-> can be designed against one shape instead of two.
+> **Shared contract — canonical source of truth:**
+> [`AndreiNicu/World-Forge`](https://github.com/AndreiNicu/World-Forge) → `contracts/BODY_CYCLES.md`.
+> Copies in other repositories (including the SillyTavern fork) are mirrored
+> **read-only**. Do not edit a copy — edit the canonical file, then run the
+> contract sync (`scripts/sync-contracts.sh`). A CI drift check keeps every copy
+> byte-identical to this canonical version.
 >
-> **Producers must not emit a `[[BODY_CYCLES]]` carrier yet**, and no World-Forge
-> agent spec references this document. It becomes version 1, and binding on
-> producers, only after the Scene Tracker's supplementary-state support lands.
+> **Half-live, and the halves are asymmetric — read this before assuming either
+> side works.** The **consumer is implemented**: the `world-forge` extension
+> reads the carrier, seeds a pristine chat, derives the phase from the day
+> counter, injects a line into `<scene_state>`, and exposes the anchor and a
+> suspend toggle in the Scene Tracker
+> (`AndreiNicu/SillyTavern` → `public/scripts/extensions/world-forge/index.js`).
+> The **producer is not**: no World-Forge agent spec references this document and
+> nothing emits a `[[BODY_CYCLES]]` carrier. §6 is therefore the *expected*
+> producer shape, not an in-force requirement.
 >
-> The design below is **checked against the consumer as it exists today**
-> (`AndreiNicu/SillyTavern@release`, `public/scripts/extensions/world-forge/index.js`,
-> extension v0.10.1). Where it depends on current consumer behavior, the code is
-> cited so a reviewer can confirm rather than take it on faith.
+> Consequence worth stating plainly: today the channel fires **only on a
+> hand-authored carrier entry**. That is deliberate ordering — the consumer is
+> testable against a hand-written entry before the pipeline commits to emitting
+> one.
+>
+> **What version 1 settled** (the v0 draft differed): the phase is *derived* from
+> the day counter rather than stored and advanced (§3.4); the anchor is `startDay`
+> — a cycle day, resolved by the producer at build time — rather than a
+> phase-name-or-integer union; phases carry **durations** rather than day ranges,
+> making gaps and overlaps unrepresentable; per-phase behavioral notes live in the
+> carrier rather than relying on keyword-fired lorebook entries (§1.4, now settled
+> against the consumer's code rather than assumed); and the cycle must **never** be
+> added to the scan prompt (§4).
 
-This document proposes a **body cycles** channel between the World-Forge producer
-pipeline and the `world-forge` extension's Scene Tracker (consumer): recurring
-body states — a menstrual cycle, a species' estrus, a lycanthrope's lunar turn —
-**owned by the Scene Tracker as supplementary per-chat state**, seeded once from
-the world.
+This document specifies the **body cycles** channel between the World-Forge
+producer pipeline and the `world-forge` extension's Scene Tracker (consumer):
+recurring body states — a menstrual cycle, a species' estrus, a lycanthrope's
+lunar turn — **owned by the Scene Tracker as supplementary per-chat state**,
+seeded once from the world.
 
 | Side | Component | Repo / path |
 | --- | --- | --- |
 | **Producer** | World-Forge agent pipeline (Architect, Compiler) | [World-Forge](https://github.com/AndreiNicu/World-Forge) |
-| **Consumer** | `world-forge` extension — Scene Tracker, supplementary state | `public/scripts/extensions/world-forge/` — **not yet written** |
+| **Consumer** | `world-forge` extension — Scene Tracker, supplementary state | `public/scripts/extensions/world-forge/` — **implemented** |
 
 ---
 
@@ -102,7 +118,7 @@ Everything else is runtime: the day counter, derivation, suppression,
 corrections. The producer never models any of it.
 
 > **Why the indices live in the carrier rather than only in a phase-keyed
-> lorebook entry — now verified.** The tidier split would put *state* in the
+> lorebook entry — settled, and this is why v1 does not revisit it.** The tidier split would put *state* in the
 > carrier and *behavior* in a Tier 2 entry keyed on the phase name, letting the
 > injected state line fire the authored substrate as a keyword. **As the consumer
 > is currently written, that does not work.**
@@ -230,23 +246,30 @@ weekday and calendar month when day tracking is off.
 
 ---
 
-## 4. Consumer behavior (informative — **unimplemented**)
+## 4. Consumer behavior (normative for the consumer; **implemented**)
 
-This section describes what the Scene Tracker *would* do. No such code exists; it
-is written to make the producer side reviewable.
+This is what the Scene Tracker does. Function names are given so a reader can
+check the behavior against the code rather than trusting the prose.
 
 - **On a pristine scene record**, read the carrier and store the cycle
-  definitions in the scene record — the anchor and phase list, not a current
-  position. Never touch a non-pristine record.
+  definitions — the anchor and phase list, **not** a current position. Never
+  touch a non-pristine record. (`maybeSeedBodyCyclesFromWorld`, bound to
+  `CHAT_CHANGED` beside the calendar seed, with the same post-`await` re-check.)
 - **Derive** the current phase per §3.4 whenever the block is built. No
-  advancement code, no counter of its own.
+  advancement code and no counter of its own. (`cycleDayForDay`, `cyclePhaseFor`.)
 - **Never scan for it.** `ScenePerson`'s existing fields (`health`, `condition`,
   `clothing`, `mood`, `lastLocation`) are populated by asking the model in the
   scan prompt. A cycle is the opposite kind of value: derived, not observed. It
-  must not be added to the scan JSON, or the model's guess will overwrite the
-  arithmetic — which is the failure §1.2 exists to prevent.
-- **Expose it in the UI** next to the per-person fields so the user can see the
-  current phase, correct the anchor, suspend it, or turn it off per chat.
+  **must not** be added to the scan JSON, or the model's guess will overwrite the
+  arithmetic — the failure §1.2 exists to prevent. This is a requirement on the
+  consumer, not a suggestion.
+- **Store definitions outside the presence roster.** The scene roster (`present`)
+  is spliced on removal, rebuilt from scan results, and pruned by missed scans, so
+  a cycle attached to it would vanish when the character left the scene. Cycle
+  definitions outlive presence and live in their own `SceneData.cycles`.
+- **Expose it in the UI** next to the per-person fields: the derived phase
+  (read-only, because it is derived), the editable anchor, and the suspend
+  toggle. Because the phase derives from the day counter, a date edit repaints it.
 - **Inject** a compact line while active — phase and note:
 
   ```
@@ -286,10 +309,24 @@ Absence never errors, matching every other seam in `WORLD_FORGE_SYNC.md`:
 
 ## 6. Producer conformance (World-Forge agents) — **not yet in force**
 
-> Nothing below is binding while this contract is a draft. No agent spec
-> references it, and no agent should emit a carrier.
+> **Not binding yet, and the reason is no longer "the contract is a draft."** The
+> contract is v1 and the consumer is implemented; what is missing is the producer
+> wiring. No World-Forge agent spec references this document, so nothing elicits a
+> cycle, records one, emits a carrier, or validates one — and until that lands, an
+> agent that emitted a carrier would be inventing content no seed asked for.
+>
+> Wiring it is a deliberate, separable piece of work with a known shape, because
+> `[[WORLD_CALENDAR]]` and `[[DICE_TABLES]]` already did it: a World Seed field,
+> Interviewer elicitation, a Refiner record line, an Architect §6 carrier block, an
+> Editor validation step, a Compiler emission step, and a `validate_export.py`
+> WARN-only check. It also needs a policy answer this contract does not presume:
+> **which characters get a cycle, and who decides** — every intimate character by
+> default, or only where the user asks for one.
+>
+> Until then the channel works on hand-authored entries, which is the right order
+> for testing it.
 
-When the consumer lands, the expected producer shape is:
+The expected producer shape, for when that work happens:
 
 - [ ] (If the world wants cycle support) exactly one `[[BODY_CYCLES]]` entry in
       the **World (Tier 1) lorebook**, **enabled** (`disable: false`) and inert
@@ -313,9 +350,9 @@ When the consumer lands, the expected producer shape is:
 ## 7. Deferred by design (v0 → later)
 
 The following are **runtime state owned by the Scene Tracker**, deliberately
-absent from this contract's first version. The strategy is to ship the rudimentary
-seed, let it stabilize in play, and add producer-side declarations only where
-experience shows the world genuinely knows something the tracker cannot.
+absent from version 1. The strategy is to let the rudimentary seed stabilize in
+play and add producer-side declarations only where experience shows the world
+genuinely knows something the tracker cannot.
 
 - **Suppression — pregnancy, contraception, illness, magic, age.** A cycle that
   keeps ticking through a pregnancy is precisely the "tracks wrongly" failure
@@ -324,8 +361,13 @@ experience shows the world genuinely knows something the tracker cannot.
   which a world file cannot know. Since §3.4 is stateless derivation, suppression
   is the one piece of genuinely *mutable* per-chat cycle state: a suspend flag
   (and later, perhaps, an override phase) stored in the scene record and honored
-  ahead of the derivation. First version: the user suspends or clears it in the
-  UI. A later version may add a producer-declared suppression vocabulary — a
+  ahead of the derivation.
+  **Implemented in v1 as exactly that and no more:** a per-cycle `suspended` flag
+  the user toggles in the Scene Tracker, which stops the cycle being derived or
+  injected. It does **not** assert why. A world that wants the model to *know* a
+  character is pregnant uses the roster's existing `condition` field, which is
+  already scanned and already injected — so v1 needs no new state for the common
+  case. A later version may add a producer-declared suppression vocabulary — a
   named condition with phases of its own, so a world can ship "pregnancy" as a
   known state — which is a natural extension of this same seed mechanism and
   should reuse it rather than grow a parallel one.
@@ -340,19 +382,26 @@ experience shows the world genuinely knows something the tracker cannot.
   a `role: 'user'` person — so `id` needs a rule for that case before this is
   allowed.
 
-### 7.1 One open design question
+### 7.1 Cycle-specific carrier vs. a generic supplementary-state seed — decided, with a trigger
 
-**Should this be a cycle-specific carrier, or one generic supplementary-state
-seed?** The Scene Tracker's per-person record is explicitly extensible (`health`,
-`condition`, `clothing`, `mood`, `lastLocation` today), and cycles are only the
-first *world-seeded* addition to it. If several more arrive, N carriers is worse
-than one `[[TRACKED_STATE]]` carrier with a typed payload.
+**Decision for v1: keep `[[BODY_CYCLES]]` cycle-specific.** Generalizing now would
+mean deriving a generic shape from one real case and one imagined one, which is how
+a carrier ends up fitting neither. The Scene Tracker's per-person record is
+extensible (`health`, `condition`, `clothing`, `mood`, `lastLocation` today) and
+cycles are its first *world-seeded* addition; a second one is hypothetical until it
+is named.
 
-This draft keeps `[[BODY_CYCLES]]` because generalizing before a second use case
-exists would be speculative — a generic shape should be derived from two real
-cases, not one real and one imagined. **The decision point is the second
-supplementary state that wants a world-level seed:** at that moment, prefer
-folding both into one generic carrier over adding a third marker token.
+**The trigger for revisiting is explicit: the second supplementary state that
+wants a world-level seed.** At that point prefer folding both into one
+`[[TRACKED_STATE]]` carrier with a typed payload over adding a third marker token —
+three carriers reading the same scene record is the point at which the per-carrier
+boilerplate outweighs the clarity of separate markers.
+
+The axis that would govern such a carrier, and that cycles clarified: **scanned**
+state (what the model observes each turn — mood, clothing) and **derived** state
+(what the tracker computes from the counter — weekday, month, cycle) are different
+kinds of thing. Only derived state needs a world-level seed at all; scanned state
+needs nothing from the producer. A generic carrier should seed derived state only.
 
 Note the distinction that would govern such a carrier, and that cycles illustrate:
 **scanned** state (what the model observes each turn — mood, clothing) and
@@ -369,7 +418,7 @@ at all; scanned state needs nothing from the producer.
 | NPC manifest, facets, stable ids, turn tag, scenes registry | `MEMORY_CONTRACT.md` |
 | Director-card tag, alias coverage, `</style_contract>`, `[[WORLD_CALENDAR]]` | `WORLD_FORGE_SYNC.md` |
 | `[[DICE_TABLES]]` carrier, roll-table payload, dice-oracle injection | `DICE_ORACLE.md` |
-| `[[BODY_CYCLES]]` carrier, cycle seed payload | this document (draft) |
+| `[[BODY_CYCLES]]` carrier, cycle seed payload | this document |
 
 All are independently versioned. `[[BODY_CYCLES]]` reuses four existing
 conventions on purpose — `[[WORLD_CALENDAR]]`'s enabled-but-inert carrier flags,
