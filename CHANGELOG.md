@@ -13,6 +13,67 @@ numbers. Newest first.
 
 ---
 
+## 2026-07-26 — `BODY_CYCLES` v1: consumer landed, contract ratified (no pipeline behavior change)
+
+The `world-forge` extension now implements the consumer side of
+`contracts/BODY_CYCLES.md` (AndreiNicu/SillyTavern#63): it reads the carrier,
+seeds a pristine chat, derives the phase from the Scene Tracker's day counter,
+injects a line into `<scene_state>`, and exposes the anchor plus a suspend
+toggle in the tracker UI. The contract's own header still claimed "consumer not
+yet written" and "producers must not emit," the first of which had become false.
+
+Ratified to **version 1**, recording what the implementation settled: the phase
+is derived rather than stored and advanced; the anchor is `startDay`, a cycle
+day the producer resolves at build time; phases carry durations rather than day
+ranges, making gaps and overlaps unrepresentable; per-phase behavioral notes
+live in the carrier rather than relying on keyword-fired lorebook entries; and
+the cycle must never reach the scan prompt.
+
+That last one was the item most worth verifying rather than assuming. Reading
+the consumer settled it: the Scene Tracker injects via `setExtensionPrompt` with
+the world-info scan flag `false`, and core only feeds an extension prompt into
+the scan buffer when that flag is set — so a phase-keyed lorebook entry would
+silently never fire. The carrier note is the floor that always reaches the
+model.
+
+**The two halves of the seam are asymmetric, and the contract now says so up
+front.** The consumer is live; the producer is not wired, so nothing emits a
+carrier and the channel fires only on hand-authored entries. §6 is labelled as
+the expected producer shape rather than an in-force requirement, with the
+remaining work named (seed field, Interviewer elicitation, Refiner record,
+Architect §6 carrier block, Editor validation, Compiler emission,
+`validate_export.py` check) plus the policy question it needs answered: which
+characters get a cycle, and who decides.
+
+`contracts/README.md` gains a **three-state** status vocabulary, because the old
+two-state one (established / draft) had no room for a seam whose sides landed
+separately — and "the contract exists" and "the pipeline emits it" are different
+claims that a reader should not have to infer.
+
+§7.1 is resolved rather than left open: keep `[[BODY_CYCLES]]` cycle-specific for
+now, with an explicit trigger for revisiting (the second supplementary state that
+wants a world-level seed → prefer one generic `[[TRACKED_STATE]]` carrier over a
+third marker token), and the axis that would govern it — only *derived* state
+needs a world-level seed; *scanned* state needs nothing from the producer.
+
+Suppression (pregnancy, contraception, illness, magic) is recorded as implemented
+in its v1 form and no more: a per-cycle `suspended` flag that stops derivation and
+injection without asserting why. A world that wants the model to know a character
+is pregnant uses the roster's existing `condition` field, already scanned and
+already injected — so the common case needs no new state.
+
+### Changed
+- `contracts/BODY_CYCLES.md` — status → `Established (consumer only)`, version → 1,
+  with a "what version 1 settled" header block; §4 rewritten as normative-and-
+  implemented with consumer function names cited; §6 re-justified (not-in-force
+  because the producer is unwired, no longer because the contract is a draft) and
+  the remaining work + open policy question named; §7 suppression marked
+  implemented; §7.1 decided with its revisit trigger.
+- `contracts/README.md` — index row updated; two-state status vocabulary replaced
+  with three states (established / established-consumer-only / draft).
+
+---
+
 ## 2026-07-25 — `contracts/BODY_CYCLES.md` draft (no pipeline behavior change)
 
 Records a design agreement for a seam that does not exist yet: recurring body
