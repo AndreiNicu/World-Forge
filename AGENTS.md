@@ -13,15 +13,24 @@
 The user typed `/worldforge brainstorm`, `/worldforge start`, `/worldforge revise`,
 `/worldforge resync-preset`, `/worldforge convert`, or a `resume`/`skip`/`status` variant.
 
-- **Open `workflows/world-forge.md` and follow it.** It is the orchestrator and the
-  source of truth for what runs when. Revise runs live in `workflows/world-forge-revise.md`,
-  convert runs in `workflows/world-forge-convert.md`.
+- **Open `workflows/world-forge.md` and follow it.** It is the **router** and the
+  source of truth for what runs when: it dispatches build runs to four stage files
+  (`world-forge-discovery.md` → `world-forge-drafting.md` → `world-forge-validation.md`
+  → `world-forge-construction.md`). Load the router plus the *active* stage file only —
+  never all of them. Revise runs live in `workflows/world-forge-revise.md`,
+  convert runs in `workflows/world-forge-convert.md`, and preset resync / audition /
+  post-launch routing in `workflows/world-forge-postlaunch.md`.
 - **Kilo Code Subagent Delegation:** If you are the top-level Kilo Code agent, do not run the pipeline commands inline. Instead, use your subagent delegation tool (e.g., the `task` tool) to route the command to the correct custom subagent:
   - `/worldforge brainstorm` or `/world-forge brainstorm` → Dispatch to `WorldForge-Brainstormer` (optional ideation upstream of Phase 0; writes informal `Brainstorm_Notes.md`, no World Seed)
   - `/worldforge start` or `/world-forge start` → Dispatch to `WorldForge-Interviewer`
   - `/worldforge revise` or `/world-forge revise` (with `--freeform`, `--target`, etc.) → Dispatch to `WorldForge-Reviser`
   - `/worldforge convert` or `/world-forge convert` → Dispatch to `WorldForge-Converter`
   - `/worldforge resume phase[N]` → Dispatch to the custom agent defined for Phase N (e.g., `WorldForge-Editor` for Phase 3)
+- **If a dispatch or model call fails, never do the phase's work inline.** Retry the
+  dispatch; if it stays unavailable, set the Pipeline State Ledger `status` to `BLOCKED`,
+  halt, and surface it to the user (router → DISPATCH PROTOCOL rule 1). An inline-produced
+  phase has no agent spec, no Context Manifest, and no valid sign-off — treat its output
+  as if the phase never ran.
 - **Pipeline files are READ-ONLY at runtime:** everything under `agent_roles/`,
   `templates/`, `workflows/`, plus `Notes_On_functionality.md` and
   `Notes_Quick_Reference.md`. You write only to the world project's `Drafts/`, `Export/`,
@@ -68,6 +77,11 @@ The user asked you to change agent specs, templates, workflows, or documentation
 7. **Export JSON is written as UTF-8, never through PowerShell.** After Phase 4, the
    read-only check `python tools/validate_export.py <Export dir>` verifies parse validity,
    mojibake, `{{original}}` presence, and position enums. It never modifies files.
+8. **A phase is complete only when its artifact is on disk.** A ledger row goes `COMPLETE`
+   only after the phase's output file is read back and contains its sign-off anchor
+   (router → DISPATCH PROTOCOL rule 2). At stage boundaries, the read-only check
+   `python tools/validate_pipeline_state.py <project folder>` re-verifies the ledger's
+   claims against the artifacts. It never modifies files.
 
 ---
 

@@ -224,7 +224,7 @@ Kilo reads two optional files from the workspace root. **World-Forge now ships b
 3. The orchestrator should respond as the Interviewer. If it instead asks something like *"what would you like to build?"*, see [§10 Troubleshooting](#10-troubleshooting).
 4. Answer the Interviewer's questions. Phase 0 takes the most user time of any phase — 30–60 minutes for a fresh world. Five minutes of friction here saves an hour of debugging at the runtime stage (see the [README quick start](../README.md#quick-start)).
 5. Subsequent phases dispatch automatically, pausing at the [pause gates documented in the README](../README.md#pause-gates).
-6. When Phase 5 completes, your `Export/` directory contains SillyTavern-importable JSON. If `Prompt_Engineer_Audit.md` lists recommendations, apply them manually per `workflows/world-forge.md` Phase 5.5 before importing.
+6. When Phase 5 completes, your `Export/` directory contains SillyTavern-importable JSON. If `Prompt_Engineer_Audit.md` lists recommendations, apply them manually per `workflows/world-forge-construction.md` Phase 5.5 before importing.
 
 ---
 

@@ -27,7 +27,7 @@ World-Forge/
 ├── Notes_On_functionality.md     ← Authoritative SillyTavern runtime reference
 ├── agent_roles/                  ← Per-phase agent specifications
 ├── templates/                    ← Structural references (World Seed, card, lorebook, preset)
-├── workflows/world-forge.md      ← The pipeline orchestrator
+├── workflows/world-forge.md      ← The pipeline router (+ four stage files world-forge-*.md)
 └── Samples/                      ← Worked example: the Lucifer world (full pipeline output)
 ```
 
@@ -881,7 +881,7 @@ You set the contract in Section 1.5 of the World Seed — the Interviewer asks f
 ## 12. Where to learn more
 
 - `README.md` — high-level overview of what the pipeline produces and how the architecture is organized
-- `workflows/world-forge.md` — full phase-by-phase orchestrator definition with pause gates and trigger commands
+- `workflows/world-forge.md` — the pipeline router: dispatch protocol, state ledger, pause gates, and trigger commands; the phase-by-phase definitions live in the four stage files (`workflows/world-forge-discovery.md`, `-drafting.md`, `-validation.md`, `-construction.md`) and the post-launch operations in `workflows/world-forge-postlaunch.md`
 - `workflows/world-forge-revise.md` — the revise pipeline (surgical post-launch edits, R0–R5.5)
 - `workflows/world-forge-convert.md` — the convert pipeline (reframe a shipped world into a new build, C0)
 - `agent_roles/*.md` — the actual specification each agent runs against (read these if you want to know what an agent will or will not do)

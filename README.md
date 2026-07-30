@@ -129,11 +129,13 @@ World-Forge/
 ├── .kilocodeignore               ← Keeps samples + maintenance docs out of runtime agent context
 ├── .kilo/kilo.jsonc              ← Preconfigured Kilo Code per-phase agents (auto-loaded; OpenRouter flavor)
 ├── tools/
-│   └── validate_export.py        ← Read-only validator for Export/ JSON (run after Phase 4)
+│   ├── validate_export.py        ← Read-only validator for Export/ JSON (run after Phase 4)
+│   └── validate_pipeline_state.py ← Read-only validator: pipeline ledger vs. artifacts on disk (run at stage boundaries)
 ├── agent_roles/                  ← Per-phase agent specifications (one .md per agent)
 ├── templates/                    ← Structural references (World Seed, character card, lorebook, preset)
 ├── workflows/
-│   └── world-forge.md            ← The pipeline orchestrator
+│   ├── world-forge.md            ← The pipeline router (dispatches the four build stage files)
+│   └── world-forge-*.md          ← Build stage files (discovery/drafting/validation/construction) + revise, convert, post-launch ops
 └── Samples/                      ← Worked example: a complete world output (Lucifer)
 ```
 
@@ -227,7 +229,7 @@ Installation, branch policy, and update cadence are documented in the fork's own
 ## Where to learn more
 
 - `tutorial.md` — extended usage walkthrough with worked examples
-- `workflows/world-forge.md` — the orchestrator's full phase definitions
+- `workflows/world-forge.md` — the pipeline router (dispatch protocol, ledger, trigger commands); full phase definitions in the stage files `workflows/world-forge-{discovery,drafting,validation,construction}.md`
 - `agent_roles/*.md` — per-phase agent specifications
 - `Notes_On_functionality.md` — authoritative reference for SillyTavern's runtime behavior
 - `CLAUDE.md` — standing context for AI agents working on the repository

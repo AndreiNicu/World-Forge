@@ -13,6 +13,67 @@ numbers. Newest first.
 
 ---
 
+## 2026-07-30 — Modular workflow router + dispatch protocol + process-state validator
+
+Two documented live failures drove this change: a failed model call led the
+orchestrating agent to perform an agent's phase **inline** — without the
+agent's spec, Context Manifest, or persona isolation — instead of
+re-dispatching; and a completed build shipped with the Phase 3.5–3.7 audit
+reports never written while the run reported success (a recheck by the same
+model then declared everything fine, which is exactly the self-validation the
+audit/apply principle exists to prevent). The orchestrator is now a thin
+**router** that dispatches four stage files, under a **DISPATCH PROTOCOL**
+with two hard rules — dispatch-never-inline, and artifact-existence gates (a
+ledger row goes COMPLETE only after the phase's output file is read back from
+disk with its sign-off anchor) — plus a second sanctioned read-only script
+that re-checks the ledger's claims against the artifacts deterministically,
+without asking the model anything. Phase content moved verbatim; no agent's
+contract, authority, or phase semantics changed.
+
+### Added
+- `workflows/world-forge-discovery.md` — Stage 1: BRAINSTORM section (moved
+  from the orchestrator) + Phases 0–1, with entry/exit conditions and
+  per-phase artifact gates.
+- `workflows/world-forge-drafting.md` — Stage 2: Phases 2–2.5, with the
+  seven-output inventory as the Phase 2 on-disk gate.
+- `workflows/world-forge-validation.md` — Stage 3: Phases 3–3.7 and the
+  audit loop (loop returns dispatch the Architect/Intimacy Architect agents
+  directly; auditors stay read-only; no audit phase is skippable by judgment).
+- `workflows/world-forge-construction.md` — Stage 4: Phases 4–5.5 and
+  pipeline completion.
+- `workflows/world-forge-postlaunch.md` — the POST-LAUNCH REVISIONS routing
+  rules, CONVERT summary, PRESET RESYNC, and AUDITION sections (moved verbatim
+  from the orchestrator; they are operating modes, not build stages).
+- `tools/validate_pipeline_state.py` — read-only, stdlib-only process-state
+  validator (second sanctioned script, approved 2026-07-30): per COMPLETE
+  ledger row it verifies the phase's artifact exists and carries its sign-off
+  anchor; cross-checks conditional-skip legality (3.6 vs. world_mode, 2.5/3.7
+  vs. intimacy_in_scope), phase order, round ceilings, and Tier 3 files vs.
+  mode; degrades to a WARN-only inventory on pre-ledger worlds. Never
+  modifies files.
+
+### Changed
+- `workflows/world-forge.md` — rewritten as the router (v8): ROUTER & STAGE
+  FILES map, the new **DISPATCH PROTOCOL** (dispatch-never-inline; artifact
+  gates with the phase → artifact → anchor table; stage entry checks; the
+  validator as deterministic backstop at stage boundaries), plus the retained
+  overview, WORLD MODE, PIPELINE STATE LEDGER, CHECKPOINT DISCIPLINE, trigger
+  commands (now naming each command's stage file), pause gates (new
+  dispatch-failure gate), and file structure. Phase sections and post-launch
+  operations moved to the files above.
+- `AGENTS.md` — session routing updated for router + stage files; new
+  dispatch-failure rule (halt and surface, never inline); new hard invariant
+  8 (artifact-gated phase completion + `validate_pipeline_state.py`).
+- `CLAUDE.md` — repository structure, principle pointers (#3 Phase 5.5, #8
+  resync, #10 convert, #11 brainstorm), consistency table (updated rows plus
+  a new router/stage dispatch-contract row), common-failure list, and the
+  Out-of-scope script exception (now two sanctioned validators).
+- `README.md`, `tutorial.md`, `wiki/Kilo-Code-Setup.md`,
+  `workflows/world-forge-convert.md` — pointers updated to the router/stage
+  split (Phase 5.5 → construction file, BRAINSTORM → discovery file).
+
+---
+
 ## 2026-07-25 — `contracts/BODY_CYCLES.md` draft (no pipeline behavior change)
 
 Records a design agreement for a seam that does not exist yet: recurring body
