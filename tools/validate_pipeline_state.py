@@ -13,7 +13,11 @@ Checks, per ledger row that claims COMPLETE:
   2 Architect          - the seven mandatory Drafts/ output classes exist and
                          are non-empty (cards, User.md, protagonist + character
                          Tier 2 entries, Tier1_World_Entries.md, the
-                         mode-appropriate Tier 3 file(s), Instructions files)
+                         mode-appropriate Tier 3 file(s), Instructions files);
+                         Drafts/Architect_Checklist.md carries the
+                         "ARCHITECT PRE-SUBMISSION CHECK" block (absence is a
+                         WARN - worlds built before 2026-07-30 predate the
+                         durable checklist)
   2.5 Intimacy Arch.   - >=1 Tier2_*_Intimacy_Profile.md + the mode-appropriate
                          Tier 3 register; "INTIMACY ARCHITECT SIGN-OFF" present
                          in some Drafts/ file
@@ -250,6 +254,13 @@ def validate(project, fail, warn):
 
     if rows.get("2", {}).get("status") == "COMPLETE":
         check_architect_outputs(drafts, mode, fail)
+        checklist_text = read_text(drafts / "Architect_Checklist.md")
+        if checklist_text is None:
+            warn("2 Architect: no Drafts/Architect_Checklist.md (the durable checklist was "
+                 "introduced 2026-07-30; worlds built earlier predate it)")
+        elif "PRE-SUBMISSION CHECK" not in checklist_text:
+            fail("2 Architect: Drafts/Architect_Checklist.md exists but has no "
+                 "'ARCHITECT PRE-SUBMISSION CHECK' block")
 
     if rows.get("2.5", {}).get("status") == "COMPLETE":
         profiles = [p for p in drafts.glob("Tier2_*_Intimacy_Profile.md") if non_empty(p)]

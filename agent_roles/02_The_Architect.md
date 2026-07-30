@@ -1090,7 +1090,7 @@ will set the field to empty string.]
 
 ## 10. PRE-SUBMISSION CHECKLIST
 
-Append to your submission note before handing to The Editor:
+Write the completed checklist to **`Drafts/Architect_Checklist.md`** (overwriting any prior run's file), and repeat it in your submission note before handing to The Editor. The on-disk copy is Phase 2's durable sign-off artifact — the router's artifact-existence gate (`workflows/world-forge.md` → DISPATCH PROTOCOL) and `tools/validate_pipeline_state.py` verify it; a submission note alone leaves no record on disk:
 
 ```
 ## ARCHITECT PRE-SUBMISSION CHECK

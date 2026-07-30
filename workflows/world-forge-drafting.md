@@ -9,7 +9,7 @@ description: World Forge build Stage 2 — Drafting (Phase 2 Architect, Phase 2.
 
 **Entry conditions (read from the Pipeline State Ledger; halt if unmet):** the `1 Refiner` row is `COMPLETE` and `Drafts/Master_Design.md` verifies on disk with its `REFINER SIGN-OFF` (Stage 1 exit gate). Resumes (`resume phase2` / `resume phase2.5`) re-enter here per the checkpoint discipline's resume-from-disk rule.
 
-**Exit conditions (verify on disk before handing back):** the seven mandatory Phase 2 outputs exist and are non-empty; when `intimacy_in_scope: true`, the Phase 2.5 outputs exist with the `INTIMACY ARCHITECT SIGN-OFF` appended to the final output file. Ledger rows `2` (and `2.5`, or `SKIPPED`) `COMPLETE`. Then hand back to the router → Stage 3 (`workflows/world-forge-validation.md`). If Phase 2.5 produced `UNRESOLVED_INTIMACY.md`, the ledger is `BLOCKED` and the run pauses for the user.
+**Exit conditions (verify on disk before handing back):** the seven mandatory Phase 2 outputs exist and are non-empty, plus `Drafts/Architect_Checklist.md` with its `ARCHITECT PRE-SUBMISSION CHECK` block; when `intimacy_in_scope: true`, the Phase 2.5 outputs exist with the `INTIMACY ARCHITECT SIGN-OFF` appended to the final output file. Ledger rows `2` (and `2.5`, or `SKIPPED`) `COMPLETE`. Then hand back to the router → Stage 3 (`workflows/world-forge-validation.md`). If Phase 2.5 produced `UNRESOLVED_INTIMACY.md`, the ledger is `BLOCKED` and the run pauses for the user.
 
 **Governing router sections (not restated here):** PIPELINE STATE LEDGER, CHECKPOINT DISCIPLINE, DISPATCH PROTOCOL — all in `workflows/world-forge.md`. Every phase below runs by dispatching its agent; never inline.
 
@@ -32,9 +32,9 @@ description: World Forge build Stage 2 — Drafting (Phase 2 Architect, Phase 2.
 6. Tier 3 lorebook — *arc mode:* `Tier3_Arc[N]_[Title]_Entries.md` per arc; *sandbox mode:* a single `Tier3_Sandbox_Entries.md` (`SANDBOX_STATE` + `WORLD_PULSE`)
 7. `Instructions_[CardName].md` — system_prompt + post_history_instructions + depth_prompt per card
 
-If the PRE-SUBMISSION CHECKLIST shows any of these unchecked, return to Architect before proceeding.
+If the PRE-SUBMISSION CHECKLIST (written to `Drafts/Architect_Checklist.md` and repeated in the submission note — Architect Section 10) shows any of these unchecked, return to Architect before proceeding.
 
-**Artifact gate (Phase 2):** all seven output classes exist on disk and are non-empty — inventory `Drafts/` against the list above (the PRE-SUBMISSION CHECKLIST arrives in the submission note; the on-disk file inventory is the gate). A missing or zero-byte file means the phase is not complete, whatever the checklist says.
+**Artifact gate (Phase 2):** all seven output classes exist on disk and are non-empty — inventory `Drafts/` against the list above — and `Drafts/Architect_Checklist.md` exists containing the `ARCHITECT PRE-SUBMISSION CHECK` block. A missing or zero-byte file means the phase is not complete, whatever the checklist says.
 
 ---
 

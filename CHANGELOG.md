@@ -71,6 +71,21 @@ contract, authority, or phase semantics changed.
 - `README.md`, `tutorial.md`, `wiki/Kilo-Code-Setup.md`,
   `workflows/world-forge-convert.md` — pointers updated to the router/stage
   split (Phase 5.5 → construction file, BRAINSTORM → discovery file).
+- `agent_roles/02_The_Architect.md` (Section 10) — the PRE-SUBMISSION
+  CHECKLIST is now also written to **`Drafts/Architect_Checklist.md`**, giving
+  Phase 2 a durable on-disk sign-off artifact (it previously existed only in
+  the submission note, leaving nothing for an artifact gate to check). The
+  router's artifact table, the ledger anchor cell, the drafting stage's
+  Phase 2 gate, and `validate_pipeline_state.py` (WARN-only for pre-existing
+  worlds) all key off it.
+- `templates/Convert_Brief_Template.md` — stale "SANDBOX MODE section"
+  pointer updated to the actual `workflows/world-forge.md` heading (WORLD
+  MODE: ARC vs. SANDBOX), matching the same normalization in `CLAUDE.md`.
+
+### Fixed
+- `.gitignore` now excludes `__pycache__/` / `*.pyc`; the accidentally
+  committed `tools/__pycache__/validate_export.cpython-311.pyc` is removed
+  from the repository.
 
 ---
 

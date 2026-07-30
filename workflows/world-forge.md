@@ -38,7 +38,7 @@ These rules exist because both failure modes below are documented from live runs
    |---|---|---|
    | 0 Interviewer | `World_Seed.md` | `INTERVIEWER SIGN-OFF` |
    | 1 Refiner | `Drafts/Master_Design.md` | `REFINER SIGN-OFF` |
-   | 2 Architect | The seven mandatory `Drafts/` outputs (stage file 2 lists them) — all present, all non-empty | `PRE-SUBMISSION CHECKLIST` (delivered in the submission note; the on-disk gate is the seven-file inventory) |
+   | 2 Architect | The seven mandatory `Drafts/` outputs (stage file 2 lists them) — all present, all non-empty — plus `Drafts/Architect_Checklist.md` | `ARCHITECT PRE-SUBMISSION CHECK` (in `Drafts/Architect_Checklist.md`; also repeated in the submission note) |
    | 2.5 Intimacy Architect | `Drafts/Tier2_*_Intimacy_Profile.md` + the mode-appropriate Tier 3 register file(s) | `INTIMACY ARCHITECT SIGN-OFF` (appended to the final output file) |
    | 3 Editor | `Drafts/Editor_Critique_[Round N].md` (latest round) | `EDITOR SIGN-OFF` |
    | 3.5 Voice Auditor | `Drafts/Voice_Audit_Report_[Round N].md` (latest round) | `VOICE AUDITOR SIGN-OFF` |
@@ -173,7 +173,7 @@ Loop state — which phase is live, what round it is on, which sign-offs are in 
 | Phase | Status | Round | Sign-off anchor |
 |---|---|---|---|
 | 1 Refiner            | COMPLETE | —  | REFINER SIGN-OFF |
-| 2 Architect          | PENDING  | —  | PRE-SUBMISSION CHECKLIST |
+| 2 Architect          | PENDING  | —  | ARCHITECT PRE-SUBMISSION CHECK |
 | 2.5 Intimacy Arch.   | PENDING  | —  | (SKIPPED when intimacy_in_scope: false) |
 | 3 Editor             | PENDING  | 0  | EDITOR SIGN-OFF |
 | 3.5 Voice Auditor    | PENDING  | 0  | VOICE AUDITOR SIGN-OFF |
@@ -290,6 +290,7 @@ Checkpoint state is inferred from disk; it is not tracked in the Pipeline State 
 │   ├── Tier3_Arc[N]_Intimacy_Register.md          ⭐ arc mode (Phase 2.5)
 │   ├── Tier3_Sandbox_Intimacy_Register.md          ← sandbox mode (single, Phase 2.5)
 │   ├── Instructions_[CardName].md
+│   ├── Architect_Checklist.md                      ← Phase 2 durable pre-submission checklist (sign-off artifact)
 │   ├── Editor_Critique_[Round N].md
 │   ├── Voice_Audit_Report_[Round N].md
 │   ├── Arc_Transition_Audit_[Round N].md

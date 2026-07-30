@@ -27,7 +27,7 @@ Fill in every section below. Delete instructional text in brackets before submit
 
 **Target project path:** [Absolute or workspace-relative path to the new project folder. Should be empty or non-existent; if it contains a `World_Seed.md` already, the Converter will refuse to overwrite without explicit confirmation.]
 
-**Target World Mode:** [`arc` | `sandbox` | `unchanged` — flipping is one of the load-bearing cases the Converter exists for. If flipping, read the SANDBOX MODE section of `workflows/world-forge.md` to understand what that means. *Rebaseline:* must be `unchanged`.]
+**Target World Mode:** [`arc` | `sandbox` | `unchanged` — flipping is one of the load-bearing cases the Converter exists for. If flipping, read the WORLD MODE: ARC vs. SANDBOX section of `workflows/world-forge.md` to understand what that means. *Rebaseline:* must be `unchanged`.]
 
 **Operating mode:** [`reframe` (default) | `rebaseline` — must match the invocation flag. `rebaseline` requires zero axes replaced in Section 3, protagonist included.]
 
