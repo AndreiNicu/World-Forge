@@ -13,6 +13,39 @@ numbers. Newest first.
 
 ---
 
+## 2026-11-05 — RPG Stats contract drafted (`[[RPG_STATS]]`, Draft v0)
+
+The first piece of the RPG layer. It specifies the character-state channel
+`DICE_ORACLE.md` §7.3 reserved, as its own contract and not as an oracle
+extension. World Forge authors the starting values once: the world's stat
+system, item catalog, starting sheets for `{{user}}` and the cast, and a
+bestiary of enemy types with `base ± spread` ranges and loot. Builds are derived
+by the Interviewer from each character's description and confirmed by the
+player; there is no class menu. The SillyTavern fork owns every live value. It
+keeps campaign state per chat (a new chat resets to the world's starting values),
+a combat working copy that swipes and rewinds can't leak through, commits keyed
+to message ids, and the roll log. Status is **Draft**: nothing reads the carrier,
+no agent spec references it, and producers must not emit it yet. No pipeline
+behavior changes.
+
+### Added
+- **`contracts/RPG_STATS.md`** — carrier (World lorebook, enabled-but-inert
+  flags like `[[WORLD_CALENDAR]]`), payload (`system`, `items`, `sheets`,
+  `bestiary`), `atZero` semantics tied to the posture boundary (principle #13),
+  `buildNote` as reference data (principle #14), the consumer lifecycle
+  (bootstrap snapshot, per-chat state, working copy, commits and rewind), the
+  expected producer wiring (not in force), deferred items, and a worked
+  zombie-world example. Explains why it does not trip `BODY_CYCLES.md` §7.1's
+  generic-carrier trigger.
+
+### Changed
+- **`contracts/README.md`** — table row for `RPG_STATS.md`; listed under Draft.
+- **`contracts/DICE_ORACLE.md`** §7.3 — the character-state bullet points at
+  the new draft. `Last updated` bumped; version unchanged.
+  **Cross-repo: needs contract sync to the ST fork** (new file + changed bytes).
+- **`CLAUDE.md`** — repository-structure tree lists all five contract files;
+  `DICE_ORACLE.md` and `BODY_CYCLES.md` were missing before this change.
+
 ## 2026-11-04 — Orchestrator seat runs DeepSeek Flash; every phase agent stays on Pro
 
 Each seat was reviewed for a cheaper Flash-tier model. Only the orchestrator
