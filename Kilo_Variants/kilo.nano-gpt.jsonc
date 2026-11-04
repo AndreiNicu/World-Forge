@@ -1,0 +1,501 @@
+// Kilo_Variants/kilo.nano-gpt.jsonc — ALL-SEATS DeepSeek V4 Pro via NANO-GPT
+// instead of OpenRouter.
+//
+// ── How to use ───────────────────────────────────────────────────────────────
+// Kilo only reads ./.kilo/kilo.jsonc (or the global config) — it does NOT load
+// this folder. To activate: register your Nano-GPT API key in Kilo's global
+// provider settings (API Provider → Nano-GPT; a first-class entry, not
+// OpenAI-Compatible — wiki/Kilo-Code-Setup.md §3.2), back up .kilo/kilo.jsonc,
+// copy this file over it (keeping the name kilo.jsonc), and reload VS Code. The
+// {file:...} prompt paths resolve relative to the config file's directory, so
+// they are written for the .kilo/ location — do not run this file from
+// Kilo_Variants/. Verify after switching: the WorldForge-* agents appear in the
+// agent picker and none shows "Unknown model".
+//
+// ── Same as the shipped config ───────────────────────────────────────────────
+// The WorldForge-Orchestrator agent, every agent's "permission" block, and the
+// per-phase temperatures are identical to .kilo/kilo.jsonc (rationale in its
+// header). Keep them in sync — only the model ids and the provider block differ.
+//
+// ── What differs from the shipped (OpenRouter) config ────────────────────────
+// - Every seat except the Orchestrator ("nano-gpt/deepseek/deepseek-v4-flash-latest",
+//   as in the shipped config) runs "nano-gpt/deepseek/deepseek-v4-pro-0813" — the V4 Pro GA,
+//   the same model the shipped config's OpenRouter alias resolves to today.
+//   Pinned, not aliased, on purpose: Nano-GPT's "deepseek/deepseek-latest"
+//   alias routes to the *Thinking* variant (temperature ignored, so the
+//   per-phase table goes dead) and, per Nano-GPT, never to DeepSeek directly
+//   (so DeepSeek's prefix caching never applies). Nano-GPT has no non-thinking
+//   Pro alias; bump the dated slug by hand when a new Pro ships.
+// - No provider routing by default (see the provider block). Nano-GPT picks
+//   the upstream itself, and that keeps a Nano-GPT subscription in effect —
+//   the model is subscription-included (counted at 2x input tokens).
+//
+// ── Verify after editing ─────────────────────────────────────────────────────
+// If the WorldForge-* agents are absent from the picker, the JSONC is malformed
+// (Kilo silently drops invalid entries) — see wiki/Kilo-Code-Setup.md §5.3.
+// Then run the §5.6 permission check once.
+{
+  "$schema": "https://app.kilo.ai/config.json",
+  "provider": {
+    "nano-gpt": {
+      // ── Provider selection (optional — read before enabling) ──────────────
+      // Nano-GPT can pin which upstream serves a request (docs.nano-gpt.com →
+      // Provider Selection). Pinning DeepSeek's first-party upstream ("deepseek")
+      // is the Nano-GPT counterpart of the shipped config's OpenRouter routing
+      // pin: DeepSeek's automatic prefix caching applies only when a request
+      // lands on DeepSeek itself, and the pipeline reloads a large spec every
+      // phase. The catch: explicit provider selection is ALWAYS pay-as-you-go
+      // at the chosen provider's price, and it BYPASSES subscription coverage
+      // for that request. Subscription users: leave this off.
+      //
+      // Form 1 — header (hard pin for every request through this provider;
+      // Kilo's documented per-provider "options.headers"). All seats run the
+      // same model, so a provider-wide pin is fine here:
+      // "options": {
+      //   "headers": { "X-Provider": "deepseek" }
+      // },
+      //
+      // Form 2 — request-body "provider" object, per model (soft preference
+      // with fallback; same field names as OpenRouter's routing: order, only,
+      // ignore, sort, allow_fallbacks, quantizations, max_price). Kilo should
+      // forward per-model "options" into the request body for this
+      // OpenAI-compatible provider, but that is not documented — after enabling,
+      // confirm on your Nano-GPT usage page that requests land on DeepSeek.
+      // Use one form, not both:
+      // "models": {
+      //   "deepseek/deepseek-v4-pro-0813": {
+      //     "options": {
+      //       "provider": { "order": ["deepseek"], "allow_fallbacks": true }
+      //     }
+      //   },
+      //   "deepseek/deepseek-v4-flash-latest": {
+      //     "options": {
+      //       "provider": { "order": ["deepseek"], "allow_fallbacks": true }
+      //     }
+      //   }
+      // }
+    }
+  },
+  "agent": {
+    // ── Orchestrator (select this agent, then type /worldforge ...) ──
+    // Runs the router (workflows/world-forge.md): dispatches each phase to its
+    // WorldForge-* agent, relays interactive agents' questions verbatim (router
+    // → DISPATCH PROTOCOL rule 5), advances the Pipeline State Ledger, runs the read-only
+    // validators. It cannot author phase content: its only writable file is the
+    // Master Design (for the ledger), and it can dispatch only WorldForge-* agents.
+    // Model: DeepSeek FLASH, the one seat that is not Pro. Its work is bookkeeping
+    // (dispatch, verbatim relay, ledger, validators) with no creative or literal-
+    // transcription output, and it is the longest-lived, most input-heavy session.
+    // The permission block (it cannot write a phase artifact) and the validators
+    // (they catch skipped phases) are what make a cheaper model safe here. If it
+    // paraphrases relayed questions or misreads the ledger, put it back on Pro.
+    // (Nano-GPT's deepseek/deepseek-v4-flash-latest is a moving alias for V4.1 Flash 1017.)
+    "WorldForge-Orchestrator": {
+      "description": "Runs /worldforge commands — dispatches each phase to its WorldForge-* agent, relays interactive agents' questions verbatim, advances the Pipeline State Ledger, runs the read-only validators. Never authors phase content.",
+      "mode": "primary",
+      "model": "nano-gpt/deepseek/deepseek-v4-flash-latest",
+      "temperature": 0.2,
+      "prompt": "{file:../workflows/world-forge.md}",
+      "permission": {
+        "read": "allow",
+        "edit": { "*": "deny", "*Drafts/Master_Design.md": "allow" },
+        "bash": {
+          "*": "deny",
+          "python tools/validate_export.py *": "allow",
+          "py tools/validate_export.py *": "allow",
+          "python tools/validate_pipeline_state.py *": "allow",
+          "py tools/validate_pipeline_state.py *": "allow"
+        },
+        "task": { "*": "deny", "WorldForge-*": "allow" },
+        "external_directory": "ask"
+      }
+    },
+    // ── Ideation (optional, upstream of Phase 0) ──
+    "WorldForge-Brainstormer": {
+      "description": "Phase 0-pre (optional) — divergent ideation partner; helps a user with only a vibe find a premise, (adaptation posture, --adapt) extracts a playable world from an existing story/fanfiction/RP document, or (improvement posture standalone, --improve) ping-pongs improvement ideas against an existing world with no commitment, parking them in the standing Big_Brain_Storm.md. Writes informal Brainstorm_Notes.md (Big_Brain_Storm.md on standalone --improve); no World Seed.",
+      "mode": "all",
+      "model": "nano-gpt/deepseek/deepseek-v4-pro-0813",
+      "temperature": 0.9,
+      "prompt": "{file:../agent_roles/Brainstormer/00_The_Brainstormer.md}",
+      // Permissions: writes only its notes files.
+      "permission": {
+        "edit": { "*": "deny", "*Brainstorm_Notes.md": "allow", "*Big_Brain_Storm.md": "allow" },
+        "bash": { "*": "deny", "python *": "ask", "py *": "ask", "node *": "ask" },
+        "task": "deny",
+        "external_directory": "ask"
+      }
+    },
+    // ── Initial build (Phases 0–5) ──
+    "WorldForge-Interviewer": {
+      "description": "Phase 0 — interviews the user through the World Seed Template; creative partner, pushes back on thin material",
+      "mode": "all",
+      "model": "nano-gpt/deepseek/deepseek-v4-pro-0813",
+      "temperature": 0.8,
+      "prompt": "{file:../agent_roles/00_The_Interviewer.md}",
+      // Permissions: writes only the World Seed.
+      "permission": {
+        "edit": { "*": "deny", "*World_Seed.md": "allow" },
+        "bash": { "*": "deny", "python *": "ask", "py *": "ask", "node *": "ask" },
+        "task": "deny",
+        "external_directory": "ask"
+      }
+    },
+    "WorldForge-Refiner": {
+      "description": "Phase 1 — classifies the World Seed into Tiers 1/2/3 and produces the locked Master Design",
+      "mode": "all",
+      "model": "nano-gpt/deepseek/deepseek-v4-pro-0813",
+      "temperature": 0.4,
+      "prompt": "{file:../agent_roles/01_The_Refiner.md}",
+      // Permissions: writes the Master Design (incl. the ledger it initializes) + its blocker file.
+      "permission": {
+        "edit": { "*": "deny", "*Drafts/Master_Design.md": "allow", "*UNRESOLVED_QUESTIONS.md": "allow" },
+        "bash": { "*": "deny", "python *": "ask", "py *": "ask", "node *": "ask" },
+        "task": "deny"
+      }
+    },
+    "WorldForge-Architect": {
+      "description": "Phase 2 — drafts all cards, persona, and Tier 1/2/3 lorebook content from the Master Design",
+      "mode": "all",
+      "model": "nano-gpt/deepseek/deepseek-v4-pro-0813",
+      "temperature": 0.8,
+      "prompt": "{file:../agent_roles/02_The_Architect.md}",
+      // Permissions: all drafts except the LOCKED Master Design and other agents' reports.
+      "permission": {
+        "edit": {
+          "*": "deny",
+          "*Drafts/*": "allow",
+          "*Drafts/Master_Design.md": "deny",
+          "*Drafts/Editor_Critique_*": "deny",
+          "*Drafts/Voice_Audit_Report_*": "deny",
+          "*Drafts/Arc_Transition_Audit_*": "deny",
+          "*Drafts/Intimacy_Audit_Report_*": "deny",
+          "*Drafts/Revision_R*": "deny",
+          "*Drafts/Revise_R*": "deny",
+          "*Drafts/Audition_*": "deny"
+        },
+        "bash": { "*": "deny", "python *": "ask", "py *": "ask", "node *": "ask" },
+        "task": "deny"
+      }
+    },
+    "WorldForge-IntimacyArchitect": {
+      "description": "Phase 2.5 (conditional) — drafts Tier 2 intimacy profiles and Tier 3 intimacy registers",
+      "mode": "all",
+      "model": "nano-gpt/deepseek/deepseek-v4-pro-0813",
+      "temperature": 0.8,
+      "prompt": "{file:../agent_roles/06_The_Intimacy_Architect.md}",
+      // Permissions: intimacy profiles/registers + its blocker file only.
+      "permission": {
+        "edit": {
+          "*": "deny",
+          "*Drafts/Tier2_*Intimacy*": "allow",
+          "*Drafts/Tier3_*Intimacy_Register.md": "allow",
+          "*UNRESOLVED_INTIMACY.md": "allow"
+        },
+        "bash": { "*": "deny", "python *": "ask", "py *": "ask", "node *": "ask" },
+        "task": "deny"
+      }
+    },
+    // Audit seats — run DeepSeek 4 Pro with per-phase temperatures (0.3 for Editor,
+    // 0.6 for Auditors) to maintain audit discipline under a chat-tuned model.
+    "WorldForge-Editor": {
+      "description": "Phase 3 — validates drafts against the hard-fail rules; read-only on drafts, writes critique reports",
+      "mode": "all",
+      "model": "nano-gpt/deepseek/deepseek-v4-pro-0813",
+      "temperature": 0.3,
+      "prompt": "{file:../agent_roles/03_The_Editor.md}",
+      // Permissions: read-only on drafts: writes only its critique (audit/apply separation, CLAUDE.md #3).
+      "permission": {
+        "edit": { "*": "deny", "*Drafts/Editor_Critique_*.md": "allow" },
+        "bash": { "*": "deny", "python *": "ask", "py *": "ask", "node *": "ask" },
+        "task": "deny"
+      }
+    },
+    "WorldForge-VoiceAuditor": {
+      "description": "Phase 3.5 — simulates dialogue and audits behavioral fidelity; read-only on drafts, writes audit reports",
+      "mode": "all",
+      "model": "nano-gpt/deepseek/deepseek-v4-pro-0813",
+      "temperature": 0.6,
+      "prompt": "{file:../agent_roles/03b_The_Voice_Auditor.md}",
+      // Permissions: read-only on drafts: writes only its report.
+      "permission": {
+        "edit": { "*": "deny", "*Drafts/Voice_Audit_Report_*.md": "allow" },
+        "bash": { "*": "deny", "python *": "ask", "py *": "ask", "node *": "ask" },
+        "task": "deny"
+      }
+    },
+    "WorldForge-ArcAuditor": {
+      "description": "Phase 3.6 (arc mode only) — audits continuity across arc seams; read-only on drafts, writes audit reports",
+      "mode": "all",
+      "model": "nano-gpt/deepseek/deepseek-v4-pro-0813",
+      "temperature": 0.6,
+      "prompt": "{file:../agent_roles/03c_The_Arc_Transition_Auditor.md}",
+      // Permissions: read-only on drafts: writes only its report.
+      "permission": {
+        "edit": { "*": "deny", "*Drafts/Arc_Transition_Audit_*.md": "allow" },
+        "bash": { "*": "deny", "python *": "ask", "py *": "ask", "node *": "ask" },
+        "task": "deny"
+      }
+    },
+    "WorldForge-IntimacyAuditor": {
+      "description": "Phase 3.7 (conditional) — audits intimate-scene fidelity and register; read-only on drafts, writes audit reports",
+      "mode": "all",
+      "model": "nano-gpt/deepseek/deepseek-v4-pro-0813",
+      "temperature": 0.6,
+      "prompt": "{file:../agent_roles/03d_The_Intimacy_Auditor.md}",
+      // Permissions: read-only on drafts: writes only its report.
+      "permission": {
+        "edit": { "*": "deny", "*Drafts/Intimacy_Audit_Report_*.md": "allow" },
+        "bash": { "*": "deny", "python *": "ask", "py *": "ask", "node *": "ask" },
+        "task": "deny"
+      }
+    },
+    "WorldForge-Compiler": {
+      "description": "Phase 4 — transcribes approved drafts to SillyTavern JSON verbatim; near-zero temperature on purpose",
+      "mode": "all",
+      "model": "nano-gpt/deepseek/deepseek-v4-pro-0813",
+      "temperature": 0.1,
+      "prompt": "{file:../agent_roles/04_The_Compiler.md}",
+      // Permissions: the only Export/ JSON writer; never Drafts/ (fix the source, not the export).
+      "permission": {
+        "edit": { "*": "deny", "*Export/*": "allow" },
+        "bash": {
+          "*": "deny",
+          "python *": "ask",
+          "py *": "ask",
+          "node *": "ask",
+          "python tools/validate_export.py *": "allow",
+          "py tools/validate_export.py *": "allow"
+        },
+        "task": "deny"
+      }
+    },
+    "WorldForge-PromptEngineer": {
+      "description": "Phase 5 — audits Export/ for runtime correctness and authors the Chat Completion Preset",
+      "mode": "all",
+      "model": "nano-gpt/deepseek/deepseek-v4-pro-0813",
+      "temperature": 0.3,
+      "prompt": "{file:../agent_roles/05_The_Prompt_Engineer.md}",
+      // Permissions: read-only on cards/lorebooks: writes only its audit, the preset, and its reports (CLAUDE.md #3/#8).
+      "permission": {
+        "edit": {
+          "*": "deny",
+          "*Export/Prompt_Engineer_Audit.md": "allow",
+          "*Export/*_ChatPreset.json": "allow",
+          "*Export/Authors_Note_Suggestions.md": "allow",
+          "*Export/Preset_Resync_Report.md": "allow"
+        },
+        "bash": { "*": "deny", "python *": "ask", "py *": "ask", "node *": "ask" },
+        "task": "deny"
+      }
+    },
+    // ── Post-launch entry points ──
+    "WorldForge-Reviser": {
+      "description": "Phase R0 — classifies a post-launch revision request and routes it through the revise pipeline",
+      "mode": "all",
+      "model": "nano-gpt/deepseek/deepseek-v4-pro-0813",
+      "temperature": 0.5,
+      "prompt": "{file:../agent_roles/revise/00_The_Reviser.md}",
+      // Permissions: writes the Revision Log entry + initializes the revision report.
+      "permission": {
+        "edit": { "*": "deny", "*Drafts/Master_Design.md": "allow", "*Drafts/Revision_R*_Report.md": "allow" },
+        "bash": { "*": "deny", "python *": "ask", "py *": "ask", "node *": "ask" },
+        "task": "deny"
+      }
+    },
+    // The revise minis (agent_roles/revise/*) are defined here so WorldForge-Orchestrator
+    // can dispatch them in order per workflows/world-forge-revise.md.
+    "WorldForge-Refiner-mini": {
+      "description": "Phase R1 — merges the revision delta into the canonical Master Design",
+      "mode": "all",
+      "model": "nano-gpt/deepseek/deepseek-v4-pro-0813",
+      "temperature": 0.4,
+      "prompt": "{file:../agent_roles/revise/01_The_Refiner_mini.md}",
+      // Permissions: Master Design merge + revision report.
+      "permission": {
+        "edit": { "*": "deny", "*Drafts/Master_Design.md": "allow", "*Drafts/Revision_R*_Report.md": "allow" },
+        "bash": { "*": "deny", "python *": "ask", "py *": "ask", "node *": "ask" },
+        "task": "deny"
+      }
+    },
+    "WorldForge-Architect-mini": {
+      "description": "Phase R2 — drafts surgical edits/inserts to touched files within the cascade",
+      "mode": "all",
+      "model": "nano-gpt/deepseek/deepseek-v4-pro-0813",
+      "temperature": 0.8,
+      "prompt": "{file:../agent_roles/revise/02_The_Architect_mini.md}",
+      // Permissions: drafts per cascade + Revision Log/report; never other agents' audit reports.
+      "permission": {
+        "edit": {
+          "*": "deny",
+          "*Drafts/*": "allow",
+          "*Drafts/Editor_Critique_*": "deny",
+          "*Drafts/Voice_Audit_Report_*": "deny",
+          "*Drafts/Arc_Transition_Audit_*": "deny",
+          "*Drafts/Intimacy_Audit_Report_*": "deny",
+          "*Drafts/Revise_R*": "deny",
+          "*Drafts/Audition_*": "deny"
+        },
+        "bash": { "*": "deny", "python *": "ask", "py *": "ask", "node *": "ask" },
+        "task": "deny"
+      }
+    },
+    "WorldForge-IntimacyArchitect-mini": {
+      "description": "Phase R2.5 (conditional) — drafts surgical edits/inserts to touched intimacy files",
+      "mode": "all",
+      "model": "nano-gpt/deepseek/deepseek-v4-pro-0813",
+      "temperature": 0.8,
+      "prompt": "{file:../agent_roles/revise/02b_The_Intimacy_Architect_mini.md}",
+      // Permissions: intimacy drafts per cascade + Revision Log/report.
+      "permission": {
+        "edit": {
+          "*": "deny",
+          "*Drafts/Tier2_*Intimacy*": "allow",
+          "*Drafts/Tier3_*Intimacy_Register.md": "allow",
+          "*Drafts/Master_Design.md": "allow",
+          "*Drafts/Revision_R*_Report.md": "allow"
+        },
+        "bash": { "*": "deny", "python *": "ask", "py *": "ask", "node *": "ask" },
+        "task": "deny"
+      }
+    },
+    "WorldForge-Editor-mini": {
+      "description": "Phase R3 — validates touched files against the Editor's hard-fail rules",
+      "mode": "all",
+      "model": "nano-gpt/deepseek/deepseek-v4-pro-0813",
+      "temperature": 0.3,
+      "prompt": "{file:../agent_roles/revise/03_The_Editor_mini.md}",
+      // Permissions: read-only on drafts: revision report + Revision Log status only.
+      "permission": {
+        "edit": { "*": "deny", "*Drafts/Master_Design.md": "allow", "*Drafts/Revision_R*_Report.md": "allow" },
+        "bash": { "*": "deny", "python *": "ask", "py *": "ask", "node *": "ask" },
+        "task": "deny"
+      }
+    },
+    "WorldForge-VoiceAuditor-mini": {
+      "description": "Phase R3.5 — simulates dialogue and audits voice fidelity on touched files",
+      "mode": "all",
+      "model": "nano-gpt/deepseek/deepseek-v4-pro-0813",
+      "temperature": 0.6,
+      "prompt": "{file:../agent_roles/revise/03b_The_Voice_Auditor_mini.md}",
+      // Permissions: read-only on drafts: its audit + revision report + Revision Log status.
+      "permission": {
+        "edit": {
+          "*": "deny",
+          "*Drafts/Revise_R*_Voice_Audit.md": "allow",
+          "*Drafts/Master_Design.md": "allow",
+          "*Drafts/Revision_R*_Report.md": "allow"
+        },
+        "bash": { "*": "deny", "python *": "ask", "py *": "ask", "node *": "ask" },
+        "task": "deny"
+      }
+    },
+    "WorldForge-ArcAuditor-mini": {
+      "description": "Phase R3.6 — audits continuity on touched arc-seam neighbors",
+      "mode": "all",
+      "model": "nano-gpt/deepseek/deepseek-v4-pro-0813",
+      "temperature": 0.6,
+      "prompt": "{file:../agent_roles/revise/03c_The_Arc_Transition_Auditor_mini.md}",
+      // Permissions: read-only on drafts: its audit + revision report + Revision Log status.
+      "permission": {
+        "edit": {
+          "*": "deny",
+          "*Drafts/Revise_R*_Arc_Transition_Audit.md": "allow",
+          "*Drafts/Master_Design.md": "allow",
+          "*Drafts/Revision_R*_Report.md": "allow"
+        },
+        "bash": { "*": "deny", "python *": "ask", "py *": "ask", "node *": "ask" },
+        "task": "deny"
+      }
+    },
+    "WorldForge-IntimacyAuditor-mini": {
+      "description": "Phase R3.7 — audits intimate-scene fidelity on touched files",
+      "mode": "all",
+      "model": "nano-gpt/deepseek/deepseek-v4-pro-0813",
+      "temperature": 0.6,
+      "prompt": "{file:../agent_roles/revise/03d_The_Intimacy_Auditor_mini.md}",
+      // Permissions: read-only on drafts: its audit + revision report + Revision Log status.
+      "permission": {
+        "edit": {
+          "*": "deny",
+          "*Drafts/Revise_R*_Intimacy_Audit.md": "allow",
+          "*Drafts/Master_Design.md": "allow",
+          "*Drafts/Revision_R*_Report.md": "allow"
+        },
+        "bash": { "*": "deny", "python *": "ask", "py *": "ask", "node *": "ask" },
+        "task": "deny"
+      }
+    },
+    "WorldForge-Compiler-mini": {
+      "description": "Phase R4 — compiles touched files and updates cumulative manifest",
+      "mode": "all",
+      "model": "nano-gpt/deepseek/deepseek-v4-pro-0813",
+      "temperature": 0.1,
+      "prompt": "{file:../agent_roles/revise/04_The_Compiler_mini.md}",
+      // Permissions: touched Export/ files + REVISED_FILES.md + its compile log + revision report.
+      "permission": {
+        "edit": {
+          "*": "deny",
+          "*Export/*": "allow",
+          "*Drafts/Revise_R*_Compile_Log.md": "allow",
+          "*Drafts/Master_Design.md": "allow",
+          "*Drafts/Revision_R*_Report.md": "allow"
+        },
+        "bash": {
+          "*": "deny",
+          "python *": "ask",
+          "py *": "ask",
+          "node *": "ask",
+          "python tools/validate_export.py *": "allow",
+          "py tools/validate_export.py *": "allow"
+        },
+        "task": "deny"
+      }
+    },
+    "WorldForge-PromptEngineer-mini": {
+      "description": "Phase R5 — audits compile output and updates runtime preset",
+      "mode": "all",
+      "model": "nano-gpt/deepseek/deepseek-v4-pro-0813",
+      "temperature": 0.3,
+      "prompt": "{file:../agent_roles/revise/05_The_Prompt_Engineer_mini.md}",
+      // Permissions: the preset only on the Export side (narrow toggles) + its audit + revision report.
+      "permission": {
+        "edit": {
+          "*": "deny",
+          "*Export/*_ChatPreset.json": "allow",
+          "*Drafts/Revise_R*_Prompt_Engineer_Audit.md": "allow",
+          "*Drafts/Master_Design.md": "allow",
+          "*Drafts/Revision_R*_Report.md": "allow"
+        },
+        "bash": { "*": "deny", "python *": "ask", "py *": "ask", "node *": "ask" },
+        "task": "deny"
+      }
+    },
+    "WorldForge-Converter": {
+      "description": "Phase C0 — reframes a shipped world into a new World Seed (protagonist / mode / tone changes), or rebaselines a revised world into a clean rebuild (--rebaseline)",
+      "mode": "all",
+      "model": "nano-gpt/deepseek/deepseek-v4-pro-0813",
+      "temperature": 0.6,
+      "prompt": "{file:../agent_roles/Converter/00_The_Converter.md}",
+      // Permissions: writes only the target World Seed; read-only on the source.
+      "permission": {
+        "edit": { "*": "deny", "*World_Seed.md": "allow" },
+        "bash": { "*": "deny", "python *": "ask", "py *": "ask", "node *": "ask" },
+        "task": "deny",
+        "external_directory": "ask"
+      }
+    },
+    "WorldForge-Auditioner": {
+      "description": "On-demand behavioral probe (post-launch) — simulates one character in one user-supplied scene and returns YES/NO/IT DEPENDS with a spec trace; read-only, changes nothing",
+      "mode": "all",
+      "model": "nano-gpt/deepseek/deepseek-v4-pro-0813",
+      "temperature": 0.6,
+      "prompt": "{file:../agent_roles/Auditioner/00_The_Auditioner.md}",
+      // Permissions: read-only probe: writes only the optional --save record.
+      "permission": {
+        "edit": { "*": "deny", "*Drafts/Audition_*.md": "allow" },
+        "bash": { "*": "deny", "python *": "ask", "py *": "ask", "node *": "ask" },
+        "task": "deny"
+      }
+    }
+  }
+}

@@ -53,6 +53,17 @@ These rules exist because both failure modes below are documented from live runs
 
 4. **Deterministic backstop.** If a Python runtime is available, run `python tools/validate_pipeline_state.py <project folder>` (read-only) at every stage boundary and at pipeline completion. It re-checks the ledger against the artifacts on disk — missing reports, absent sign-off anchors, incoherent conditional skips, order violations — exactly the failure modes the gates above guard, checked without asking the model anything. Failures mean a phase must be re-dispatched; the script never modifies files.
 
+5. **Relay protocol (interactive agents).** A dispatched agent runs as a non-interactive child session: it cannot ask the user anything itself, so its questions come back to you as its result. The Brainstormer, Interviewer, Reviser, and Converter work this way by design — their phase *is* a conversation. You are a relay, not a participant:
+   - **Questions out, verbatim.** Show the child's questions to the user exactly as returned, under a one-line header naming the agent. Do not paraphrase, merge, reorder, summarize, or soften them — the pushback is the agent's job, and a relayed question that lost its edge is a different question.
+   - **Never answer on the user's behalf.** Not from earlier conversation, not from the seed, not because the answer "seems obvious." Every answer the child receives is the user's own reply.
+   - **Answers back, verbatim.** Pass the user's reply to the child unedited, resuming the **same child session** (the `task_id` the dispatch returned). If the reply is ambiguous, pass it anyway — the child decides whether to follow up.
+   - **Resume from disk, never from memory.** If the child session cannot be resumed, dispatch a fresh one and instruct it to resume from disk (CHECKPOINT DISCIPLINE rule 3). Never reconstruct the conversation for it from your own memory.
+   - **The phase ends when the artifact gate says so** (rule 2), not when the child's last message sounds final.
+
+   **Direct alternative:** for a long Phase 0, the user may select `WorldForge-Interviewer` (or the Brainstormer) in the agent picker and talk to it directly, then return to the orchestrator. The stage entry check (rule 3) and the artifact gate (rule 2) pick up the result from disk exactly as if it had been dispatched.
+
+**Runtime enforcement (Kilo Code).** The shipped `.kilo/kilo.jsonc` enforces rule 1 above, and audit/apply separation, through per-agent `permission` blocks: `WorldForge-Orchestrator` can write only `Drafts/Master_Design.md` (for this ledger) and can dispatch only `WorldForge-*` agents; each phase agent can write only the files its spec says it writes, cannot dispatch, and cannot touch pipeline files. A denied write is a signal, not an obstacle — an agent hitting one has gone off-script; halt and report rather than routing around it (e.g. through a script).
+
 ---
 
 ## PIPELINE OVERVIEW
