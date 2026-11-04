@@ -13,6 +13,160 @@ numbers. Newest first.
 
 ---
 
+## 2026-11-04 — Orchestrator seat runs DeepSeek Flash; every phase agent stays on Pro
+
+Each seat was reviewed for a cheaper Flash-tier model. Only the orchestrator
+qualifies. It dispatches, relays, keeps the ledger and runs validators, and
+produces no prose or JSON. As the longest-lived session it also carries the
+most input tokens. Its permission block and the read-only validators backstop
+the failures a weaker model would cause. Every phase agent stays on Pro: the
+models wiki rules Flash out for the Compiler and Architect (dropped
+`{{original}}` macros), the Editor and Auditors need the strongest model
+against sycophancy, the creative seats' output is the product, and the Refiner
+writes the locked Master Design every later phase builds on (a possible later
+trial, not now).
+
+### Changed
+- `.kilo/kilo.jsonc` — `WorldForge-Orchestrator` model →
+  `openrouter/~deepseek/deepseek-flash-latest` (resolves to V4.1 Flash 1017 on
+  2026-11-04), with its own DeepSeek first-party routing entry; the entry
+  comment states the rationale and the revert condition.
+- `Kilo_Variants/kilo.nano-gpt.jsonc` — Orchestrator →
+  `nano-gpt/deepseek/deepseek-v4-flash-latest`; the commented body-form
+  provider-selection block covers both model ids. The GLM and Kimi variants
+  are unchanged (single model family, no Flash counterpart chosen).
+- `wiki/Kilo-Code-Setup.md` §5.1 + §5.5 (Flash-orchestrator note: why only
+  this seat, what to watch on a first run, how to revert),
+  `wiki/Agentic-Tools-and-Models.md` §3.4 (the orchestrator exception to the
+  Flash-tier guidance), `Kilo_Variants/README.md` (Nano-GPT row).
+
+---
+
+## 2026-11-04 — `Kilo_Variants/kilo.nano-gpt.jsonc`: run the pipeline through Nano-GPT
+
+A drop-in config for users whose aggregator is Nano-GPT rather than OpenRouter.
+It is the same shipped config (orchestrator, permission maps, per-phase
+temperatures) with Nano-GPT model ids. It is pinned to the V4 Pro GA
+(`deepseek/deepseek-v4-pro-0813`), the model the shipped OpenRouter alias
+resolves to today. Nano-GPT's own `deepseek/deepseek-latest` alias was rejected:
+it routes to the Thinking variant (temperature ignored) through third-party
+providers only, so DeepSeek's prefix caching would never apply.
+
+### Added
+- `Kilo_Variants/kilo.nano-gpt.jsonc` — all 24 agents on
+  `nano-gpt/deepseek/deepseek-v4-pro-0813`. Provider selection (pin DeepSeek's
+  first-party upstream, `deepseek`) ships **commented out** in two forms: the
+  `X-Provider` header via Kilo's per-provider `options.headers`, and the
+  per-model request-body `provider` object (forwarding unverified for this
+  provider). It is off by default because Nano-GPT bills explicit selection
+  pay-as-you-go and bypasses subscription coverage.
+- `wiki/Kilo-Code-Setup.md` §3.2 Nano-GPT items 5–6 (provider selection: how,
+  where to check support, the two catches; why the variant pins rather than
+  aliases); §5.1 lists the new variant.
+
+### Changed
+- `Kilo_Variants/README.md` — table row and notes for the Nano-GPT variant.
+- `CLAUDE.md` — structure tree lists the file; the harness-enforcement
+  cross-file row now covers every `Kilo_Variants/*.jsonc` (four config files
+  with identical permission maps).
+- All four Kilo configs — the orchestrator comment points at DISPATCH PROTOCOL
+  rule 5 (it named a non-existent "RELAY PROTOCOL" section); the shipped
+  header says "every Kilo_Variants/ file".
+
+---
+
+## 2026-11-04 — Shipped Kilo config tracks OpenRouter's DeepSeek Pro "latest" alias
+
+OpenRouter now publishes tilde-prefixed "latest" aliases that always redirect
+to the newest model in a family. Checking the catalog also showed that the
+shipped config's undated `deepseek/deepseek-v4-pro` slug is the April 0423
+preview, not the V4 Pro GA (`deepseek/deepseek-v4-pro-0813`), which is what the
+alias resolves to today. DeepSeek's first-party upstream serves the target, so
+the prefix-caching routing pin still applies.
+
+### Changed
+- `.kilo/kilo.jsonc` — all 24 seats move from `openrouter/deepseek/deepseek-v4-pro`
+  to `openrouter/~deepseek/deepseek-pro-latest`. The provider-routing entry is
+  re-keyed to the alias (a routing key that doesn't match the agents' model id
+  silently does nothing). The header documents the trade-off: new Pro releases
+  arrive with no config change and no review, the temperatures were tuned on
+  V4 Pro, and a dated slug freezes a version.
+- `wiki/Kilo-Code-Setup.md` §3.2 — new item 7 on "latest" aliases (what they
+  resolve to, billing, reproducibility trade-off, the 0423-preview trap, and
+  why the `Kilo_Variants/` files stay pinned: `~z-ai/glm-latest` resolves to
+  GLM 5.3 and `~moonshotai/kimi-latest` to Kimi K3, which those variants were
+  not tuned for). Item 6 and §5.1 name the alias; item 6 states the
+  exact-key rule.
+
+---
+
+## 2026-11-04 — Kilo harness enforcement: orchestrator agent + per-agent permissions + relay protocol
+
+The 2026-07-30 dispatch protocol named the two worst live failures — a phase
+performed inline by the top-level agent after a failed dispatch, and audit
+reports never written while the run reported success — but guarded them only
+with prose the model is asked to follow, run from Kilo's general-purpose Code
+agent, which can edit anything. Kilo's agent-permission system (verified
+against kilo.ai/docs/customize/agent-permissions: path-glob `edit` rules,
+`task` dispatch allow-lists, last-match-wins, agent rules over global
+auto-approve) lets the harness enforce those rules instead. Kilo also
+documents that task-dispatched agents are non-interactive and cannot ask the
+user questions, so the parent-relays-the-Interviewer pattern runs already used
+is now a written rule rather than improvised behavior. No agent spec's
+content, authority, or phase semantics changed; this is config plus docs.
+
+### Added
+- `.kilo/kilo.jsonc` — **`WorldForge-Orchestrator`** (`mode: "primary"`,
+  system prompt = `workflows/world-forge.md`): may write only
+  `Drafts/Master_Design.md` (the ledger), may run only the two read-only
+  validators, may dispatch only `WorldForge-*` agents. It cannot author a
+  phase's artifact, so "dispatch, never inline" is structural.
+- `.kilo/kilo.jsonc` — a **`permission` block on every `WorldForge-*`
+  agent**: `edit` denies everything, then allows exactly the files the
+  agent's spec says it writes (Editor/Auditors: their own report only;
+  Prompt Engineer: its audit, the preset, and its reports, never cards or
+  lorebooks; Architect: `Drafts/*` minus the locked Master Design and other
+  agents' reports; Compiler: `Export/*`; revise minis: their parents' scope
+  plus the Revision Log, revision report, and their own `Revise_R*` reports).
+  Pipeline files match no allow rule anywhere. `task: deny` on every phase
+  agent. `bash` denied except the sanctioned UTF-8 write fallback
+  (`python`/`py`/`node`), which asks, plus `validate_export.py` on the two
+  Compilers. Kilo's built-in Code agent stays unrestricted, so maintenance is
+  unaffected.
+- `workflows/world-forge.md` — DISPATCH PROTOCOL **rule 5, relay protocol**:
+  interactive agents' (Brainstormer, Interviewer, Reviser, Converter)
+  questions go to the user verbatim, the orchestrator never answers on the
+  user's behalf, replies go back verbatim to the same child session
+  (`task_id`), a failed resume re-dispatches with resume-from-disk, and the
+  direct-selection alternative for long Phase 0 interviews. Plus a
+  runtime-enforcement note: a permission denial is an off-script signal, never
+  something to route around.
+- `wiki/Kilo-Code-Setup.md` — §5.5 (write-authority table, consequences,
+  relay) and §5.6 (a six-step permission verification check for the
+  behaviors Kilo's docs leave unstated); `permission` and `primary` in the
+  §5.2 field list; two troubleshooting rows (permission denial, paraphrased
+  relay).
+- `CLAUDE.md` — cross-file consistency row: each spec's write authority ↔ its
+  agent's permission map, identical across `.kilo/kilo.jsonc` and both
+  `Kilo_Variants/` files.
+
+### Changed
+- `Kilo_Variants/kilo.glm-5.2.jsonc`, `Kilo_Variants/kilo.kimi-k2.5.jsonc` —
+  carry the same orchestrator entry and identical permission maps (only model
+  / temperature / routing differ); headers say so. `Kilo_Variants/README.md`
+  agent count 23 → 24.
+- `AGENTS.md` — Kilo runs start from `WorldForge-Orchestrator`; the Code agent
+  redirects the user there (or follows the same rules unenforced); the relay
+  rule.
+- `README.md` quick start and `wiki/Kilo-Code-Setup.md` §5.1 / §7 / §8 — select
+  the orchestrator instead of the Code agent; the shipped agent count
+  (stale "twelve") corrected to twenty-four; §8 explains agent permissions
+  outrank global auto-approval.
+- `.kilo/kilo.jsonc` (and variants) — header documents the permission model;
+  the revise-minis comment now names the orchestrator as their dispatcher.
+
+---
+
 ## 2026-07-30 — Modular workflow router + dispatch protocol + process-state validator
 
 Two documented live failures drove this change: a failed model call led the

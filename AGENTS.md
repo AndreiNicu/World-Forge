@@ -20,7 +20,18 @@ The user typed `/worldforge brainstorm`, `/worldforge start`, `/worldforge revis
   never all of them. Revise runs live in `workflows/world-forge-revise.md`,
   convert runs in `workflows/world-forge-convert.md`, and preset resync / audition /
   post-launch routing in `workflows/world-forge-postlaunch.md`.
-- **Kilo Code Subagent Delegation:** If you are the top-level Kilo Code agent, do not run the pipeline commands inline. Instead, use your subagent delegation tool (e.g., the `task` tool) to route the command to the correct custom subagent:
+- **Kilo Code: run commands through `WorldForge-Orchestrator`.** The user selects it in
+  the agent picker and types `/worldforge …` to it. Its system prompt is the router, and
+  its `permission` block lets it write only the ledger and dispatch only `WorldForge-*`
+  agents. If you are Kilo's general-purpose **Code** agent and receive a `/worldforge`
+  command, tell the user to switch to `WorldForge-Orchestrator` — if they want you to
+  proceed anyway, follow the same dispatch rules below (you are not permission-restricted,
+  so the rules are on you).
+- **Interactive agents need a relay.** Dispatched agents cannot ask the user questions
+  directly; their questions come back as their result. Relay them verbatim, never answer
+  on the user's behalf, and pass the user's reply back verbatim to the same child session
+  (router → DISPATCH PROTOCOL rule 5).
+- **Kilo Code Subagent Delegation:** Whether you are the orchestrator or the Code agent, do not run the pipeline commands inline. Use your subagent delegation tool (the `task` tool) to route the command to the correct custom subagent:
   - `/worldforge brainstorm` or `/world-forge brainstorm` → Dispatch to `WorldForge-Brainstormer` (optional ideation upstream of Phase 0; writes informal `Brainstorm_Notes.md`, no World Seed)
   - `/worldforge start` or `/world-forge start` → Dispatch to `WorldForge-Interviewer`
   - `/worldforge revise` or `/world-forge revise` (with `--freeform`, `--target`, etc.) → Dispatch to `WorldForge-Reviser`

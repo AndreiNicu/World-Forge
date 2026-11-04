@@ -101,7 +101,7 @@ You need: VS Code with an agentic extension — [Kilo Code](https://github.com/K
 **A note on model choice.** The agent specs in `agent_roles/` and the orchestrator in `workflows/world-forge.md` are deliberately long and prescriptive — each phase loads several thousand tokens of structural rules, validation checks, hard-fail conditions, and cross-references. To get the full benefit of the pipeline (and not silent skipping of validation steps or drift in tier discipline), use a model with strong long-context attention and a high tolerance for following dense, multi-step instructions. From the testing done so far, **DeepSeek 4 Pro** has held up well across the full pipeline. **Grok** failed during a run, though it is not yet clear whether the failure was the model itself or the way the agentic tool (Roo Code, since retired) drove it — treat this as a caveat, not a verdict. If you run the pipeline against a model not listed here and it succeeds (or fails in an interesting way), reports are welcome.
 
 1. Clone this repository and open it as a VS Code workspace.
-2. Open your agentic extension and select the orchestrator-class entry point: the **Code** agent in Kilo Code, or the default agent in Cline.
+2. Open your agentic extension and select the orchestrator entry point: the shipped **`WorldForge-Orchestrator`** agent in Kilo Code (permission-restricted so it dispatches each phase instead of doing the work itself — see [wiki/Kilo-Code-Setup.md §5.5](wiki/Kilo-Code-Setup.md#55-permissions--the-harness-enforces-the-pipelines-rules)), or the default agent in Cline.
 3. In the chat, type:
    ```
    /worldforge start
