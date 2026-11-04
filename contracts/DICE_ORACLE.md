@@ -1,6 +1,6 @@
 # Dice Oracle Contract — `[[DICE_TABLES]]`
 
-**Status:** Established · **Version:** 2 · **Last updated:** 2026-07-07
+**Status:** Established · **Version:** 2 · **Last updated:** 2026-11-05
 
 > **Shared contract — canonical source of truth:**
 > [`AndreiNicu/World-Forge`](https://github.com/AndreiNicu/World-Forge) → `contracts/DICE_ORACLE.md`.
@@ -368,6 +368,9 @@ corruption). When the RPG layer is built it wants its own home:
   needs; the current client-side oracle is not.
 - **A character-state channel** — sheets/stats/HP persisted deliberately (likely
   leaning on npc-memory or a new contract), which §7.2 checks would read from.
+  **Now drafted as [`RPG_STATS.md`](./RPG_STATS.md)** (status Draft — neither
+  side built): the `[[RPG_STATS]]` carrier with the world's stat system, item
+  catalog, starting sheets, and bestiary, keyed by the npc-memory slug ids.
 - **Temp NPC resolution & persistence** — resolve the unnamed NPC a story
   conjures ("TOM") to a temporary id, attach the rolled attributes so it stays
   consistent while it matters, then clear it. Meshes with npc-memory's
