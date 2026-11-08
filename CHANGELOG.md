@@ -13,6 +13,61 @@ numbers. Newest first.
 
 ---
 
+## 2026-11-05 — Outcome Authority contract drafted (exploration, Draft v0)
+
+An exploration branch for the rule the RPG layer stands on: what happens in the
+world, and what the dice and stats say, holds. `{{user}}`'s message is an
+attempt, never a state write. The player owns `{{user}}`'s choices; the world
+owns their body, pockets, and outcomes. The draft covers four kinds of claim
+(possession, premise, outcome denial, result declaration) and the mechanisms
+that would answer them. It also records two holes in `RPG_STATS.md` v0 to close
+when this settles: swipes inside a fight currently re-roll for free, and the
+correction channel has no limit on what it can override. Out-of-fiction edits
+(JSON, message edits, branching) are explicitly a non-goal; the player owns the
+chat. Status is **Draft**: no carrier, no agent spec or preset block references
+it, nothing in the fork enforces it. No pipeline behavior changes.
+
+### Added
+- **`contracts/OUTCOME_AUTHORITY.md`** — the rule and the order of authority,
+  the closed list of state writers, the four claim kinds, consumer sketches
+  (legality check before generation, rolls pinned to the user message so swipes
+  replay them, parse-only corrections, status restated each turn), a sketched
+  `outcome_authority` preset block with its counter-guardrail, a sketched
+  `downed` extension for `RPG_STATS.md` (`allows`, closed `recovery` list,
+  `allDown` authored from Master Design Section 6), non-goals, the expected
+  `RPG_STATS.md` changes, and open questions.
+- **Two decisions recorded (§10.1).** The legality check gains a small-model
+  plausibility pass for objects outside the catalog ("would this object make
+  sense within this roleplay's boundaries?"), with catalog matching kept as the
+  deterministic first pass. Refusals are always in-story, with no
+  out-of-character fallback: an action the state forbids is attempted, fails,
+  and can cost what the state says it would (a jump on a broken leg damages it
+  further). New open questions: where the world-boundary description for the
+  small model comes from, creating items during play, and statuses (needed for
+  the broken-leg case).
+- **Classification narrowed to big red flags (§4.1b, §4.5, §10.1b,
+  2026-11-09).** The small model no longer judges open-ended plausibility. It
+  classifies an uncatalogued object on two axes, **type** (a shared two-level
+  vocabulary: `firearm.handgun`, `melee.blade`, `explosive.launcher`, ...) and
+  **nature** (`mundane` / `magical` / `futuristic` / `legendary`), and the fork
+  looks the result up against the world's **absent list**. The nature axis is
+  what catches Excalibur, which is just a sword by type. Possession is matched
+  by type, not brand, so "my Beretta" finds the Glock on the sheet. Unknown and
+  borderline objects are allowed, and world-invented names must be catalog items
+  with an authored type. Deferred: rarity tiers (loot), fire mode and size (item
+  properties for combat), improvised-weapon entries. Open: where the absent list
+  is carried (leading candidate: its own `[[WORLD_BOUNDS]]` carrier) and how the
+  vocabulary grows.
+
+### Changed
+- **`contracts/RPG_STATS.md`** — §7 deferred list and §9 relationship table
+  point at the new draft. No payload or lifecycle change.
+- **`contracts/README.md`** — row for the new draft; listed under Draft.
+- **`CLAUDE.md`** — repo tree lists the new contract; principle #13's
+  "Adjacent and not yet built" note points at it.
+
+---
+
 ## 2026-11-05 — RPG Stats contract drafted (`[[RPG_STATS]]`, Draft v0)
 
 The first piece of the RPG layer. It specifies the character-state channel
