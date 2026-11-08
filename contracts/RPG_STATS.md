@@ -494,6 +494,11 @@ Deliberately absent from v0. Each one is a later, additive version:
 - **World-update migration** — offering to apply a revised carrier to a running
   campaign, using the §4.1 hash.
 - **Campaigns spanning several chats.**
+- **Outcome authority** — what `{{user}}`'s message can and cannot change:
+  swipes replaying pinned rolls, corrections limited to parse errors, `downed`
+  recovery rules, and a legality check before generation. Explored ahead of
+  time in [`OUTCOME_AUTHORITY.md`](./OUTCOME_AUTHORITY.md) (Draft), which
+  lists the passages here it expects to change (its §9).
 
 ---
 
@@ -611,6 +616,7 @@ a human elite and a named boss.
 | `[[DICE_TABLES]]` carrier, roll-table payload, dice-oracle injection | `DICE_ORACLE.md` |
 | `[[BODY_CYCLES]]` carrier, cycle seed payload | `BODY_CYCLES.md` |
 | `[[RPG_STATS]]` carrier, stat system, starting sheets, bestiary | this document |
+| Who decides outcomes; what `{{user}}`'s message can change | `OUTCOME_AUTHORITY.md` (Draft) |
 
 All are independently versioned. `[[RPG_STATS]]` reuses existing conventions on
 purpose: the enabled-but-inert carrier flags and pristine-record seeding of

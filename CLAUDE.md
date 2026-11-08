@@ -48,7 +48,8 @@ World-Forge/
 │   ├── WORLD_FORGE_SYNC.md           ← Runtime seams: Director-card tag (§2), narration-surface aliases (§3), </style_contract> marker (§4), [[WORLD_CALENDAR]] Scene Tracker date seed (§5), style_override runtime
 │   ├── DICE_ORACLE.md                ← Dice oracle channel: [[DICE_TABLES]] carrier, roll-table payload (schema 2), authoritative-facts injection; §7 RPG complexity roadmap
 │   ├── BODY_CYCLES.md                ← Recurring body states: [[BODY_CYCLES]] carrier, per-character cycle seed, phase derived from the day counter (consumer only — producer not wired)
-│   └── RPG_STATS.md                  ← RPG stats: [[RPG_STATS]] carrier — stat system, item catalog, starting sheets, bestiary; fork owns live state per chat (DRAFT — neither side built, producers must not emit)
+│   ├── RPG_STATS.md                  ← RPG stats: [[RPG_STATS]] carrier — stat system, item catalog, starting sheets, bestiary; fork owns live state per chat (DRAFT — neither side built, producers must not emit)
+│   └── OUTCOME_AUTHORITY.md          ← Outcome authority: {{user}}'s message is an attempt, never a state write — authority order, pinned rolls, legality check, downed/recovery, sketched outcome_authority preset block; no carrier (DRAFT — exploration, neither side built)
 ├── tools/
 │   ├── validate_export.py            ← Read-only Export/ JSON validator (explicit exception to the no-code rule; see Out of scope)
 │   └── validate_pipeline_state.py    ← Read-only process-state validator: ledger claims vs. artifacts on disk (second sanctioned exception; see Out of scope)
@@ -296,7 +297,7 @@ The jailbreak's `{{user}}`-as-actor clause (#2, block library §5a-detail clause
 
 **Boundaries.** The posture block is **world-and-cast property, never protagonist property** — it lands in Tier 3 and never in the Tier 2 Protagonist Lorebook, where it would read as an instruction about the player's character (Editor Step 5.7d). It touches no other architectural principle. A posture change is an ordinary revision (`tier3_arc_tonal_recalibration` / `sandbox_state_recalibration`, Section 6 is not the Section 1 / 11a bright line) whose cascade spans **every** arc, not one. In a reframe conversion the block always regenerates (every field is computed against a specific protagonist); in rebaseline it keeps.
 
-**Adjacent and not yet built:** world-integrity enforcement against `{{user}}`'s *inputs* — a declaration impossible in this world (a firearm in a medieval setting, a resource the character does not have). That is the same root cause pointing the other way (the fiction outranks momentary comfort) but a different check: the model should decline the *premise* rather than resolve the attempt, which the auto-success prohibition does not reach. Tracked as follow-up; clause 2b is its foundation.
+**Adjacent and not yet built:** world-integrity enforcement against `{{user}}`'s *inputs* — a declaration impossible in this world (a firearm in a medieval setting, a resource the character does not have). That is the same root cause pointing the other way (the fiction outranks momentary comfort) but a different check: the model should decline the *premise* rather than resolve the attempt, which the auto-success prohibition does not reach. Tracked as follow-up; clause 2b is its foundation. Exploration is drafted in `contracts/OUTCOME_AUTHORITY.md` (Draft, not in force), together with the stat-side counterpart: claims that contradict tracked RPG state (possession, outcome denial, result declarations).
 
 ### 14. `{{user}}` is reference data, never impersonation guidance (both protagonist artifacts)
 
