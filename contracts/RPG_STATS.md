@@ -961,7 +961,10 @@ Absence never errors, matching every other seam:
 
 ## 7. Deferred and reserved
 
-Deliberately absent from v0. Each one is a later, additive version:
+Deliberately absent from v0. Each one is a later, additive version. The
+mechanics among them (combat, refill time, encumbrance effects, repair checks,
+restocking) are specified in [`RESOLUTION.md`](./RESOLUTION.md), written from
+the fork side. Any new authored data they need is added here.
 
 - **Combat resolution** — damage, hit chance, initiative, turn order. Needs the
   reserved item `combat` field and, per `DICE_ORACLE.md` §7.3, likely
@@ -1266,6 +1269,7 @@ reloads' worth of ammunition, and the second one has to be refilled first.
 | `[[BODY_CYCLES]]` carrier, cycle seed payload | `BODY_CYCLES.md` |
 | `[[RPG_STATS]]` carrier, stat system, item catalog (weapons, magazines, ammunition), starting sheets, bestiary, currency and vendors | this document |
 | Item `type` / `nature` vocabulary, possession and legality checks on weapons and money | `OUTCOME_AUTHORITY.md` (Draft) |
+| Dice, math, modifiers, time, combat, attempt parsing — how the engine uses this payload | `RESOLUTION.md` (Placeholder, fork-authored) |
 | Who decides outcomes; what `{{user}}`'s message can change | `OUTCOME_AUTHORITY.md` (Draft) |
 
 All are independently versioned. `[[RPG_STATS]]` reuses existing conventions on

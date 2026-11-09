@@ -85,6 +85,13 @@ changes.
   forward as an ammunition-counting property only; the §9 `type` / `nature` row
   is marked applied.
 
+- **`contracts/RESOLUTION.md`** (Placeholder) — reserves the home for the
+  engine half of the RPG layer: dice, math, modifiers, time, combat, and attempt
+  parsing. Authored from the SillyTavern fork side, which owns the runtime;
+  World Forge produces only the data it consumes. Listed in
+  `contracts/README.md` (new **Placeholder** status) and `CLAUDE.md`, and
+  referenced from `RPG_STATS.md` §7 and §9.
+
 ### Fixed
 - **`contracts/RPG_STATS.md` §3.2** listed "ammo" as an example resource. Ammo
   is now explicitly an item, not a character pool.

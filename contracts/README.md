@@ -12,13 +12,14 @@ SillyTavern extensions in the fork.
 | [`BODY_CYCLES.md`](./BODY_CYCLES.md) | Recurring body states: the `[[BODY_CYCLES]]` carrier, per-character cycle seed payload, and phase derivation from the Scene Tracker day counter. **Consumer implemented, producer not wired** — no agent spec emits the carrier yet, so it fires only on hand-authored entries. |
 | [`RPG_STATS.md`](./RPG_STATS.md) | RPG stats: the `[[RPG_STATS]]` carrier with the world's stat system, item catalog (weapons with magazine / internal / direct feeds, fire modes, durability), authored starting sheets for `{{user}}` and the cast, the bestiary of enemy types with stat ranges and loot, a small economy (currency item, condition-based prices, fixed and wandering vendors with randomized funds), scavenge tables, and carry weight. The fork owns all live state per chat. **Draft** — neither side built. |
 | [`OUTCOME_AUTHORITY.md`](./OUTCOME_AUTHORITY.md) | Outcome authority: `{{user}}`'s message is an attempt, never a state write. Order of authority, the closed list of state writers, pinned rolls, the legality check, downed/recovery, and a sketched `outcome_authority` preset block. No carrier. **Draft** — exploration, neither side built. |
+| [`RESOLUTION.md`](./RESOLUTION.md) | Resolution: the engine half of the RPG layer — dice, math, modifiers, time, combat, and how attempts are parsed. Authored from the fork side, which owns the runtime; World Forge produces only the data it consumes. No carrier. **Placeholder** — no content yet. |
 
 These files live here, next to `tools/validate_export.py` — the producer that
 must conform to them. The SillyTavern fork carries a read-only mirror and keeps
 it byte-identical via its `scripts/sync-contracts.sh` plus a CI drift check.
 Edit the contracts here; the fork re-syncs from this directory.
 
-**Status matters, and each contract states its own.** Three states occur, because
+**Status matters, and each contract states its own.** Four states occur, because
 the two sides of a seam land independently:
 
 - **Established** — both sides live. The extensions read it and the producer
@@ -32,6 +33,8 @@ the two sides of a seam land independently:
   Nothing reads it, no agent spec references it, producers must not emit its
   carrier. Drafts live here so both sides can be designed against one shape
   rather than two. `RPG_STATS.md`, `OUTCOME_AUTHORITY.md`.
+- **Placeholder** — a reserved file whose content will be written later, from
+  the side that owns it. Edits still land in this canonical copy. `RESOLUTION.md`.
 
 Read a contract's header before assuming either side works — "the contract
 exists" and "the pipeline emits it" are different claims, and the header is where
