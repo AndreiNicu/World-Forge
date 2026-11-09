@@ -103,7 +103,11 @@ Campaign state changes **only** through:
    used/gained/lost, equipment change, permanent effect, death, party change).
 3. **The model's report of the world's response**, parsed by the fork. The model
    reports what the world did to `{{user}}` ("took a bite"). It never relays
-   what `{{user}}` claimed ("wasn't hurt").
+   what `{{user}}` claimed ("wasn't hurt"). It also never **creates catalog
+   items**: what a search, a body, or a stranger yields comes from a fork roll
+   (`RPG_STATS.md` §3.12, §4.6), and narration the roll didn't produce isn't
+   committed. This is the model-side counterpart of a possession claim. Left
+   open, the model becomes the loot table.
 
 `{{user}}`'s message text is not on this list. It can *propose* an action the
 fork then resolves (drink a dressing → the fork checks inventory → commit). It
@@ -217,7 +221,12 @@ The fork checks the parts of `{{user}}`'s message it can check **for certain**:
   empty"), or refilling with no loose rounds that fit (`RPG_STATS.md` §3.8.4);
 - using a copy that is `broken` (`RPG_STATS.md` §3.9);
 - paying more currency than `{{user}}` holds, or buying what a vendor's stock no
-  longer has (`RPG_STATS.md` §3.10).
+  longer has (`RPG_STATS.md` §3.10);
+- selling to a vendor for more than its current funds, selling it a type it
+  doesn't `buy`, or trading with a fixed vendor the party isn't with
+  (`RPG_STATS.md` §3.10.2–§3.10.3);
+- taking an item (loot, a scavenge find, a purchase) that would push the load
+  past `carry.max` (`RPG_STATS.md` §3.13).
 
 On a hit, the fork **injects an authoritative fact** ("`{{user}}` has no
 carbine."; "`{{user}}` is downed: can speak and crawl, cannot fight.") so the
@@ -393,6 +402,10 @@ posture blocks:
   note, no lecture.
 - **No narrated recovery.** Never write a downed or dead character, `{{user}}`
   or anyone else, back into action unless the state shows the recovery.
+- **Finds come from the roll.** When a search or a body is resolved, narrate what
+  the injected result says was there, and no catalog item beyond it. An empty
+  result is an empty room. Scenery the place would plausibly hold (a chair, a
+  brick, a kitchen knife) is still there, and carries no mechanics.
 - **Counter-guardrail, stated with equal weight (non-optional content):** this
   is not licence to refuse. Legal actions resolve normally. Improvising with
   ordinary objects the scene supports is allowed and carries no mechanics. The

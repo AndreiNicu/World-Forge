@@ -13,7 +13,7 @@ numbers. Newest first.
 
 ---
 
-## 2026-11-09 — RPG Stats: weapons, ammunition, durability, economy (Draft v0)
+## 2026-11-09 — RPG Stats: weapons, ammunition, durability, economy, scavenging, carry weight (Draft v0)
 
 Extends the `[[RPG_STATS]]` draft so weapons carry real bookkeeping that a live
 HUD in the fork can show: rounds in the inserted magazine, magazines full or
@@ -47,6 +47,27 @@ changes.
   copy objects (`mode`, `magazine`, `loaded`, `durability`).
 - Recommended main / secondary / ranged weapon slot default (world-defined, not
   hard-coded).
+- **§3.10.1 Condition pricing** (`system.pricing.condition`) — a copy's value is
+  `price × max(floor, durability/max)`, broken copies sell as scrap. Rarity by
+  condition needs no rarity field: world finds roll worn, and a pristine copy
+  exists only where stock authors one (the worked example's pristine Beretta M9
+  at a premium).
+- **§3.10.2 Fixed and wandering vendors** — fixed settlement vendors with
+  `funds` ranges re-rolled per `fundsRefresh` (`visit` default, `day`, `never`);
+  wandering vendor *types* that spawn as temporary instances from a fork roll,
+  with randomly rolled funds and `stockTable` stock, discarded when the party
+  leaves. §3.10.3: trade requires being at the vendor's location or with its NPC.
+- **§3.12 Scavenge tables** (`scavenge[]`) — loot tables for kinds of place,
+  matched by name and aliases, rolled on search and pinned to the player's
+  message, optional check, per-place depletion, a `fallback` table, and vendor
+  lines that turn up a wandering trader.
+- **§3.13 Carry weight** (`system.carry`, item `weight`, sheet `carry.max`) —
+  inventory plus equipment against a hard limit set by the build (an operator's
+  50 kg), with encumbrance tiers (`burdened`, `overloaded`) narrated from the
+  state block. Tier mechanics are deferred.
+- **Narration never mints catalog items** (`RPG_STATS.md` §4.6,
+  `OUTCOME_AUTHORITY.md` §2.2 and §5). Without this, the model becomes the loot
+  table.
 
 ### Changed
 - **`contracts/RPG_STATS.md`** — items gain `type` / `nature` from the
@@ -59,7 +80,8 @@ changes.
   rounds, with one vendor.
 - **`contracts/OUTCOME_AUTHORITY.md`** — vocabulary gains `ammo` and `currency`
   classes; the deterministic legality pass gains empty-weapon, last-magazine,
-  no-rounds-to-refill, broken-copy, and can't-afford checks; fire mode moves
+  no-rounds-to-refill, broken-copy, can't-afford, vendor-can't-cover,
+  wrong-place-to-trade, and over-carry-limit checks; fire mode moves
   forward as an ammunition-counting property only; the §9 `type` / `nature` row
   is marked applied.
 

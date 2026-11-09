@@ -145,11 +145,14 @@ the worked example in §8):
     "equipmentSlots": [ { "key": "main", "label": "Main weapon" } ],
     "currency": { "item": "dollar", "symbol": "$" },          // money is an item (§3.10)
     "refill": { "outOfCombat": "free",                        // refilling magazines (§3.8.4)
-                "inCombat": { "outcomes": { "success": "full", "partial": "half", "fail": "none" } } }
+                "inCombat": { "outcomes": { "success": "full", "partial": "half", "fail": "none" } } },
+    "pricing": { "condition": { "floor": 0.2, "broken": 0.05 } },   // value follows wear (§3.10.1)
+    "carry": { "unit": "kg",                                  // weight limit and encumbrance (§3.13)
+               "tiers": [ { "atPct": 60, "state": "burdened", "note": "Slower on foot; tires faster." } ] }
   },
   "items": [                           // the item catalog (§3.3)
     { "id": "c8_carbine", "name": "C8 Carbine", "type": "firearm.rifle", "slot": "main",
-      "price": 900, "requires": { "proficiency": "rifles", "rank": 2 },
+      "price": 900, "weight": 3.4, "requires": { "proficiency": "rifles", "rank": 2 },
       "ammo": { "feed": "magazine", "magazines": ["stanag_30"] },             // §3.8
       "fireModes": [ { "key": "single", "rounds": 1 }, { "key": "burst", "rounds": 3 } ] },
     { "id": "stanag_30", "name": "STANAG Magazine", "type": "ammo.magazine", "price": 25,
@@ -171,6 +174,7 @@ the worked example in §8):
                      { "item": "dollar", "qty": 40 } ],
       "equipment": { "main": { "item": "c8_carbine", "mode": "single",
                                "magazine": { "item": "stanag_30", "loaded": 30 } } },
+      "carry": { "max": 50 },                                                // §3.13
       "buildNote": "Ex-SAS, weeks in a coma. Training intact, body not." }
   ],
   "bestiary": [                        // things that are fought, instanced per encounter (§3.5)
@@ -178,9 +182,17 @@ the worked example in §8):
       "resources": { "hp": { "base": 40, "spread": 10 } },
       "loot": [ { "item": "field_dressing", "chance": 0.15 } ] }
   ],
-  "vendors": [                         // places that buy and sell (§3.10)
-    { "id": "junction_trader", "name": "Junction Trader",
-      "stock": [ { "item": "round_556", "qty": 200 } ], "buyRate": 0.5 }
+  "vendors": [                         // places and people that buy and sell (§3.10)
+    { "id": "junction_trader", "kind": "fixed", "name": "Junction Trader",
+      "location": "Junction Market", "funds": { "base": 300, "spread": 150 },
+      "stock": [ { "item": "round_556", "qty": 200 } ], "buyRate": 0.5 },
+    { "id": "squatter_trader", "kind": "wandering", "name": "Squatter Trader",
+      "funds": { "base": 120, "spread": 80 },
+      "stockTable": [ { "item": "field_dressing", "chance": 0.6, "qty": { "base": 2, "spread": 1 } } ] }
+  ],
+  "scavenge": [                        // what kinds of place hold, rolled on search (§3.12)
+    { "id": "pharmacy", "name": "Pharmacy", "aliases": ["chemist", "drugstore"], "depletes": true,
+      "loot": [ { "item": "field_dressing", "chance": 0.5, "qty": { "base": 2, "spread": 1 } } ] }
   ]
 }
 ```
@@ -194,7 +206,8 @@ the worked example in §8):
 | `items` | array | no | The item catalog (§3.3). Inventory, equipment, and loot reference items **only** by `id`. |
 | `sheets` | array | yes | Starting sheets for persistent individuals (§3.4). Must contain exactly one `persona` sheet. |
 | `bestiary` | array | no | Enemy types, instanced per encounter (§3.5). |
-| `vendors` | array | no | Places and people that buy and sell (§3.10). Requires `system.currency`. |
+| `vendors` | array | no | Places and people that buy and sell: fixed settlement vendors and wandering vendor types (§3.10). Requires `system.currency`. |
+| `scavenge` | array | no | Scavenge tables: what kinds of place hold, rolled when searched (§3.12). |
 
 ### 3.2 `system` — the world's rules
 
@@ -270,6 +283,15 @@ still spent). How the roll turns a rank into success / partial / fail belongs to
 combat resolution and is deferred (§7); until it exists the consumer may use any
 documented scheme.
 
+**`pricing`** — optional. `{ "condition": { "floor": 0–1, "broken": 0–1 } }`.
+How wear changes what an item is worth (§3.10.1). Absent ⇒ condition doesn't
+affect price.
+
+**`carry`** — optional. Enables the weight limit (§3.13): `{ "unit": string,
+"tiers": [ { "atPct": 1–99, "state": string, "note": string } ] }`. `unit` is a
+display label (`"kg"`, `"lb"`). Absent ⇒ no weight tracking, and every `weight`
+and `carry` field is ignored.
+
 ### 3.3 `items[]` — the catalog
 
 | Field | Type | Required | Meaning |
@@ -283,7 +305,8 @@ documented scheme.
 | `requires` | object | no | `{ "proficiency": key, "rank": int }`. A character below the rank cannot equip it. `rank` defaults to `1`. |
 | `consumable` | bool | no | Used up on use. Default `false`. |
 | `effects` | array | no | Applied on use. Each is `{ "resource": key, "delta": int, "target": "current" \| "max" }`. `target` defaults to `"current"`. A `"max"` effect is **permanent** (the "permanent potion" case). |
-| `price` | int | no | Base value in currency units (§3.10). Absent ⇒ not for sale and worth nothing to a vendor. Never set on the currency item itself. |
+| `price` | int | no | Base value in currency units, for a pristine copy (§3.10). Absent ⇒ not for sale and worth nothing to a vendor. Never set on the currency item itself. |
+| `weight` | number | no | Per unit, in `system.carry.unit` (§3.13). Default `0`. A magazine's weight is the same full or empty; loaded rounds are not weighed separately. |
 | `ammo` | object | no | Makes the item a ranged weapon and says how it is fed (§3.8). |
 | `fireModes` | array | no | Firearm fire modes and the rounds each pull of the trigger spends (§3.8.2). |
 | `magazine` | object | no | Makes the item a magazine: `{ "accepts": [itemId], "capacity": int }` (§3.8.1). |
@@ -317,6 +340,7 @@ A sheet is an individual whose state carries across the whole campaign:
 | `abilities` | array | no | `{ "id", "name", "type", "description"?, "uses"?, "cost"? }`. `type` is free world vocabulary (`"skill"`, `"spell"`, `"passive"`). `uses` names the proficiency it draws on. `cost` is `resourceKey → int` (a spell's MP). |
 | `inventory` | array | no | `{ "item": itemId, "qty": int }`, plus optional per-copy state for stateful items (`loaded`, `durability`; §3.11). |
 | `equipment` | object | no | `slotKey → itemId \| copy object \| null`. A plain id is a pristine copy; a copy object carries state (`mode`, `loaded`, `magazine`, `durability`; §3.11). An equipped item need not also appear in `inventory`. |
+| `carry` | object | no | `{ "max": number }`: the most this character can carry, inventory and equipment together, in `system.carry.unit` (§3.13). Required on party sheets when `system.carry` is declared. Part of the authored build. |
 | `buildNote` | string | yes | Why the build looks the way it does, in one or two sentences, observable register. See below. |
 | `statuses` | array | — | **Reserved** for conditions (bleeding, infected). Not defined in v0. |
 
@@ -500,7 +524,7 @@ Each copy has its own current value (§3.11), starting at `max` unless authored.
 - Durability is optional on any item. Swords, axes, firearms (a jam-prone rifle),
   armor.
 
-### 3.10 Currency and vendors
+### 3.10 Currency, pricing, and vendors
 
 **Money is an item.** `system.currency.item` names it — dollars, euros, bottle
 caps, ration chits, whatever the world uses. Because it is an ordinary stackable
@@ -508,24 +532,96 @@ item, loot drops it with plain loot lines, possession checks find it ("I pay 50"
 with 30 in the pocket fails, `OUTCOME_AUTHORITY.md` §4.1a), and trade is an
 item swap. A world has one currency in v0.
 
-**`price`** on a catalog item is its base value in currency units.
+**`price`** on a catalog item is its base value in currency units, for a
+pristine copy.
 
-**`vendors[]`** — places and people that buy and sell:
+#### 3.10.1 Condition pricing
 
-| Field | Type | Required | Meaning |
+With `system.pricing.condition` declared, a copy's **value** follows its wear:
+
+```
+value = price × max(floor, durability / max)     working copy
+value = price × broken                           broken copy
+```
+
+Items without `durability` always use the full `price`. Rounds loaded in a
+magazine or an `internal`-feed weapon are valued separately at their own round
+price and added. Values round to the nearest whole unit.
+
+Value applies in both directions. A vendor sells a worn copy for its value
+(a stock line's `price` override replaces `price` in the formula). A vendor buys
+from the party at `value × buyRate`.
+
+**Rarity by condition falls out of this. It needs no rarity field.** Loot and
+scavenge lines roll `durability` ranges, so weapons found in the world come out
+worn and sell cheap. A pristine copy only exists where the world authors one: a
+stock line with no `durability` (pristine), optionally with a `price` override
+above base as a scarcity premium. "A perfect-condition M9 at the gunsmith,
+priced like it" is one stock line. Scavenging enough worn guns to afford it is
+the loop.
+
+#### 3.10.2 Vendors: fixed and wandering
+
+| `kind` | What it is | Lifecycle |
+| --- | --- | --- |
+| `"fixed"` (default) | A settlement trader. An authored individual, like a sheet. | Exists from the start. Its stock is campaign state; its funds re-roll on refresh. |
+| `"wandering"` | A **type**, like a bestiary entry. A squatter barricaded in an apartment who'll deal, a convoy passing through. | Spawns as a temporary instance (§3.12, §4.3) with randomly rolled funds and stock. Discarded when the party leaves. |
+
+| Field | Applies to | Type | Meaning |
 | --- | --- | --- | --- |
-| `id` | string | yes | snake_case, unique among vendors. |
-| `name` | string | yes | Display name. |
-| `npc` | string | no | `MEMORY_CONTRACT.md` slug of the character who runs it. Links trade to that character's lorebook voice. |
-| `location` | string | no | Free-text place name, matching the location's lorebook naming. |
-| `stock` | array | yes | `{ "item": itemId, "qty"?: int, "price"?: int }`. `qty` absent ⇒ unlimited. `price` overrides the item's base `price` here. Stateful stock may carry `loaded` / `durability`, as on sheets. |
-| `buyRate` | number | no | Fraction of base `price` the vendor pays when buying from the party. Default `0.5`. `0` ⇒ buys nothing. |
-| `buys` | string[] | no | Item `type`s or `class.*` patterns the vendor will buy (`["ammo.*", "firearm.*"]`). Absent ⇒ buys anything with a `price`. |
-| `note` | string | no | One line on how the place deals, observable register (cash only; haggles hard). |
+| `id` | both | string | snake_case, unique among vendors. Required. |
+| `kind` | both | string | `"fixed"` \| `"wandering"`. Default `"fixed"`. |
+| `name` | both | string | Display name. Required. |
+| `npc` | fixed | string | `MEMORY_CONTRACT.md` slug of the character who runs it. Links trade to that character's lorebook voice. A wandering vendor has none: if a trader should recur as a person, author them as `fixed`. |
+| `location` | fixed | string | Free-text place name, matching the location's lorebook naming. Where trade can happen (§3.10.3). |
+| `funds` | both | number \| range | Cash the vendor can pay out. Absent ⇒ unlimited. |
+| `fundsRefresh` | fixed | string | When funds re-roll: `"visit"` (default), `"day"`, or `"never"`. |
+| `stock` | both | array | `{ "item": itemId, "qty"?: int, "price"?: int, "loaded"?, "durability"? }`. Fixed: the starting stock (required). Wandering: guaranteed lines (optional). `qty` absent ⇒ unlimited. `price` overrides the item's base `price` here. |
+| `stockTable` | wandering | array | Loot-style lines rolled at spawn: `{ "item", "chance": 0–1, "qty"?, "price"?, "loaded"?, "durability"? }`, values may be ranges (§3.6). On a `fixed` vendor the field is **reserved** for restocking (§7). |
+| `buyRate` | both | number | Fraction of a copy's value the vendor pays when buying from the party (§3.10.1). Default `0.5`. `0` ⇒ buys nothing. |
+| `buys` | both | string[] | Item `type`s or `class.*` patterns the vendor will buy (`["ammo.*", "firearm.*"]`). Absent ⇒ buys anything with a `price`. |
+| `note` | both | string | One line on how the vendor deals, observable register (cash only; haggles hard; won't let you past the door chain). |
 
-Authored stock is a **starting value**, like a sheet. Once a chat begins, stock
-is campaign state the fork owns (§1.2): what the party buys out stays bought out.
-Restocking is deferred (§7).
+**Funds.** Money the party pays a vendor goes into its funds; money the vendor
+pays out comes out of them. A sale the vendor can't cover fails
+(`OUTCOME_AUTHORITY.md` §4.1a). The party can sell part of what it brought and
+carry the rest to someone else.
+
+**Refresh** re-rolls `funds` from its range and **replaces** the current value:
+the trader's cash in hand has changed since the party last saw them.
+
+- `"visit"` — a visit begins when the party arrives at the vendor's `location`
+  and ends when it leaves (the Scene Tracker location changes). Each new visit
+  re-rolls. Walking out and straight back in also re-rolls, so a player can fish
+  for a rich day; the world accepts that.
+- `"day"` — at most once per in-world day (the Scene Tracker day counter), on
+  the first visit that day. The choice for worlds that want the fishing closed.
+- `"never"` — rolled once at bootstrap; only trade moves it.
+
+Without a location signal, the consumer treats each opening of an explicit
+trade action as a visit.
+
+Fixed-vendor **stock doesn't refresh** in v0. What the party buys out stays
+bought out; restocking is deferred (§7).
+
+**Wandering spawns.** A wandering instance appears only from a fork roll: a
+`vendor` line in a scavenge table (§3.12), or the consumer's encounter logic (the
+same trigger that spawns bestiary encounters, a consumer design question). Its
+funds and `stockTable` roll once at spawn, and its `stock` lines are added as
+they are. The model narrating a stranger with things to sell creates no vendor.
+That is scenery, with no mechanics (`OUTCOME_AUTHORITY.md` §3.2). The instance is
+discarded when the party leaves the place it spawned or the scene ends, and
+whatever wasn't bought is gone with it.
+
+#### 3.10.3 Where trade happens
+
+Trade with a **fixed** vendor requires the party to be at its `location` (the
+Scene Tracker's current location, matched case-insensitively), or the vendor's
+`npc` to be present in the scene (the `present` list of the `npcmem` turn tag,
+`MEMORY_CONTRACT.md`). With neither signal available, the consumer gates trade
+through an explicit HUD trade action. A **wandering** instance is present by
+construction for as long as it exists. A trade attempted away from the vendor
+fails (`OUTCOME_AUTHORITY.md` §4.1a): Sal can't be sold to from across the map.
 
 ### 3.11 Item copies and their state
 
@@ -562,6 +658,72 @@ item is; the copy says *which one*.
   worn blade at the opening moment is an authored decision, like `current < max`
   on a resource.
 
+### 3.12 `scavenge[]` — searching the world
+
+A scavenge table is a loot table attached to a **kind of place** rather than to
+an enemy: a pharmacy, a police cruiser, a gas station, a gutted apartment. It is
+the authored answer to "what's in here," so neither the player nor the model has
+to invent one.
+
+| Field | Type | Required | Meaning |
+| --- | --- | --- | --- |
+| `id` | string | yes | snake_case, unique among scavenge tables. |
+| `name` | string | yes | Display name of the kind of place. |
+| `aliases` | string[] | no | Other names the consumer matches against (`"chemist"`, `"drugstore"`). |
+| `loot` | array | yes | Loot lines as in §3.5 (`item`, `chance`, `qty`, `loaded`, `durability`, ranges allowed), plus **vendor lines**: `{ "vendor": vendorId, "chance": 0–1 }`, naming a `wandering` vendor the search can turn up. |
+| `depletes` | bool | no | Default `true`: a place searched once stays searched (below). |
+| `check` | check object | no | As in `system.refill` (§3.2): `full` rolls the table as authored, `half` halves every line's `chance`, `none` finds nothing and still spends the time. Absent ⇒ no check; the table rolls as authored. |
+| `fallback` | bool | no | At most one table. Used for a search the consumer can't match to any table. |
+| `note` | string | no | One line, observable register (already picked over; the back room is locked). |
+
+**A search is an attempt.** `{{user}}` says what they search. The consumer
+matches the place against table `name` and `aliases`, using the player's message
+and the Scene Tracker location. The small-model classification pass
+(`OUTCOME_AUTHORITY.md` §4.1b) is a natural later helper for unmatched names.
+The consumer rolls the table, pins the roll to that user message (swipes replay
+it), and injects the result as authoritative fact. The model narrates finding
+it. If nothing matches and there is no `fallback` table, the search finds no
+catalog items: whatever the scene supports is scenery and carries no stats.
+
+**Depletion** is keyed by table and place: the table `id` plus the Scene
+Tracker's current location. Searching a depleted place finds nothing ("the
+shelves were cleared already"), including on a later visit. Without a location
+signal, depletion can't be tracked and is skipped. Places refilling over time is
+deferred (§7).
+
+**Vendor lines** are how the world produces a wandering trader: a search of an
+apartment block turns up a barricaded unit with someone inside willing to deal.
+The line rolls like any other; on a hit, the consumer spawns that vendor's
+instance (§3.10.2).
+
+### 3.13 Carry weight
+
+Enabled by `system.carry`. Every item has a `weight` per unit (default `0`), and
+every party sheet has a `carry.max`.
+
+- **Load** is the sum of `weight × qty` over the sheet's inventory **and**
+  equipment. The rifle on the sling and the magazine in it count the same as
+  what's in the pack.
+- **The limit is hard.** Load never exceeds `carry.max`. Gaining an item that
+  would push it over fails. The loot stays on the floor, and a purchase is
+  refused before any money changes hands (`OUTCOME_AUTHORITY.md` §4.1a). The
+  player chooses what to drop or hand to a companion. The fork never drops
+  anything on its own.
+- **Encumbrance tiers.** `system.carry.tiers` are ordered by `atPct`. The
+  highest tier whose `atPct` the load has reached applies, and its `state` and
+  `note` go into the state block (§4.5). An operator at 44 of 50 kg is
+  `burdened` and the model writes them slower and tiring faster. What a tier
+  does mechanically (movement, initiative, stamina drain, a failed escape) is
+  deferred with combat resolution (§7). In v0 a tier is authoritative fact the
+  model narrates from.
+- **The limit is part of the build.** `carry.max` is authored with the rest of
+  the sheet and explained in `buildNote` when it's unusual. A trained operator
+  who carries 50 kg; a nurse who manages 30. A starting load above the limit is
+  invalid.
+- **Party members carry separately.** Handing an item to a companion moves it
+  between sheets and is a commit. Bestiary instances and vendors don't track
+  weight.
+
 ---
 
 ## 4. Consumer lifecycle — designed, not implemented
@@ -574,9 +736,10 @@ the same picture of what the starting values are *for*.
 On the first RPG action in a chat with no campaign state (pristine), the consumer
 reads the carrier and **snapshots the whole payload** into the chat's campaign
 state: `system`, `items`, and `bestiary` as the campaign's rules, and `sheets`
-and vendor `stock` as its starting state. Stateful inventory lines are expanded
-into individual copies with consumer-assigned ids (§3.11). It records a content
-hash of the carrier alongside the snapshot.
+and fixed-vendor `stock` as its starting state. Stateful inventory lines are
+expanded into individual copies with consumer-assigned ids (§3.11). Fixed vendors'
+`funds` roll on their first refresh (§3.10.2). It records a content hash of the
+carrier alongside the snapshot.
 
 Snapshotting the rules, not just the sheets, means a world revised mid-campaign
 changes nothing in that campaign. The hash lets a later consumer notice the
@@ -604,7 +767,13 @@ the fight all go to the working copy too. A live HUD shows the working copy.
 
 When the encounter ends, the sheets' changes from the working copy are committed
 (§4.4), recovery rolls for spent `direct`-feed ammunition resolve (§3.8.3), loot
-rolls resolve into inventory, and the instances are discarded.
+rolls resolve into inventory, and the instances are discarded. Loot that would
+push a sheet over its carry limit (§3.13) stays on the ground for the player to
+pick through.
+
+A **wandering vendor** instance (§3.10.2) is temporary in the same way, without
+a working copy. Trades with it commit normally, and the instance itself (funds,
+remaining stock) is discarded when the party leaves.
 
 ### 4.4 Commits and rewind
 
@@ -614,8 +783,11 @@ Campaign state changes only at **commits**:
 - an item is used, gained, or lost (loot, a consumable, a trade);
 - outside an encounter: rounds are fired, a weapon is reloaded or refilled, or a
   copy wears (§3.8–§3.9);
-- a purchase or sale with a vendor (both the party's inventory and the vendor's
-  stock change, §3.10);
+- a purchase or sale with a vendor (the party's inventory, the vendor's stock,
+  and the vendor's funds all change, §3.10);
+- a fixed vendor's funds refresh, or a wandering vendor spawns (§3.10.2);
+- a search resolves, including depleting the place (§3.12);
+- an item moves between party sheets (§3.13);
 - equipment changes;
 - a permanent effect applies (a `target: "max"` item effect);
 - a sheet reaches an `atZero` of `"dead"`, or a `unique` bestiary entry is
@@ -636,7 +808,10 @@ and `buildNote`. For weapons: the equipped weapon's mode, rounds in the inserted
 magazine (or loaded, for `internal` feed), how many loaded magazines remain, and
 any copy that is `broken`. "Last magazine" and "no loaded magazines, 45 loose
 rounds" are exactly the facts the model must not drift from. Money is shown with
-the currency `symbol`. During combat it adds the encounter: each instance's name,
+the currency `symbol`. With `system.carry`: each party member's load against
+their limit and the encumbrance tier in force, with its `note`. While the party
+is trading: the vendor's funds and stock with current values. After a search:
+what it turned up. During combat it adds the encounter: each instance's name,
 rough condition, and `note`, plus any boss `phases` note that has fired. Exact
 numbers versus descriptive condition ("badly hurt") is a consumer presentation
 choice. The block is authoritative fact, the same standing as the dice oracle's
@@ -653,8 +828,19 @@ and the user can confirm or correct it.
 **Shots are observed, rounds are counted.** The model reports trigger pulls
 ("fires twice"); the consumer multiplies by the current fire mode's `rounds` and
 decrements the inserted magazine. The model never reports a remaining-rounds
-figure, the same way it never reports an HP total. How the model reports changes (a tag, a
-scan, a UI action) is a consumer design question, out of scope for v0.
+figure, the same way it never reports an HP total.
+
+**Narration never mints catalog items.** A catalog item enters the campaign only
+through a fork roll (bestiary loot, a scavenge table, a wandering vendor's
+stock), a trade, or the authored starting state. If the model narrates "a box of
+9mm under the counter" that no roll produced, the consumer doesn't commit it.
+Otherwise the model becomes the loot table, and a model that wants to please
+hands out ammunition whenever things get tense (producer `CLAUDE.md`
+principle #13). Ordinary uncatalogued objects the scene supports stay free to
+pick up and carry no stats (`OUTCOME_AUTHORITY.md` §3.2).
+
+How the model reports changes (a tag, a scan, a UI action) is a consumer design
+question, out of scope for v0.
 
 ---
 
@@ -682,6 +868,15 @@ Absence never errors, matching every other seam:
   warning.
 - `price` or `vendors` present with no valid `system.currency` ⇒ prices are
   ignored and vendors don't load; logged once.
+- A vendor line in a scavenge table that names no `wandering` vendor is dropped;
+  warning. An unknown `kind` loads as `"fixed"`; an unknown `fundsRefresh` as
+  `"visit"`.
+- More than one `fallback` scavenge table ⇒ the first wins; warning.
+- `system.carry` declared but a party sheet has no `carry.max` ⇒ that sheet has no
+  limit; warning. A starting load above the limit seeds anyway, with a warning;
+  nothing more can be picked up until it's under.
+- No Scene Tracker location ⇒ depletion is skipped, and trade with fixed vendors
+  goes through an explicit trade action (§3.10.3, §3.12).
 - Unknown fields are ignored. Reserved fields (`combat`, `statuses`) are ignored
   until defined.
 
@@ -697,11 +892,14 @@ Absence never errors, matching every other seam:
 `[[DICE_TABLES]]` used:
 
 1. **World Seed** — a new §2i *RPG System* (resources, proficiencies, slots,
-   item catalog with weapons and ammunition, bestiary, currency, vendors), plus a
-   *Starting Build* field in §3 (protagonist) and in §4 (each statted NPC).
+   item catalog with weapons, ammunition, and weights, bestiary, currency,
+   settlement vendors and wandering vendor types, scavenge tables, carry tiers),
+   plus a *Starting Build* field in §3 (protagonist) and in §4 (each statted NPC),
+   including carry limit.
 2. **Interviewer** — elicits the stat system for the world's genre (proposing
    the main / secondary / ranged slot default, §3.2, and asking what the world
-   uses as money and where it can be spent), then
+   uses as money, which settlements trade, and what kinds of place are worth
+   searching), then
    **derives** a proposed starting build from the protagonist description and
    presents it with its reasoning, for the player to confirm or adjust. The coma
    and ex-SAS case is the model example: a weakened `current` with the reason
@@ -738,6 +936,13 @@ Absence never errors, matching every other seam:
 - [ ] If any `price` or `vendors` exists, `system.currency` names a catalog
       item, and that item has no `price`. Every vendor `npc` is a manifest slug.
       Every `buys` entry is a vocabulary type or `class.*` pattern.
+- [ ] Every `fixed` vendor has `stock`; every `wandering` vendor has `stock` or
+      `stockTable` and no `npc` or `location`. `funds` ranges stay ≥ 0.
+- [ ] Every scavenge `vendor` line names a `wandering` vendor. At most one
+      `fallback` table. Scavenge and stock-table lines resolve to catalog items.
+- [ ] With `system.carry`: every party sheet has `carry.max`, its starting load
+      (inventory + equipment) is within it, and tiers are in ascending `atPct`
+      with unique `state` names. An unusual limit is explained in `buildNote`.
 - [ ] Every sheet satisfies `min ≤ current ≤ max ≤ cap`; ranks are in
       `[1, maxRank]`; every bestiary range stays within `[min, cap]`.
 - [ ] Every sheet has a `buildNote` that explains any non-obvious value
@@ -774,9 +979,14 @@ Deliberately absent from v0. Each one is a later, additive version:
 - **Ammunition realism** — a chambered round (+1), dropping magazines on a speed
   reload, mixed round types in one magazine, ammunition variants with different
   effects.
-- **Carry weight and capacity**, two-handed and dual-wield rules.
-- **Economy depth** — vendor restocking, haggling and reputation pricing, more
-  than one currency, exchange rates.
+- **Encumbrance mechanics** — what a carry tier does to movement, initiative,
+  stamina, or an escape. v0 tiers are narrated fact only.
+- **Carry bonuses** — a bigger backpack or a cart raising `carry.max` (an item
+  field plus a slot for it).
+- **Two-handed and dual-wield rules.**
+- **Economy depth** — fixed-vendor restocking (the reserved `stockTable`),
+  haggling and reputation pricing, more than one currency, exchange rates.
+- **Scavenge respawn** — depleted places refilling over time.
 - **Dice-notation ranges** (`3d10+25`) alongside `base ± spread`, reusing the
   oracle's roll grammar.
 - **Weighted or exclusive loot tables** beyond independent `chance` lines.
@@ -799,9 +1009,16 @@ An illustrative carrier `content` for a zombie-apocalypse world. `{{user}}` is a
 ex-SAS operator who woke from a coma into the outbreak and took a pistol off a
 dead officer on the way out of the hospital. Maya Okafor is a nurse companion. A
 full world would declare all its zombie types; three are shown, plus a human
-elite and a named boss. One vendor shows the economy. Dollars are the currency
-here only because this world kept them; caps, euros, or ration chits work the
-same way.
+elite and a named boss. Dollars are the currency here only because this world
+kept them; caps, euros, or ration chits work the same way.
+
+The economy loop is visible end to end. Scavenge tables (a pharmacy, a police
+cruiser, an apartment block) turn up worn guns, magazines with a few rounds in
+them, and sometimes a squatter willing to trade. Two settlement vendors buy
+what's found at a fraction of its condition-adjusted value. One of them, a
+gunsmith in Northgate, has a single pristine Beretta M9 priced well above base:
+the reward for a lot of scavenging. Carry limits make each trip back a choice
+about what to leave.
 
 The opening state is built for tension on purpose: `{{user}}` has a Glock with
 9 rounds in the magazine, one empty spare, and 11 loose rounds in a pocket. Two
@@ -835,45 +1052,60 @@ reloads' worth of ammunition, and the second one has to be refilled first.
     "refill": {
       "outOfCombat": "free",
       "inCombat": { "outcomes": { "success": "full", "partial": "half", "fail": "none" } }
+    },
+    "pricing": { "condition": { "floor": 0.2, "broken": 0.05 } },
+    "carry": {
+      "unit": "kg",
+      "tiers": [
+        { "atPct": 60, "state": "burdened", "note": "Slower on foot; tires faster; climbing is hard work." },
+        { "atPct": 90, "state": "overloaded", "note": "Can't run. Every stair and fence is a struggle." }
+      ]
     }
   },
   "items": [
-    { "id": "c8_carbine", "name": "C8 Carbine", "type": "firearm.rifle", "slot": "main",
+    { "id": "c8_carbine", "name": "C8 Carbine", "type": "firearm.rifle", "weight": 3.4, "slot": "main",
       "requires": { "proficiency": "rifles", "rank": 2 }, "price": 900,
       "ammo": { "feed": "magazine", "magazines": ["stanag_30"] },
       "fireModes": [ { "key": "single", "label": "Semi", "rounds": 1 },
                      { "key": "burst", "label": "Burst", "rounds": 3 },
                      { "key": "auto", "label": "Auto", "rounds": { "base": 8, "spread": 3 } } ],
       "durability": { "max": 300, "atZero": "broken" } },
-    { "id": "stanag_30", "name": "STANAG Magazine", "type": "ammo.magazine", "price": 30,
+    { "id": "stanag_30", "name": "STANAG Magazine", "type": "ammo.magazine", "weight": 0.5, "price": 30,
       "magazine": { "accepts": ["round_556"], "capacity": 30 } },
-    { "id": "round_556", "name": "5.56mm Round", "type": "ammo.round", "price": 2 },
-    { "id": "glock_17", "name": "Glock 17", "type": "firearm.handgun", "slot": "secondary",
+    { "id": "round_556", "name": "5.56mm Round", "type": "ammo.round", "weight": 0.012, "price": 2 },
+    { "id": "glock_17", "name": "Glock 17", "type": "firearm.handgun", "weight": 0.7, "slot": "secondary",
       "requires": { "proficiency": "handguns", "rank": 1 }, "price": 350,
       "ammo": { "feed": "magazine", "magazines": ["glock_mag_17"] } },
-    { "id": "glock_mag_17", "name": "Glock Magazine", "type": "ammo.magazine", "price": 20,
+    { "id": "glock_mag_17", "name": "Glock Magazine", "type": "ammo.magazine", "weight": 0.1, "price": 20,
       "magazine": { "accepts": ["round_9mm"], "capacity": 17 } },
-    { "id": "round_9mm", "name": "9mm Round", "type": "ammo.round", "price": 1 },
-    { "id": "remington_870", "name": "Remington 870", "type": "firearm.shotgun", "slot": "main",
+    { "id": "round_9mm", "name": "9mm Round", "type": "ammo.round", "weight": 0.008, "price": 1 },
+    { "id": "beretta_m9", "name": "Beretta M9", "type": "firearm.handgun", "weight": 0.95, "slot": "secondary",
+      "requires": { "proficiency": "handguns", "rank": 1 }, "price": 500,
+      "description": "Military-issue 9mm. Clean ones haven't been seen since the first month.",
+      "ammo": { "feed": "magazine", "magazines": ["beretta_mag_15"] },
+      "durability": { "max": 250, "atZero": "broken" } },
+    { "id": "beretta_mag_15", "name": "Beretta Magazine", "type": "ammo.magazine", "weight": 0.1, "price": 20,
+      "magazine": { "accepts": ["round_9mm"], "capacity": 15 } },
+    { "id": "remington_870", "name": "Remington 870", "type": "firearm.shotgun", "weight": 3.6, "slot": "main",
       "requires": { "proficiency": "shotguns", "rank": 1 }, "price": 450,
       "ammo": { "feed": "internal", "accepts": ["shell_12g"], "capacity": 6 } },
-    { "id": "shell_12g", "name": "12-Gauge Shell", "type": "ammo.shell", "price": 3 },
-    { "id": "recurve_bow", "name": "Recurve Bow", "type": "ranged.bow", "slot": "ranged",
+    { "id": "shell_12g", "name": "12-Gauge Shell", "type": "ammo.shell", "weight": 0.04, "price": 3 },
+    { "id": "recurve_bow", "name": "Recurve Bow", "type": "ranged.bow", "weight": 1.2, "slot": "ranged",
       "requires": { "proficiency": "archery", "rank": 1 }, "price": 250,
       "description": "Quiet. The only thing that doesn't bring more of them.",
       "ammo": { "feed": "direct", "accepts": ["arrow"] } },
-    { "id": "arrow", "name": "Arrow", "type": "ammo.arrow", "price": 4, "recover": 0.5 },
-    { "id": "fire_axe", "name": "Fire Axe", "type": "melee.blade", "slot": "main", "price": 60,
+    { "id": "arrow", "name": "Arrow", "type": "ammo.arrow", "weight": 0.03, "price": 4, "recover": 0.5 },
+    { "id": "fire_axe", "name": "Fire Axe", "type": "melee.blade", "weight": 2.7, "slot": "main", "price": 60,
       "durability": { "max": 120, "atZero": "broken" } },
-    { "id": "combat_knife", "name": "Combat Knife", "type": "melee.blade", "slot": "secondary",
+    { "id": "combat_knife", "name": "Combat Knife", "type": "melee.blade", "weight": 0.3, "slot": "secondary",
       "price": 40, "durability": { "max": 150, "atZero": "broken" } },
-    { "id": "stab_vest", "name": "Police Stab Vest", "type": "armor.light", "slot": "armor",
+    { "id": "stab_vest", "name": "Police Stab Vest", "type": "armor.light", "weight": 2.5, "slot": "armor",
       "price": 200, "durability": { "max": 80, "atZero": "destroyed" } },
-    { "id": "field_dressing", "name": "Field Dressing", "type": "consumable.medical",
+    { "id": "field_dressing", "name": "Field Dressing", "type": "consumable.medical", "weight": 0.1,
       "consumable": true, "price": 35,
       "description": "Gauze, tape, a sachet of clotting powder.",
       "effects": [ { "resource": "hp", "delta": 20 } ], "tags": ["medical"] },
-    { "id": "military_stim", "name": "Experimental Military Stim", "type": "consumable.drug",
+    { "id": "military_stim", "name": "Experimental Military Stim", "type": "consumable.drug", "weight": 0.05,
       "consumable": true,
       "description": "Unlabelled auto-injector from a quarantine lab.",
       "effects": [ { "resource": "hp", "target": "max", "delta": 10 } ],
@@ -896,13 +1128,14 @@ reloads' worth of ammunition, and the second one has to be refilled first.
         { "item": "round_9mm", "qty": 11 },
         { "item": "dollar", "qty": 35 }
       ],
+      "carry": { "max": 50 },
       "equipment": {
         "main": null,
         "secondary": { "item": "glock_17", "magazine": { "item": "glock_mag_17", "loaded": 9 } },
         "ranged": null,
         "armor": null
       },
-      "buildNote": "Ex-SAS operator, home on leave when the coma took them; woke weeks later into the outbreak. Training and reflexes intact, body not: HP and stamina well below max until they recover. Took a Glock off a dead officer in the hospital stairwell: the magazine in it is half spent, the spare is empty, and the rest is a pocketful of loose rounds."
+      "buildNote": "Ex-SAS operator, home on leave when the coma took them; woke weeks later into the outbreak. Training and reflexes intact, body not: HP and stamina well below max until they recover. Took a Glock off a dead officer in the hospital stairwell: the magazine in it is half spent, the spare is empty, and the rest is a pocketful of loose rounds. Used to carrying a full combat load, about 50 kg, and feels every kilo of it now."
     },
     {
       "id": "maya_okafor", "kind": "npc", "party": true,
@@ -915,6 +1148,7 @@ reloads' worth of ammunition, and the second one has to be refilled first.
       ],
       "inventory": [ { "item": "field_dressing", "qty": 4 }, { "item": "dollar", "qty": 120 } ],
       "equipment": { "main": { "item": "fire_axe", "durability": 70 } },
+      "carry": { "max": 30 },
       "buildNote": "ICU nurse who kept the ward running through the first week. Expert medic, untrained fighter: she swings the axe because she has to. It came off the corridor wall and has already been through a door and two of them; the edge is chipped."
     }
   ],
@@ -952,8 +1186,9 @@ reloads' worth of ammunition, and the second one has to be refilled first.
                 { "item": "stanag_30", "chance": 1.0, "qty": 3 } ] }
   ],
   "vendors": [
-    { "id": "junction_trader", "name": "The Junction Trader", "npc": "sal_moreno",
+    { "id": "junction_trader", "kind": "fixed", "name": "The Junction Trader", "npc": "sal_moreno",
       "location": "Junction Market",
+      "funds": { "base": 300, "spread": 150 }, "fundsRefresh": "visit",
       "stock": [
         { "item": "round_9mm", "qty": 120 },
         { "item": "round_556", "qty": 200 },
@@ -967,7 +1202,54 @@ reloads' worth of ammunition, and the second one has to be refilled first.
       ],
       "buyRate": 0.4,
       "buys": ["firearm.*", "ammo.*", "consumable.*"],
-      "note": "Cash only. Won't touch anything that's been bitten." }
+      "note": "Cash only. Won't touch anything that's been bitten." },
+    { "id": "okoro_gunsmith", "kind": "fixed", "name": "Okoro Gunsmithing", "npc": "daniel_okoro",
+      "location": "Northgate Settlement",
+      "funds": { "base": 600, "spread": 300 }, "fundsRefresh": "day",
+      "stock": [
+        { "item": "beretta_m9", "qty": 1, "price": 1400 },
+        { "item": "beretta_mag_15", "qty": 3 },
+        { "item": "c8_carbine", "qty": 1, "durability": 150 },
+        { "item": "stanag_30", "qty": 4, "loaded": 0 }
+      ],
+      "buyRate": 0.5,
+      "buys": ["firearm.*", "ammo.*", "armor.*"],
+      "note": "Strips every gun you sell him on the bench before he names a price." },
+    { "id": "squatter_trader", "kind": "wandering", "name": "Squatter Trader",
+      "funds": { "base": 120, "spread": 80 },
+      "stockTable": [
+        { "item": "field_dressing", "chance": 0.6, "qty": { "base": 2, "spread": 1 } },
+        { "item": "round_9mm", "chance": 0.5, "qty": { "base": 15, "spread": 10 } },
+        { "item": "glock_mag_17", "chance": 0.3, "loaded": { "base": 8, "spread": 8 } },
+        { "item": "combat_knife", "chance": 0.3, "durability": { "base": 90, "spread": 40 } },
+        { "item": "shell_12g", "chance": 0.25, "qty": { "base": 6, "spread": 4 } },
+        { "item": "military_stim", "chance": 0.03, "price": 900 }
+      ],
+      "buyRate": 0.3,
+      "buys": ["consumable.*", "ammo.*"],
+      "note": "Talks through a door chain. Wants medicine more than money." }
+  ],
+  "scavenge": [
+    { "id": "pharmacy", "name": "Pharmacy", "aliases": ["chemist", "drugstore", "clinic"],
+      "loot": [ { "item": "field_dressing", "chance": 0.6, "qty": { "base": 2, "spread": 2 } },
+                { "item": "military_stim", "chance": 0.02 },
+                { "item": "dollar", "chance": 0.4, "qty": { "base": 30, "spread": 25 } } ],
+      "note": "Usually hit early. Look behind the counter and in the back room." },
+    { "id": "police_cruiser", "name": "Police cruiser", "aliases": ["cop car", "patrol car"],
+      "loot": [ { "item": "glock_17", "chance": 0.3 },
+                { "item": "glock_mag_17", "chance": 0.5, "qty": { "base": 1, "spread": 1 },
+                  "loaded": { "base": 8, "spread": 8 } },
+                { "item": "round_9mm", "chance": 0.4, "qty": { "base": 12, "spread": 8 } },
+                { "item": "stab_vest", "chance": 0.1, "durability": { "base": 40, "spread": 25 } } ] },
+    { "id": "apartment_block", "name": "Apartment block", "aliases": ["flats", "apartments", "tenement"],
+      "loot": [ { "item": "dollar", "chance": 0.5, "qty": { "base": 20, "spread": 15 } },
+                { "item": "field_dressing", "chance": 0.2 },
+                { "item": "round_9mm", "chance": 0.15, "qty": { "base": 8, "spread": 6 } },
+                { "item": "fire_axe", "chance": 0.05, "durability": { "base": 80, "spread": 30 } },
+                { "vendor": "squatter_trader", "chance": 0.08 } ],
+      "note": "Most doors are open. The ones that aren't, someone is behind." },
+    { "id": "anywhere_else", "name": "Anywhere else", "fallback": true, "depletes": false,
+      "loot": [ { "item": "dollar", "chance": 0.15, "qty": { "base": 5, "spread": 4 } } ] }
   ]
 }
 ```
@@ -1009,3 +1291,12 @@ not trip `BODY_CYCLES.md` §7.1's generic-carrier trigger (§1.3).
   control, or both. A HUD control is the cleaner fit for out-of-fiction
   bookkeeping like a fire-mode toggle; a reload under fire is an in-fiction
   attempt and probably belongs to narration.
+- **Location identity.** Scavenge depletion and fixed-vendor trade both key off
+  the Scene Tracker's current location as a free-text string. Two names for the
+  same pharmacy deplete separately, and a vendor's `location` must match
+  verbatim. A stable location id (the way `MEMORY_CONTRACT.md` gives NPCs one)
+  may be needed before v1.
+- **Matching a search to a table.** Name and alias matching is brittle against
+  free prose ("I check the chemist's on the corner"). The small-model
+  classification pass is a candidate helper, or the HUD could offer the matching
+  tables as a choice.

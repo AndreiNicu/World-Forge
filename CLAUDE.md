@@ -48,7 +48,7 @@ World-Forge/
 │   ├── WORLD_FORGE_SYNC.md           ← Runtime seams: Director-card tag (§2), narration-surface aliases (§3), </style_contract> marker (§4), [[WORLD_CALENDAR]] Scene Tracker date seed (§5), style_override runtime
 │   ├── DICE_ORACLE.md                ← Dice oracle channel: [[DICE_TABLES]] carrier, roll-table payload (schema 2), authoritative-facts injection; §7 RPG complexity roadmap
 │   ├── BODY_CYCLES.md                ← Recurring body states: [[BODY_CYCLES]] carrier, per-character cycle seed, phase derived from the day counter (consumer only — producer not wired)
-│   ├── RPG_STATS.md                  ← RPG stats: [[RPG_STATS]] carrier — stat system, item catalog (weapons, magazines, ammo, durability), starting sheets, bestiary, currency + vendors; fork owns live state per chat (DRAFT — neither side built, producers must not emit)
+│   ├── RPG_STATS.md                  ← RPG stats: [[RPG_STATS]] carrier — stat system, item catalog (weapons, magazines, ammo, durability), starting sheets, bestiary, currency + vendors, scavenge tables, carry weight; fork owns live state per chat (DRAFT — neither side built, producers must not emit)
 │   └── OUTCOME_AUTHORITY.md          ← Outcome authority: {{user}}'s message is an attempt, never a state write — authority order, pinned rolls, legality check, downed/recovery, sketched outcome_authority preset block; no carrier (DRAFT — exploration, neither side built)
 ├── tools/
 │   ├── validate_export.py            ← Read-only Export/ JSON validator (explicit exception to the no-code rule; see Out of scope)
