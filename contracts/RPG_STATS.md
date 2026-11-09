@@ -1,6 +1,6 @@
 # RPG Stats Contract — `[[RPG_STATS]]`
 
-**Status:** Draft · **Version:** 0 · **Last updated:** 2026-11-05
+**Status:** Draft · **Version:** 0 · **Last updated:** 2026-11-09
 
 > **Shared contract — canonical source of truth:**
 > [`AndreiNicu/World-Forge`](https://github.com/AndreiNicu/World-Forge) → `contracts/RPG_STATS.md`.
@@ -24,8 +24,9 @@
 
 This document specifies the **RPG stats** channel between the World-Forge producer
 pipeline and the SillyTavern fork's RPG layer (consumer): the world's stat system,
-its item catalog, the **starting sheets** of `{{user}}` and the cast, and the
-**bestiary** of things that can be fought. It is the "character-state channel"
+its item catalog (including weapons, magazines, and ammunition), the **starting
+sheets** of `{{user}}` and the cast, the **bestiary** of things that can be
+fought, and a small **economy** (currency, prices, vendors). It is the "character-state channel"
 `DICE_ORACLE.md` §7.3 anticipated, specified on its own rather than accreted onto
 the stateless oracle.
 
@@ -90,8 +91,11 @@ campaign.
   how people talk about it — stays in the Tier 1 species entry. A bestiary
   entry's `note` carries only what matters in a fight (§3.5), and does not
   restate the lore entry.
-- **Not combat rules.** v0 defines what a character *has*. How damage, hit
-  chance, and initiative resolve is deliberately absent (§7).
+- **Not combat rules.** v0 defines what a character *has*, and the
+  bookkeeping of what they carry: rounds loaded, magazines full or empty, a
+  blade's wear, money in the pocket (§3.8–§3.11). How damage, hit chance, and
+  initiative resolve is deliberately absent (§7). Weapon logistics work without
+  combat resolution; weapon numbers do not.
 
 ### 1.4 Arc and sandbox
 
@@ -138,27 +142,45 @@ the worked example in §8):
     ],
     "attributes":     [ { "key": "str", "label": "Strength", "min": 1, "cap": 99 } ],
     "proficiencies":  [ { "key": "rifles", "label": "Rifles", "maxRank": 5 } ],
-    "equipmentSlots": [ { "key": "primary", "label": "Primary weapon" } ]
+    "equipmentSlots": [ { "key": "main", "label": "Main weapon" } ],
+    "currency": { "item": "dollar", "symbol": "$" },          // money is an item (§3.10)
+    "refill": { "outOfCombat": "free",                        // refilling magazines (§3.8.4)
+                "inCombat": { "outcomes": { "success": "full", "partial": "half", "fail": "none" } } }
   },
   "items": [                           // the item catalog (§3.3)
-    { "id": "c8_carbine", "name": "C8 Carbine", "slot": "primary",
-      "requires": { "proficiency": "rifles", "rank": 2 } },
-    { "id": "field_dressing", "name": "Field Dressing", "consumable": true,
-      "effects": [ { "resource": "hp", "delta": 20 } ] }
+    { "id": "c8_carbine", "name": "C8 Carbine", "type": "firearm.rifle", "slot": "main",
+      "price": 900, "requires": { "proficiency": "rifles", "rank": 2 },
+      "ammo": { "feed": "magazine", "magazines": ["stanag_30"] },             // §3.8
+      "fireModes": [ { "key": "single", "rounds": 1 }, { "key": "burst", "rounds": 3 } ] },
+    { "id": "stanag_30", "name": "STANAG Magazine", "type": "ammo.magazine", "price": 25,
+      "magazine": { "accepts": ["round_556"], "capacity": 30 } },
+    { "id": "round_556", "name": "5.56mm Round", "type": "ammo.round", "price": 2 },
+    { "id": "katana", "name": "Katana", "type": "melee.blade", "slot": "main", "price": 400,
+      "durability": { "max": 100, "atZero": "broken" } },                     // §3.9
+    { "id": "field_dressing", "name": "Field Dressing", "type": "consumable.medical",
+      "consumable": true, "effects": [ { "resource": "hp", "delta": 20 } ] },
+    { "id": "dollar", "name": "Dollar", "type": "currency.note" }
   ],
   "sheets": [                          // persistent individuals (§3.4)
     { "id": "user", "kind": "persona",
       "resources": { "hp": { "current": 100, "max": 150 } },
       "proficiencies": { "rifles": 4 },
       "abilities": [ { "id": "self_treat", "name": "Self-Treatment", "type": "skill" } ],
-      "inventory": [ { "item": "field_dressing", "qty": 2 } ],
-      "equipment": { "primary": null },
+      "inventory": [ { "item": "field_dressing", "qty": 2 },
+                     { "item": "stanag_30", "qty": 2, "loaded": 30 },        // copies with state (§3.11)
+                     { "item": "dollar", "qty": 40 } ],
+      "equipment": { "main": { "item": "c8_carbine", "mode": "single",
+                               "magazine": { "item": "stanag_30", "loaded": 30 } } },
       "buildNote": "Ex-SAS, weeks in a coma. Training intact, body not." }
   ],
   "bestiary": [                        // things that are fought, instanced per encounter (§3.5)
     { "id": "shambler", "name": "Shambler", "tier": "common",
       "resources": { "hp": { "base": 40, "spread": 10 } },
       "loot": [ { "item": "field_dressing", "chance": 0.15 } ] }
+  ],
+  "vendors": [                         // places that buy and sell (§3.10)
+    { "id": "junction_trader", "name": "Junction Trader",
+      "stock": [ { "item": "round_556", "qty": 200 } ], "buyRate": 0.5 }
   ]
 }
 ```
@@ -172,6 +194,7 @@ the worked example in §8):
 | `items` | array | no | The item catalog (§3.3). Inventory, equipment, and loot reference items **only** by `id`. |
 | `sheets` | array | yes | Starting sheets for persistent individuals (§3.4). Must contain exactly one `persona` sheet. |
 | `bestiary` | array | no | Enemy types, instanced per encounter (§3.5). |
+| `vendors` | array | no | Places and people that buy and sell (§3.10). Requires `system.currency`. |
 
 ### 3.2 `system` — the world's rules
 
@@ -180,7 +203,10 @@ proficiencies; a high-fantasy world declares HP, MP, and spell schools; a noir
 world might declare Nerve and Heat. Every sheet, item, and bestiary entry uses
 the same shape, and `system` decides what the keys are.
 
-**`resources[]`** — pools that go down and come back up (HP, MP, stamina, ammo).
+**`resources[]`** — pools on a character that go down and come back up (HP, MP,
+stamina). Ammunition is **not** a resource: rounds, arrows, and magazines are
+items, because they are looted, bought, sold, and loaded into a specific weapon
+(§3.8).
 
 | Field | Type | Required | Meaning |
 | --- | --- | --- | --- |
@@ -202,11 +228,47 @@ holds a rank from `1` to `maxRank` per proficiency it has. An absent proficiency
 means untrained.
 
 **`equipmentSlots[]`** — where items are worn or wielded. Fields: `key`,
-`label`.
+`label`. The slot set is world-defined like every other key. For weapons, the
+**recommended default** (and the Interviewer's opening proposal, §6) is three
+slots by role:
+
+| Slot key | Role | Examples |
+| --- | --- | --- |
+| `main` | the main weapon | rifle, shotgun, katana, longsword |
+| `secondary` | the small weapon carried alongside | pistol, revolver, dagger, machete |
+| `ranged` | the non-firearm ranged weapon | bow, crossbow, throwing knives |
+
+A slot is a **role**, not a type: a katana and a rifle are both `main`. What
+kind of object a weapon is lives on the item's `type` (§3.3). Worlds that want
+other roles declare them (`main_hand` / `off_hand`, `heavy`, `armor`). A longbow
+archer's world may well put bows in `main`.
 
 All four arrays use objects rather than bare strings on purpose: later versions
 add fields to them (a proficiency's governing attribute, a resource's regen rule)
 without a migration.
+
+**`currency`** — optional. `{ "item": itemId, "symbol"?: string }`. Names the
+catalog item that is money (§3.10). `symbol` is a display prefix for the HUD and
+state block (`"$"`, `"€"`, `"₽"`); absent ⇒ the item's `name` is used. Required
+when `vendors` or any `price` is present.
+
+**`refill`** — optional. How magazines and internal-feed weapons are loaded
+from loose rounds (§3.8.4):
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `outOfCombat` | `"free"` \| check object | Default `"free"`: a refill outside an encounter is a plain commit. |
+| `inCombat` | `"free"` \| check object | Default: a check reading the `requires.proficiency` of the weapon being loaded (for a magazine: the equipped weapon that takes it), untrained if it has none, with outcomes `full` / `half` / `none`. |
+
+A **check object** is `{ "check"?: key, "outcomes": { "success", "partial", "fail" } }`.
+`check` names a proficiency or attribute key the roll reads (a world that wants
+refilling to test Dexterity or Nerve rather than weapon training names it here);
+absent ⇒ the loaded weapon's `requires.proficiency`, as above. Each outcome is
+`"full"` (every magazine being refilled is filled), `"half"` (half the rounds that
+would have gone in, rounded down), or `"none"` (no rounds loaded; the time is
+still spent). How the roll turns a rank into success / partial / fail belongs to
+combat resolution and is deferred (§7); until it exists the consumer may use any
+documented scheme.
 
 ### 3.3 `items[]` — the catalog
 
@@ -214,17 +276,30 @@ without a migration.
 | --- | --- | --- | --- |
 | `id` | string | yes | snake_case, unique among items. The only way anything references an item. |
 | `name` | string | yes | Display name. |
+| `type` | string | see note | `class.type` from the shared classification vocabulary (`OUTCOME_AUTHORITY.md` §4.5): `firearm.rifle`, `melee.blade`, `ranged.bow`, `ammo.magazine`, `currency.note`, … Possession is matched by type (`OUTCOME_AUTHORITY.md` §3.1). **Required** on weapons, magazines, ammunition, and the currency item; recommended on everything else. |
+| `nature` | string[] | no | From the same vocabulary: `mundane`, `magical`, `futuristic`, `legendary`. Default `["mundane"]`. |
 | `description` | string | no | One line, observable register. |
 | `slot` | string | no | An `equipmentSlots` key. Absent ⇒ the item cannot be equipped. |
 | `requires` | object | no | `{ "proficiency": key, "rank": int }`. A character below the rank cannot equip it. `rank` defaults to `1`. |
 | `consumable` | bool | no | Used up on use. Default `false`. |
 | `effects` | array | no | Applied on use. Each is `{ "resource": key, "delta": int, "target": "current" \| "max" }`. `target` defaults to `"current"`. A `"max"` effect is **permanent** (the "permanent potion" case). |
-| `tags` | string[] | no | Free world vocabulary (`"ammo"`, `"medical"`, `"quest"`). |
-| `combat` | object | — | **Reserved** for weapon and armor numbers (damage, armor value). Not defined in v0; consumers ignore it. |
+| `price` | int | no | Base value in currency units (§3.10). Absent ⇒ not for sale and worth nothing to a vendor. Never set on the currency item itself. |
+| `ammo` | object | no | Makes the item a ranged weapon and says how it is fed (§3.8). |
+| `fireModes` | array | no | Firearm fire modes and the rounds each pull of the trigger spends (§3.8.2). |
+| `magazine` | object | no | Makes the item a magazine: `{ "accepts": [itemId], "capacity": int }` (§3.8.1). |
+| `durability` | object | no | Wear: `{ "max": int, "perUse"?: int, "atZero": "broken" \| "destroyed" }` (§3.9). |
+| `recover` | number | no | `0–1`. Chance each spent unit is recovered after the encounter (arrows, bolts, throwing knives; §3.8.3). Default `0`. |
+| `tags` | string[] | no | Free world vocabulary (`"medical"`, `"quest"`, `"rare"`). |
+| `combat` | object | — | **Reserved** for weapon and armor numbers (damage, range, accuracy, armor value, what a fire mode does to a hit). Not defined in v0; consumers ignore it. |
 
 The catalog exists because inventory, equipment, and loot all point at the same
 things. Without one list, the same carbine is described three slightly different
 ways and the fork cannot tell they are one item.
+
+**Stateful items.** An item with `ammo` (internal feed), `magazine`, or
+`durability` carries per-copy state: two katanas can be at different wear, two
+magazines at different fill. Such items do not merge into a fungible stack; the
+consumer tracks each copy separately (§3.11). Every other item stacks by `qty`.
 
 ### 3.4 `sheets[]` — persistent individuals
 
@@ -240,8 +315,8 @@ A sheet is an individual whose state carries across the whole campaign:
 | `attributes` | object | no | `attributeKey → int`. |
 | `proficiencies` | object | no | `proficiencyKey → rank`. |
 | `abilities` | array | no | `{ "id", "name", "type", "description"?, "uses"?, "cost"? }`. `type` is free world vocabulary (`"skill"`, `"spell"`, `"passive"`). `uses` names the proficiency it draws on. `cost` is `resourceKey → int` (a spell's MP). |
-| `inventory` | array | no | `{ "item": itemId, "qty": int }`. |
-| `equipment` | object | no | `slotKey → itemId \| null`. An equipped item need not also appear in `inventory`. |
+| `inventory` | array | no | `{ "item": itemId, "qty": int }`, plus optional per-copy state for stateful items (`loaded`, `durability`; §3.11). |
+| `equipment` | object | no | `slotKey → itemId \| copy object \| null`. A plain id is a pristine copy; a copy object carries state (`mode`, `loaded`, `magazine`, `durability`; §3.11). An equipped item need not also appear in `inventory`. |
 | `buildNote` | string | yes | Why the build looks the way it does, in one or two sentences, observable register. See below. |
 | `statuses` | array | — | **Reserved** for conditions (bleeding, infected). Not defined in v0. |
 
@@ -272,8 +347,8 @@ discarded when the encounter ends (§4.3).
 | `resources` | object | yes | `resourceKey → value`, where value is a number or a range (§3.6). It sets `max`; an instance spawns at `current = max`. |
 | `attributes`, `proficiencies` | object | no | As on sheets; values may be ranges. |
 | `abilities` | array | no | As on sheets. |
-| `equipment` | object | no | As on sheets. |
-| `loot` | array | no | `{ "item": itemId, "chance": 0–1, "qty"?: number \| range }`. Each line rolls independently when an instance is defeated. `qty` defaults to `1`. |
+| `equipment` | object | no | As on sheets. Instances **do not track** ammunition, magazines, or durability: an enemy's weapon never runs dry or breaks, and the instance is discarded at encounter end anyway. |
+| `loot` | array | no | `{ "item": itemId, "chance": 0–1, "qty"?: number \| range, "loaded"?: number \| range, "durability"?: number \| range }`. Each line rolls independently when an instance is defeated. `qty` defaults to `1`. `loaded` and `durability` set the state of a dropped stateful item (a magazine with `{ "base": 12, "spread": 10 }` rounds left, a carbine at half wear); absent ⇒ pristine. Currency drops are ordinary loot lines on the currency item. |
 | `note` | string | no | One or two lines on how it fights, in observable register (slow but grabs; travels in packs). Not the lore. |
 | `unique` | bool | no | At most one instance per encounter, and its defeat is committed to campaign state (§4.4). Default `false`; `true` is expected for bosses. |
 | `npc` | string | no | The `MEMORY_CONTRACT.md` slug of a named character this entry fights *as*. Links the fight to the character's lorebook voice and memory. See below. |
@@ -300,6 +375,10 @@ instance spawns, then clamps it to the system's `[min, cap]` (or `[1, maxRank]`
 for ranks). `spread: 0` or a plain number means fixed. Sheets never take ranges:
 a persistent individual has one authored starting value.
 
+Two places outside the bestiary also take ranges: loot `loaded` / `durability`
+(rolled when the drop resolves, clamped to the item's `capacity` / `max`), and a
+fire mode's `rounds` (rolled **per trigger pull**, §3.8.2).
+
 `base ± spread` was chosen over dice notation (`3d10+25`) because it is easier for
 the producer's agents to author correctly, and the authored intent ("about 40,
 give or take 10") reads directly. Dice notation is a candidate later addition
@@ -324,6 +403,165 @@ souls-like world that rules it **in** says `"dead"` explicitly, because the
 model's trained floor will otherwise refuse to let the fight be lost. The value
 is authored from Master Design Section 6, never defaulted (§6).
 
+### 3.8 Weapons and ammunition
+
+A weapon is a catalog item with a `slot` and a weapon `type`. A **ranged**
+weapon also carries `ammo`, which says how it is fed. There are three feeds,
+because "reloading" means three different things in play:
+
+| `feed` | Weapons | Where the rounds are | Fields |
+| --- | --- | --- | --- |
+| `"magazine"` | rifles, pistols, SMGs | in a detachable magazine, which is its own item with its own fill | `magazines`: the magazine item ids it takes |
+| `"internal"` | pump shotguns, revolvers, bolt-action rifles | in the weapon itself | `accepts`: round item ids; `capacity`: int |
+| `"direct"` | bows, crossbows, thrown weapons | nowhere — each use draws one unit from the inventory stack | `accepts`: item ids drawn |
+
+Melee weapons carry no `ammo`. They may carry `durability` (§3.9), as may any
+weapon.
+
+```jsonc
+{ "id": "glock_17", "type": "firearm.handgun", "slot": "secondary",
+  "ammo": { "feed": "magazine", "magazines": ["glock_mag_17"] } }
+{ "id": "remington_870", "type": "firearm.shotgun", "slot": "main",
+  "ammo": { "feed": "internal", "accepts": ["shell_12g"], "capacity": 6 } }
+{ "id": "recurve_bow", "type": "ranged.bow", "slot": "ranged",
+  "ammo": { "feed": "direct", "accepts": ["arrow"] } }
+{ "id": "throwing_knife", "type": "ranged.thrown", "slot": "ranged", "recover": 0.7,
+  "ammo": { "feed": "direct", "accepts": ["throwing_knife"] } }
+```
+
+A thrown weapon names **itself** as its ammunition: equipping throwing knives
+equips the stack, and each throw spends one from inventory. No special case.
+
+#### 3.8.1 Magazines
+
+A magazine is an item with a `magazine` block: `{ "accepts": [roundItemId],
+"capacity": int }`. Each copy has its own `loaded` count (§3.11). A magazine-fed
+weapon holds **one inserted magazine** at a time; its other magazines sit in
+inventory, full, partial, or empty.
+
+Magazines exist as tracked items, rather than as a loose-round count on the
+gun, because of what happens when the last one runs dry. Loose rounds in the
+pack are useless until they are pressed into magazines, and that takes time a
+fight may not give (§3.8.4). A gun with ammunition in the pack and no loaded
+magazine is the tension this design is for.
+
+#### 3.8.2 Fire modes
+
+`fireModes` is an array of `{ "key": string, "label"?: string, "rounds": number
+| range }`. `rounds` is what one trigger pull spends: `single` 1, `burst` 3,
+`auto` a range rolled per pull (`{ "base": 8, "spread": 3 }`). The first entry is
+the default mode. A firearm without `fireModes` spends one round per shot.
+
+The current mode is per-copy state (`mode`, §3.11). Switching mode spends
+nothing and is not a commit inside an encounter (it lives in the working copy);
+outside one it commits with the next change. What a mode does to a hit is
+combat resolution, reserved for `combat` (§7). Here it only counts rounds.
+
+#### 3.8.3 Recovery
+
+`recover` (0–1) on a `direct`-feed ammunition item is the chance that each unit
+spent during an encounter is found again afterwards: arrows pulled from bodies,
+throwing knives picked up. The consumer rolls once per spent unit at encounter
+end and returns the recovered units to inventory. Rounds and shells don't
+recover (`recover` absent ⇒ `0`).
+
+#### 3.8.4 Reload and refill
+
+Two different actions, kept apart on purpose:
+
+- **Reload** — swap the inserted magazine for a fuller one from inventory. The
+  removed magazine goes back to inventory with whatever it still holds, **even
+  when empty**. It is never destroyed. A reload with no magazine in inventory
+  holding a single round fails (`OUTCOME_AUTHORITY.md` §4.1a).
+- **Refill** — press loose rounds from an inventory stack into magazines, or load
+  them into an `internal`-feed weapon. Governed by `system.refill` (§3.2): free
+  outside combat by default, a check inside it. The roll is pinned to the player
+  message that attempted it (`OUTCOME_AUTHORITY.md` §4.2), so a swipe replays the
+  same result. A `"fail"` loads nothing **and still costs the time**. The model
+  narrates fumbled rounds while the threat closes in, as the world's answer
+  (`OUTCOME_AUTHORITY.md` §3.3). Refilling with no loose rounds that fit fails.
+
+How long a refill takes in turns is deferred with initiative and turn order
+(§7). Until then, "it took too long" is something the model narrates from the
+check's outcome, not a number.
+
+### 3.9 Durability
+
+`durability: { "max": int, "perUse"?: int, "atZero": "broken" | "destroyed" }`.
+Each copy has its own current value (§3.11), starting at `max` unless authored.
+
+- **`perUse`** (default `1`) is subtracted for each use the fork observes: a
+  strike for a melee weapon, a trigger pull for a firearm. A narrated extra hit
+  (the blade chips on bone, the rifle takes a fall) is an observation like any
+  other (§4.6) and may cost more.
+- **`"broken"`** — at `0` the copy stays in inventory and cannot be used until
+  repaired. Repair is deferred (§7). **`"destroyed"`** — at `0` the copy is
+  removed.
+- Durability is optional on any item. Swords, axes, firearms (a jam-prone rifle),
+  armor.
+
+### 3.10 Currency and vendors
+
+**Money is an item.** `system.currency.item` names it — dollars, euros, bottle
+caps, ration chits, whatever the world uses. Because it is an ordinary stackable
+item, loot drops it with plain loot lines, possession checks find it ("I pay 50"
+with 30 in the pocket fails, `OUTCOME_AUTHORITY.md` §4.1a), and trade is an
+item swap. A world has one currency in v0.
+
+**`price`** on a catalog item is its base value in currency units.
+
+**`vendors[]`** — places and people that buy and sell:
+
+| Field | Type | Required | Meaning |
+| --- | --- | --- | --- |
+| `id` | string | yes | snake_case, unique among vendors. |
+| `name` | string | yes | Display name. |
+| `npc` | string | no | `MEMORY_CONTRACT.md` slug of the character who runs it. Links trade to that character's lorebook voice. |
+| `location` | string | no | Free-text place name, matching the location's lorebook naming. |
+| `stock` | array | yes | `{ "item": itemId, "qty"?: int, "price"?: int }`. `qty` absent ⇒ unlimited. `price` overrides the item's base `price` here. Stateful stock may carry `loaded` / `durability`, as on sheets. |
+| `buyRate` | number | no | Fraction of base `price` the vendor pays when buying from the party. Default `0.5`. `0` ⇒ buys nothing. |
+| `buys` | string[] | no | Item `type`s or `class.*` patterns the vendor will buy (`["ammo.*", "firearm.*"]`). Absent ⇒ buys anything with a `price`. |
+| `note` | string | no | One line on how the place deals, observable register (cash only; haggles hard). |
+
+Authored stock is a **starting value**, like a sheet. Once a chat begins, stock
+is campaign state the fork owns (§1.2): what the party buys out stays bought out.
+Restocking is deferred (§7).
+
+### 3.11 Item copies and their state
+
+Stateful items (§3.3) are tracked **per copy**. The catalog `id` says *what* an
+item is; the copy says *which one*.
+
+- **The producer never authors copy ids.** The consumer assigns them at bootstrap
+  (§4.1) and whenever a stateful item enters the campaign (loot, purchase).
+- **Authoring state.** An inventory line may carry state for every copy it
+  creates:
+
+  ```jsonc
+  { "item": "stanag_30", "qty": 3, "loaded": 30 }   // three full magazines
+  { "item": "stanag_30", "qty": 1, "loaded": 0 }    // one empty
+  { "item": "katana", "qty": 1, "durability": 62 }
+  ```
+
+  The consumer expands each line into `qty` separate copies. Omitted state means
+  pristine: `loaded` = `capacity`, `durability` = `max`.
+- **Equipped copies.** An equipment value is a plain id (a pristine copy) or a
+  copy object:
+
+  | Field | For | Meaning |
+  | --- | --- | --- |
+  | `item` | all | Catalog id. |
+  | `durability` | items with `durability` | Current wear. |
+  | `mode` | weapons with `fireModes` | Current fire mode `key`. Default: the first mode. |
+  | `magazine` | `magazine` feed | The inserted magazine: `{ "item", "loaded" }`, or `null` for none inserted. Default: a full one of the first listed type. |
+  | `loaded` | `internal` feed | Rounds in the weapon. Default: `capacity`. |
+
+  A `direct`-feed weapon has no loaded state; its count is the inventory stack of
+  what it `accepts`.
+- **Non-default starting state needs a reason in `buildNote`.** An empty gun or a
+  worn blade at the opening moment is an authored decision, like `current < max`
+  on a resource.
+
 ---
 
 ## 4. Consumer lifecycle — designed, not implemented
@@ -335,9 +573,10 @@ the same picture of what the starting values are *for*.
 
 On the first RPG action in a chat with no campaign state (pristine), the consumer
 reads the carrier and **snapshots the whole payload** into the chat's campaign
-state: `system`, `items`, and `bestiary` as the campaign's rules, and `sheets` as
-its starting state. It records a content hash of the carrier alongside the
-snapshot.
+state: `system`, `items`, and `bestiary` as the campaign's rules, and `sheets`
+and vendor `stock` as its starting state. Stateful inventory lines are expanded
+into individual copies with consumer-assigned ids (§3.11). It records a content
+hash of the carrier alongside the snapshot.
 
 Snapshotting the rules, not just the sheets, means a world revised mid-campaign
 changes nothing in that campaign. The hash lets a later consumer notice the
@@ -360,8 +599,12 @@ regenerations, and rewinds inside the fight revise or discard working-copy
 changes. They never touch campaign state, so a re-roll can't permanently cost
 anything.
 
+Rounds fired, magazines swapped, fire-mode switches, refills, and wear during
+the fight all go to the working copy too. A live HUD shows the working copy.
+
 When the encounter ends, the sheets' changes from the working copy are committed
-(§4.4), loot rolls resolve into inventory, and the instances are discarded.
+(§4.4), recovery rolls for spent `direct`-feed ammunition resolve (§3.8.3), loot
+rolls resolve into inventory, and the instances are discarded.
 
 ### 4.4 Commits and rewind
 
@@ -369,6 +612,10 @@ Campaign state changes only at **commits**:
 
 - an encounter ends;
 - an item is used, gained, or lost (loot, a consumable, a trade);
+- outside an encounter: rounds are fired, a weapon is reloaded or refilled, or a
+  copy wears (§3.8–§3.9);
+- a purchase or sale with a vendor (both the party's inventory and the vendor's
+  stock change, §3.10);
 - equipment changes;
 - a permanent effect applies (a `target: "max"` item effect);
 - a sheet reaches an `atZero` of `"dead"`, or a `unique` bestiary entry is
@@ -385,7 +632,11 @@ trail.
 
 The model never sees the raw carrier (§2). The consumer injects a compact
 **state block** each turn. It covers the party's current resources, equipment,
-and `buildNote`. During combat it adds the encounter: each instance's name,
+and `buildNote`. For weapons: the equipped weapon's mode, rounds in the inserted
+magazine (or loaded, for `internal` feed), how many loaded magazines remain, and
+any copy that is `broken`. "Last magazine" and "no loaded magazines, 45 loose
+rounds" are exactly the facts the model must not drift from. Money is shown with
+the currency `symbol`. During combat it adds the encounter: each instance's name,
 rough condition, and `note`, plus any boss `phases` note that has fired. Exact
 numbers versus descriptive condition ("badly hurt") is a consumer presentation
 choice. The block is authoritative fact, the same standing as the dice oracle's
@@ -397,7 +648,12 @@ Every roll is made by the consumer and logged against its message id: spawn
 ranges, loot, and whatever later combat resolution needs. The model's part is
 observational, the same split as `BODY_CYCLES.md` §1.2. It can report that
 `{{user}}` drank a dressing or took a bite. The consumer turns that into a change,
-and the user can confirm or correct it. How the model reports changes (a tag, a
+and the user can confirm or correct it.
+
+**Shots are observed, rounds are counted.** The model reports trigger pulls
+("fires twice"); the consumer multiplies by the current fire mode's `rounds` and
+decrements the inserted magazine. The model never reports a remaining-rounds
+figure, the same way it never reports an HP total. How the model reports changes (a tag, a
 scan, a UI action) is a consumer design question, out of scope for v0.
 
 ---
@@ -417,6 +673,15 @@ Absence never errors, matching every other seam:
   to the system `min` if `base` is missing.
 - An `npc` link or an `npc` sheet `id` that matches no manifest id still seeds.
   The fight just has no lorebook voice to draw on. Not an error.
+- A weapon whose `ammo` names no known item (an unknown magazine or round id)
+  seeds, but can't be loaded; warning. A magazine with no `accepts` or no
+  `capacity` is treated as a non-stateful item.
+- An unknown `feed` value ⇒ the `ammo` block is ignored and the weapon is treated
+  as melee; warning. An unknown `mode` falls back to the first fire mode.
+- `loaded` above `capacity` or `durability` above `max` is clamped, with a
+  warning.
+- `price` or `vendors` present with no valid `system.currency` ⇒ prices are
+  ignored and vendors don't load; logged once.
 - Unknown fields are ignored. Reserved fields (`combat`, `statuses`) are ignored
   until defined.
 
@@ -432,9 +697,11 @@ Absence never errors, matching every other seam:
 `[[DICE_TABLES]]` used:
 
 1. **World Seed** — a new §2i *RPG System* (resources, proficiencies, slots,
-   item catalog, bestiary), plus a *Starting Build* field in §3 (protagonist) and
-   in §4 (each statted NPC).
-2. **Interviewer** — elicits the stat system for the world's genre, then
+   item catalog with weapons and ammunition, bestiary, currency, vendors), plus a
+   *Starting Build* field in §3 (protagonist) and in §4 (each statted NPC).
+2. **Interviewer** — elicits the stat system for the world's genre (proposing
+   the main / secondary / ranged slot default, §3.2, and asking what the world
+   uses as money and where it can be spent), then
    **derives** a proposed starting build from the protagonist description and
    presents it with its reasoning, for the player to confirm or adjust. The coma
    and ex-SAS case is the model example: a weakened `current` with the reason
@@ -458,6 +725,19 @@ Absence never errors, matching every other seam:
       sheets for named NPCs also emits an `[[NPC_MANIFEST]]`.
 - [ ] Every key used is declared in `system`. Every item reference resolves to a
       catalog `id`. Every `requires.proficiency` is declared.
+- [ ] Every weapon, magazine, ammunition item, and the currency item has a
+      `type` from the shared vocabulary (`OUTCOME_AUTHORITY.md` §4.5).
+- [ ] Every `ammo` block has a valid `feed` and its references resolve: a
+      `magazine` feed's `magazines` are items with a `magazine` block; an
+      `internal` feed has `accepts` and `capacity`; every `accepts` id is a
+      catalog item. Every magazine's `accepts` resolves to round items.
+- [ ] `fireModes` keys are unique per weapon; every `rounds` is ≥ 1 (a range's
+      floor included). Starting `mode` values name a declared mode.
+- [ ] Starting `loaded` ≤ capacity and `durability` ≤ `max`. Any non-pristine
+      starting copy is explained in the sheet's `buildNote` (§3.11).
+- [ ] If any `price` or `vendors` exists, `system.currency` names a catalog
+      item, and that item has no `price`. Every vendor `npc` is a manifest slug.
+      Every `buys` entry is a vocabulary type or `class.*` pattern.
 - [ ] Every sheet satisfies `min ≤ current ≤ max ≤ cap`; ranks are in
       `[1, maxRank]`; every bestiary range stays within `[min, cap]`.
 - [ ] Every sheet has a `buildNote` that explains any non-obvious value
@@ -485,7 +765,18 @@ Deliberately absent from v0. Each one is a later, additive version:
 - **Levels, XP, and growth** — how `max` and ranks rise. v0 already allows `max`
   to change through `target: "max"` effects; systematic growth is later.
 - **Regeneration and rest** — how `current` recovers between fights.
-- **Currency, shops, trade.**
+- **Weapon combat numbers** — damage, range, accuracy, what a fire mode does to a
+  hit, reach (knife vs. katana). All in the reserved `combat` field.
+- **Refill duration in turns** and the roll scheme behind `system.refill`
+  checks; both wait on initiative and turn order.
+- **Repair** — restoring durability (a repair kit item, a vendor service, a
+  proficiency). Until then a `broken` copy stays broken.
+- **Ammunition realism** — a chambered round (+1), dropping magazines on a speed
+  reload, mixed round types in one magazine, ammunition variants with different
+  effects.
+- **Carry weight and capacity**, two-handed and dual-wield rules.
+- **Economy depth** — vendor restocking, haggling and reputation pricing, more
+  than one currency, exchange rates.
 - **Dice-notation ranges** (`3d10+25`) alongside `base ± spread`, reusing the
   oracle's roll grammar.
 - **Weighted or exclusive loot tables** beyond independent `chance` lines.
@@ -505,9 +796,16 @@ Deliberately absent from v0. Each one is a later, additive version:
 ## 8. Worked example — zombie world (strict JSON)
 
 An illustrative carrier `content` for a zombie-apocalypse world. `{{user}}` is an
-ex-SAS operator who woke from a coma into the outbreak. Maya Okafor is a nurse
-companion. A full world would declare all its zombie types; three are shown, plus
-a human elite and a named boss.
+ex-SAS operator who woke from a coma into the outbreak and took a pistol off a
+dead officer on the way out of the hospital. Maya Okafor is a nurse companion. A
+full world would declare all its zombie types; three are shown, plus a human
+elite and a named boss. One vendor shows the economy. Dollars are the currency
+here only because this world kept them; caps, euros, or ration chits work the
+same way.
+
+The opening state is built for tension on purpose: `{{user}}` has a Glock with
+9 rounds in the magazine, one empty spare, and 11 loose rounds in a pocket. Two
+reloads' worth of ammunition, and the second one has to be refilled first.
 
 ```json
 {
@@ -521,31 +819,66 @@ a human elite and a named boss.
     "proficiencies": [
       { "key": "rifles", "label": "Rifles", "maxRank": 5 },
       { "key": "handguns", "label": "Handguns", "maxRank": 5 },
+      { "key": "shotguns", "label": "Shotguns", "maxRank": 5 },
+      { "key": "archery", "label": "Archery", "maxRank": 5 },
       { "key": "melee", "label": "Melee weapons", "maxRank": 5 },
       { "key": "hand_to_hand", "label": "Hand-to-hand", "maxRank": 5 },
       { "key": "first_aid", "label": "First aid", "maxRank": 5 }
     ],
     "equipmentSlots": [
-      { "key": "primary", "label": "Primary weapon" },
-      { "key": "sidearm", "label": "Sidearm" },
-      { "key": "melee", "label": "Melee weapon" },
+      { "key": "main", "label": "Main weapon" },
+      { "key": "secondary", "label": "Secondary" },
+      { "key": "ranged", "label": "Ranged" },
       { "key": "armor", "label": "Body armor" }
-    ]
+    ],
+    "currency": { "item": "dollar", "symbol": "$" },
+    "refill": {
+      "outOfCombat": "free",
+      "inCombat": { "outcomes": { "success": "full", "partial": "half", "fail": "none" } }
+    }
   },
   "items": [
-    { "id": "c8_carbine", "name": "C8 Carbine", "slot": "primary",
-      "requires": { "proficiency": "rifles", "rank": 2 }, "tags": ["firearm"] },
-    { "id": "glock_17", "name": "Glock 17", "slot": "sidearm",
-      "requires": { "proficiency": "handguns", "rank": 1 }, "tags": ["firearm"] },
-    { "id": "fire_axe", "name": "Fire Axe", "slot": "melee", "tags": ["melee"] },
-    { "id": "stab_vest", "name": "Police Stab Vest", "slot": "armor" },
-    { "id": "field_dressing", "name": "Field Dressing", "consumable": true,
+    { "id": "c8_carbine", "name": "C8 Carbine", "type": "firearm.rifle", "slot": "main",
+      "requires": { "proficiency": "rifles", "rank": 2 }, "price": 900,
+      "ammo": { "feed": "magazine", "magazines": ["stanag_30"] },
+      "fireModes": [ { "key": "single", "label": "Semi", "rounds": 1 },
+                     { "key": "burst", "label": "Burst", "rounds": 3 },
+                     { "key": "auto", "label": "Auto", "rounds": { "base": 8, "spread": 3 } } ],
+      "durability": { "max": 300, "atZero": "broken" } },
+    { "id": "stanag_30", "name": "STANAG Magazine", "type": "ammo.magazine", "price": 30,
+      "magazine": { "accepts": ["round_556"], "capacity": 30 } },
+    { "id": "round_556", "name": "5.56mm Round", "type": "ammo.round", "price": 2 },
+    { "id": "glock_17", "name": "Glock 17", "type": "firearm.handgun", "slot": "secondary",
+      "requires": { "proficiency": "handguns", "rank": 1 }, "price": 350,
+      "ammo": { "feed": "magazine", "magazines": ["glock_mag_17"] } },
+    { "id": "glock_mag_17", "name": "Glock Magazine", "type": "ammo.magazine", "price": 20,
+      "magazine": { "accepts": ["round_9mm"], "capacity": 17 } },
+    { "id": "round_9mm", "name": "9mm Round", "type": "ammo.round", "price": 1 },
+    { "id": "remington_870", "name": "Remington 870", "type": "firearm.shotgun", "slot": "main",
+      "requires": { "proficiency": "shotguns", "rank": 1 }, "price": 450,
+      "ammo": { "feed": "internal", "accepts": ["shell_12g"], "capacity": 6 } },
+    { "id": "shell_12g", "name": "12-Gauge Shell", "type": "ammo.shell", "price": 3 },
+    { "id": "recurve_bow", "name": "Recurve Bow", "type": "ranged.bow", "slot": "ranged",
+      "requires": { "proficiency": "archery", "rank": 1 }, "price": 250,
+      "description": "Quiet. The only thing that doesn't bring more of them.",
+      "ammo": { "feed": "direct", "accepts": ["arrow"] } },
+    { "id": "arrow", "name": "Arrow", "type": "ammo.arrow", "price": 4, "recover": 0.5 },
+    { "id": "fire_axe", "name": "Fire Axe", "type": "melee.blade", "slot": "main", "price": 60,
+      "durability": { "max": 120, "atZero": "broken" } },
+    { "id": "combat_knife", "name": "Combat Knife", "type": "melee.blade", "slot": "secondary",
+      "price": 40, "durability": { "max": 150, "atZero": "broken" } },
+    { "id": "stab_vest", "name": "Police Stab Vest", "type": "armor.light", "slot": "armor",
+      "price": 200, "durability": { "max": 80, "atZero": "destroyed" } },
+    { "id": "field_dressing", "name": "Field Dressing", "type": "consumable.medical",
+      "consumable": true, "price": 35,
       "description": "Gauze, tape, a sachet of clotting powder.",
       "effects": [ { "resource": "hp", "delta": 20 } ], "tags": ["medical"] },
-    { "id": "military_stim", "name": "Experimental Military Stim", "consumable": true,
+    { "id": "military_stim", "name": "Experimental Military Stim", "type": "consumable.drug",
+      "consumable": true,
       "description": "Unlabelled auto-injector from a quarantine lab.",
       "effects": [ { "resource": "hp", "target": "max", "delta": 10 } ],
-      "tags": ["medical", "rare"] }
+      "tags": ["medical", "rare"] },
+    { "id": "dollar", "name": "Dollar", "type": "currency.note" }
   ],
   "sheets": [
     {
@@ -557,9 +890,19 @@ a human elite and a named boss.
         { "id": "self_treat", "name": "Self-Treatment", "type": "skill", "uses": "first_aid",
           "description": "Can dress their own wounds under pressure." }
       ],
-      "inventory": [ { "item": "field_dressing", "qty": 1 } ],
-      "equipment": { "primary": null, "sidearm": null, "melee": null, "armor": null },
-      "buildNote": "Ex-SAS operator, home on leave when the coma took them; woke weeks later into the outbreak. Training and reflexes intact, body not: HP and stamina well below max until they recover."
+      "inventory": [
+        { "item": "field_dressing", "qty": 1 },
+        { "item": "glock_mag_17", "qty": 1, "loaded": 0 },
+        { "item": "round_9mm", "qty": 11 },
+        { "item": "dollar", "qty": 35 }
+      ],
+      "equipment": {
+        "main": null,
+        "secondary": { "item": "glock_17", "magazine": { "item": "glock_mag_17", "loaded": 9 } },
+        "ranged": null,
+        "armor": null
+      },
+      "buildNote": "Ex-SAS operator, home on leave when the coma took them; woke weeks later into the outbreak. Training and reflexes intact, body not: HP and stamina well below max until they recover. Took a Glock off a dead officer in the hospital stairwell: the magazine in it is half spent, the spare is empty, and the rest is a pocketful of loose rounds."
     },
     {
       "id": "maya_okafor", "kind": "npc", "party": true,
@@ -570,16 +913,17 @@ a human elite and a named boss.
         { "id": "triage", "name": "Triage", "type": "skill", "uses": "first_aid",
           "description": "Stabilises a downed ally." }
       ],
-      "inventory": [ { "item": "field_dressing", "qty": 4 } ],
-      "equipment": { "melee": "fire_axe" },
-      "buildNote": "ICU nurse who kept the ward running through the first week. Expert medic, untrained fighter: she swings the axe because she has to."
+      "inventory": [ { "item": "field_dressing", "qty": 4 }, { "item": "dollar", "qty": 120 } ],
+      "equipment": { "main": { "item": "fire_axe", "durability": 70 } },
+      "buildNote": "ICU nurse who kept the ward running through the first week. Expert medic, untrained fighter: she swings the axe because she has to. It came off the corridor wall and has already been through a door and two of them; the edge is chipped."
     }
   ],
   "bestiary": [
     { "id": "shambler", "name": "Shambler", "tier": "common",
       "resources": { "hp": { "base": 40, "spread": 10 } },
       "note": "Slow, relentless, dangerous when it gets hands on you. Comes in numbers.",
-      "loot": [ { "item": "field_dressing", "chance": 0.1 } ] },
+      "loot": [ { "item": "field_dressing", "chance": 0.1 },
+                { "item": "dollar", "chance": 0.3, "qty": { "base": 10, "spread": 8 } } ] },
     { "id": "runner", "name": "Runner", "tier": "common",
       "resources": { "hp": { "base": 30, "spread": 8 } },
       "note": "Recently turned. Fast, closes distance before you can aim." },
@@ -589,18 +933,41 @@ a human elite and a named boss.
     { "id": "rogue_operator", "name": "Rogue Operator", "tier": "elite",
       "resources": { "hp": { "base": 120, "spread": 15 } },
       "proficiencies": { "rifles": { "base": 3, "spread": 1 }, "hand_to_hand": 3 },
-      "equipment": { "primary": "c8_carbine", "armor": "stab_vest" },
+      "equipment": { "main": "c8_carbine", "secondary": "glock_17", "armor": "stab_vest" },
       "note": "Trained, works in pairs, uses cover and flanks.",
-      "loot": [ { "item": "c8_carbine", "chance": 0.4 },
-                { "item": "field_dressing", "chance": 0.6, "qty": { "base": 2, "spread": 1 } } ] },
+      "loot": [ { "item": "c8_carbine", "chance": 0.4, "durability": { "base": 180, "spread": 80 } },
+                { "item": "stanag_30", "chance": 0.7, "qty": { "base": 2, "spread": 1 },
+                  "loaded": { "base": 15, "spread": 15 } },
+                { "item": "round_556", "chance": 0.5, "qty": { "base": 20, "spread": 10 } },
+                { "item": "field_dressing", "chance": 0.6, "qty": { "base": 2, "spread": 1 } },
+                { "item": "dollar", "chance": 0.8, "qty": { "base": 60, "spread": 40 } } ] },
     { "id": "colonel_hale", "name": "Colonel Hale", "tier": "boss", "unique": true,
       "npc": "colonel_hale",
       "resources": { "hp": { "base": 300, "spread": 0 } },
       "proficiencies": { "rifles": 5, "hand_to_hand": 4 },
-      "equipment": { "primary": "c8_carbine", "armor": "stab_vest" },
+      "equipment": { "main": "c8_carbine", "secondary": "glock_17", "armor": "stab_vest" },
       "note": "Fights from behind his men until there are none left.",
       "phases": [ { "atHpPct": 50, "note": "His last guards are down; he stops giving orders and fights himself." } ],
-      "loot": [ { "item": "military_stim", "chance": 1.0 } ] }
+      "loot": [ { "item": "military_stim", "chance": 1.0 },
+                { "item": "stanag_30", "chance": 1.0, "qty": 3 } ] }
+  ],
+  "vendors": [
+    { "id": "junction_trader", "name": "The Junction Trader", "npc": "sal_moreno",
+      "location": "Junction Market",
+      "stock": [
+        { "item": "round_9mm", "qty": 120 },
+        { "item": "round_556", "qty": 200 },
+        { "item": "shell_12g", "qty": 40 },
+        { "item": "glock_mag_17", "qty": 4 },
+        { "item": "stanag_30", "qty": 2, "price": 45 },
+        { "item": "remington_870", "qty": 1 },
+        { "item": "recurve_bow", "qty": 1 },
+        { "item": "arrow", "qty": 30 },
+        { "item": "field_dressing", "qty": 6, "price": 50 }
+      ],
+      "buyRate": 0.4,
+      "buys": ["firearm.*", "ammo.*", "consumable.*"],
+      "note": "Cash only. Won't touch anything that's been bitten." }
   ]
 }
 ```
@@ -615,7 +982,8 @@ a human elite and a named boss.
 | Director-card tag, alias coverage, `</style_contract>`, `[[WORLD_CALENDAR]]` | `WORLD_FORGE_SYNC.md` |
 | `[[DICE_TABLES]]` carrier, roll-table payload, dice-oracle injection | `DICE_ORACLE.md` |
 | `[[BODY_CYCLES]]` carrier, cycle seed payload | `BODY_CYCLES.md` |
-| `[[RPG_STATS]]` carrier, stat system, starting sheets, bestiary | this document |
+| `[[RPG_STATS]]` carrier, stat system, item catalog (weapons, magazines, ammunition), starting sheets, bestiary, currency and vendors | this document |
+| Item `type` / `nature` vocabulary, possession and legality checks on weapons and money | `OUTCOME_AUTHORITY.md` (Draft) |
 | Who decides outcomes; what `{{user}}`'s message can change | `OUTCOME_AUTHORITY.md` (Draft) |
 
 All are independently versioned. `[[RPG_STATS]]` reuses existing conventions on
@@ -634,5 +1002,10 @@ not trip `BODY_CYCLES.md` §7.1's generic-carrier trigger (§1.3).
   whether that is a world choice (a carrier field) or a user setting.
 - **Whether `attributes` earn their place in v1** or wait until combat needs them.
 - **Carrier size.** A large bestiary plus catalog in one entry is fine for the
-  consumer but heavy to hand-edit. Splitting into several carriers is possible
+  consumer but heavy to hand-edit, and weapons, magazines, rounds, and vendors
+  make the catalog grow fastest. Splitting into several carriers is possible
   but costs the single-read simplicity.
+- **How mode switches and reloads are reported** — narration observation, a HUD
+  control, or both. A HUD control is the cleaner fit for out-of-fiction
+  bookkeeping like a fire-mode toggle; a reload under fire is an in-fiction
+  attempt and probably belongs to narration.

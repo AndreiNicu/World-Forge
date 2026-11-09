@@ -1,6 +1,6 @@
 # Outcome Authority Contract — who decides what happened
 
-**Status:** Draft · **Version:** 0 · **Last updated:** 2026-11-05
+**Status:** Draft · **Version:** 0 · **Last updated:** 2026-11-09
 
 > **Shared contract — canonical source of truth:**
 > [`AndreiNicu/World-Forge`](https://github.com/AndreiNicu/World-Forge) → `contracts/OUTCOME_AUTHORITY.md`.
@@ -209,7 +209,15 @@ The fork checks the parts of `{{user}}`'s message it can check **for certain**:
 - a named catalog item (by `name`) when nothing of its **type** is in
   inventory or equipment (§3.1);
 - an action while `{{user}}`'s status forbids it (`downed`, `dead`);
-- an ability whose `cost` exceeds the current resource.
+- an ability whose `cost` exceeds the current resource;
+- firing a weapon with nothing loaded (an empty inserted magazine, no magazine
+  inserted, an empty `internal` feed, or no units left for a `direct` feed —
+  `RPG_STATS.md` §3.8);
+- reloading when no magazine in inventory holds a round ("the last magazine is
+  empty"), or refilling with no loose rounds that fit (`RPG_STATS.md` §3.8.4);
+- using a copy that is `broken` (`RPG_STATS.md` §3.9);
+- paying more currency than `{{user}}` holds, or buying what a vendor's stock no
+  longer has (`RPG_STATS.md` §3.10).
 
 On a hit, the fork **injects an authoritative fact** ("`{{user}}` has no
 carbine."; "`{{user}}` is downed: can speak and crawl, cannot fight.") so the
@@ -314,8 +322,10 @@ check.
 | `explosive` | `thrown`, `launcher`, `placed` |
 | `energy` | `handheld`, `heavy` |
 | `focus` | `staff`, `wand`, `talisman` (magical implements) |
+| `ammo` | `round`, `shell`, `arrow`, `bolt`, `magazine`, `cell` |
 | `consumable` | `medical`, `food`, `drug` |
 | `armor` | `light`, `heavy`, `shield` |
+| `currency` | `coin`, `note`, `token` |
 | `tool` | `general` |
 
 A knife and a katana are both `melee.blade`; a Beretta is `firearm.handgun`; an
@@ -327,10 +337,17 @@ Type says what kind of object something is; nature says what kind of world it
 belongs to. **Type alone cannot catch the red flags:** Excalibur is just a
 sword by type. The flags live on the nature axis.
 
+`ammo` and `currency` were added on 2026-11-09 with `RPG_STATS.md`'s weapons and
+economy sections: a magazine, a box of rounds, and a wallet of dollars are
+catalog items and need a type for possession matching. A magazine is
+`ammo.magazine` whatever it feeds; `ammo.cell` is the energy-weapon analogue for
+worlds that have them.
+
 **Kept out of the vocabulary on purpose:** fire mode (semi / automatic) is an
-item property, not a type level, because one rifle can do both, and it only
-matters once combat resolution exists. Size and reach (knife vs. katana) are
-likewise later item properties.
+item property, not a type level, because one rifle can do both. It now exists as
+`fireModes` in `RPG_STATS.md` §3.8.2, for counting rounds only; what it does to a
+hit waits for combat resolution. Size and reach (knife vs. katana) are still
+later item properties.
 
 **The world's absent list** names what cannot exist, by either axis:
 
@@ -467,7 +484,7 @@ any ally stands" until the field is settled.
 | §3.7 `atZero` | `downed` gains `allows`, `recovery`, `allDown` (§6). |
 | §4.5 what the model sees | Status lines with allowed actions are restated each turn (§4.4). |
 | §1.2 who owns what | Points here for the authority order (§2.1). |
-| §3.3 `items[]` | Items gain `type` (from the §4.5 vocabulary) and `nature`; possession is matched by type (§3.1). |
+| §3.3 `items[]` | Items gain `type` (from the §4.5 vocabulary) and `nature`; possession is matched by type (§3.1). **Applied 2026-11-09** with the weapons and economy sections (required on weapons, ammunition, magazines, and currency). |
 
 ---
 
@@ -495,7 +512,9 @@ any ally stands" until the field is settled.
 - **Deferred:** rarity tiers (they belong to loot: drop rates and one-per-campaign
   `unique` items, not to existence), fire mode and size as item properties
   (they matter once combat resolution exists), and improvised-weapon catalog
-  entries (same reason).
+  entries (same reason). *Later the same day:* fire mode moved forward as an
+  ammunition-counting property only (`RPG_STATS.md` §3.8.2), because a live HUD
+  decrements rounds by mode. Its combat effect stays deferred.
 
 ### 10.2 Open
 
