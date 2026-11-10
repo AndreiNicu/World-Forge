@@ -13,6 +13,91 @@ numbers. Newest first.
 
 ---
 
+## 2026-11-09 — RPG Stats: weapons, ammunition, durability, economy, scavenging, carry weight (Draft v0)
+
+Extends the `[[RPG_STATS]]` draft so weapons carry real bookkeeping that a live
+HUD in the fork can show: rounds in the inserted magazine, magazines full or
+empty, fire mode, blade wear, money. Tracked magazines are the point. Loose
+rounds in the pack are useless until they're pressed into magazines, and doing
+that in a fight is a check that can fail and still cost the time. Weapon
+*combat* numbers (damage, range, what a fire mode does to a hit) stay reserved
+under `combat`. Still `schema: 0`, still **Draft**: nothing reads the carrier,
+no agent spec references it, producers must not emit it. No pipeline behavior
+changes.
+
+### Added
+- **`contracts/RPG_STATS.md` §3.8 Weapons and ammunition** — three feeds
+  (`magazine`, `internal`, `direct`); magazines as their own items with per-copy
+  fill; `fireModes` with rounds per trigger pull (ranges allowed for `auto`);
+  `recover` chance for arrows and thrown weapons; reload (swap magazines, empties
+  go back to inventory) kept apart from refill (loose rounds into magazines).
+- **`system.refill`** — free out of combat by default, a check in combat with
+  `full` / `half` / `none` outcomes; pinned to the player message so swipes
+  replay it. Optional `check` key for worlds that test Dexterity or Nerve rather
+  than weapon training.
+- **§3.9 Durability** (`max`, `perUse`, `atZero: broken | destroyed`), optional
+  on any item.
+- **§3.10 Currency and vendors** — money is a catalog item named by
+  `system.currency` (with a display `symbol`: `$`, `€`, caps, chits);
+  `price` on items; `vendors[]` with starting stock, per-line price overrides,
+  `buyRate`, and `buys` type filters. Stock becomes fork-owned campaign state.
+- **§3.11 Item copies** — stateful items are tracked per copy with
+  consumer-assigned ids; inventory lines may author shared starting state
+  (`{ "item": "stanag_30", "qty": 3, "loaded": 30 }`); equipment values may be
+  copy objects (`mode`, `magazine`, `loaded`, `durability`).
+- Recommended main / secondary / ranged weapon slot default (world-defined, not
+  hard-coded).
+- **§3.10.1 Condition pricing** (`system.pricing.condition`) — a copy's value is
+  `price × max(floor, durability/max)`, broken copies sell as scrap. Rarity by
+  condition needs no rarity field: world finds roll worn, and a pristine copy
+  exists only where stock authors one (the worked example's pristine Beretta M9
+  at a premium).
+- **§3.10.2 Fixed and wandering vendors** — fixed settlement vendors with
+  `funds` ranges re-rolled per `fundsRefresh` (`visit` default, `day`, `never`);
+  wandering vendor *types* that spawn as temporary instances from a fork roll,
+  with randomly rolled funds and `stockTable` stock, discarded when the party
+  leaves. §3.10.3: trade requires being at the vendor's location or with its NPC.
+- **§3.12 Scavenge tables** (`scavenge[]`) — loot tables for kinds of place,
+  matched by name and aliases, rolled on search and pinned to the player's
+  message, optional check, per-place depletion, a `fallback` table, and vendor
+  lines that turn up a wandering trader.
+- **§3.13 Carry weight** (`system.carry`, item `weight`, sheet `carry.max`) —
+  inventory plus equipment against a hard limit set by the build (an operator's
+  50 kg), with encumbrance tiers (`burdened`, `overloaded`) narrated from the
+  state block. Tier mechanics are deferred.
+- **Narration never mints catalog items** (`RPG_STATS.md` §4.6,
+  `OUTCOME_AUTHORITY.md` §2.2 and §5). Without this, the model becomes the loot
+  table.
+
+### Changed
+- **`contracts/RPG_STATS.md`** — items gain `type` / `nature` from the
+  Outcome Authority vocabulary (required on weapons, ammunition, magazines, and
+  currency); bestiary instances explicitly don't track ammunition or wear; loot
+  lines take `loaded` / `durability` ranges; lifecycle, state block, observation
+  rule ("shots are observed, rounds are counted"), graceful degradation,
+  producer rules, deferred list, and open questions updated; worked example
+  rebuilt around a half-spent Glock, an empty spare, and a pocket of loose
+  rounds, with one vendor.
+- **`contracts/OUTCOME_AUTHORITY.md`** — vocabulary gains `ammo` and `currency`
+  classes; the deterministic legality pass gains empty-weapon, last-magazine,
+  no-rounds-to-refill, broken-copy, can't-afford, vendor-can't-cover,
+  wrong-place-to-trade, and over-carry-limit checks; fire mode moves
+  forward as an ammunition-counting property only; the §9 `type` / `nature` row
+  is marked applied.
+
+- **`contracts/RESOLUTION.md`** (Placeholder) — reserves the home for the
+  engine half of the RPG layer: dice, math, modifiers, time, combat, and attempt
+  parsing. Authored from the SillyTavern fork side, which owns the runtime;
+  World Forge produces only the data it consumes. Listed in
+  `contracts/README.md` (new **Placeholder** status) and `CLAUDE.md`, and
+  referenced from `RPG_STATS.md` §7 and §9.
+
+### Fixed
+- **`contracts/RPG_STATS.md` §3.2** listed "ammo" as an example resource. Ammo
+  is now explicitly an item, not a character pool.
+
+---
+
 ## 2026-11-05 — Outcome Authority contract drafted (exploration, Draft v0)
 
 An exploration branch for the rule the RPG layer stands on: what happens in the
