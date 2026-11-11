@@ -41,7 +41,8 @@ something" and "the fork commits a result."
 - **Dice grammar** — dice notation and roll syntax, shared with the dice oracle
   where it can be. *Placeholder.*
 - **Attempt interpretation** — how `{{user}}`'s message is split into beats,
-  which beats roll, and which bring up HUD actions. **§2, Draft.** How the main
+  which beats roll, which bring up HUD actions, what the player may and may not
+  declare, and how the message is displayed and sent. **§2, Draft.** How the main
   model's reply is parsed into observations afterward is still a placeholder.
 - **The deferred mechanics built on the core** — what carry tiers do, repair
   checks, vendor restocking, and the other items `RPG_STATS.md` §7 defers to
@@ -72,14 +73,15 @@ a clause can be, and what the fork does with each.
 The fork splits `{{user}}`'s message into **beats**: one clause, one thing
 `{{user}}` does, says, or decides. Each beat gets exactly one **kind** from the
 vocabulary (§2.3). The kind decides whether the fork does nothing, commits
-state, rolls, or brings up a HUD action. Narration around the beats (scene
-description the player wrote, "There were 4 apartments") is not a beat.
+state, rolls, or brings up a HUD action. A clause that describes the world
+rather than something `{{user}}` does ("There were 4 apartments", "The apartment
+was empty") is a `claim` beat (§2.4a).
 
 Only `{{user}}` makes beats. A clause that acts for another character ("Maya
 covers the stairs") is not `{{user}}`'s action. When it's an instruction to an
 ally, it is `speech`, and what the ally does is the world's response. When it
-narrates the ally acting on their own, it is ignored as a claim on someone
-else's turn.
+narrates the ally acting on their own, it is a `claim` about another character
+(`npc`, §2.4a), and the world decides what they do.
 
 ### 2.3 The vocabulary
 
@@ -90,9 +92,10 @@ else's turn.
 | `stance` | A change to `{{user}}`'s own readiness or posture. | "Raising my rifle" | no | A free action (§2.7). Checks it's possible, then records the stance and shows it on the HUD. |
 | `move` | Entering or leaving a distinct place: a room, a building, a street, an area. | "I entered apartment 202" | **yes** | Commits the new location, makes the **arrival roll** (§2.5), and offers the place's HUD actions (search, trade). |
 | `attempt` | An action whose outcome is uncertain and matters: against resistance, risk, or opposition. | "I force the door", "I sneak past", "I shoot it" | **yes** | Rolls. How the check is chosen and resolved is the core roll and math (§1, placeholder). |
-| `use` | A deterministic action with an item or the party's own gear. | "I drink a dressing", "I swap magazines", "I equip the axe" | usually no | Runs the legality check (`OUTCOME_AUTHORITY.md` §4.1a), then commits. Rolls only where the contract already asks for a check (refill, `RPG_STATS.md` §3.8.4). |
-| `search` | Searching a place for things. | "I search the kitchen" | no, by itself | Brings up the matching search action (`RPG_STATS.md` §3.12). The table rolls only when the player chooses it. |
+| `use` | A deterministic action with an item or the party's own gear, including taking something a roll placed. | "I drink a dressing", "I swap magazines", "I equip the axe", "I take the shotgun it dropped" | usually no | Runs the legality check (`OUTCOME_AUTHORITY.md` §4.1a), then commits. Rolls only where the contract already asks for a check (refill, `RPG_STATS.md` §3.8.4). Taking an item no roll placed becomes a `search` (§2.4a). |
+| `search` | Searching a place for things. | "I search the kitchen" | no, by itself | Brings up the matching search action (`RPG_STATS.md` §3.12) and ends the turn there (§2.6). The table rolls only when the player chooses it. |
 | `speech` | Words `{{user}}` says, including instructions to allies and requests to trade. | "Anyone in here?", "Maya, cover the stairs" | no | Nothing by default. A line meant to make someone do something they otherwise wouldn't (persuade, lie, intimidate) is an `attempt`. A trade request to a vendor brings up the trade action (`RPG_STATS.md` §3.10.3). |
+| `claim` | A statement about the world rather than something `{{user}}` does: who's there, what a place holds, how something turned out, what someone else decided, or plain scenery. | "There were 4 apartments", "The apartment was empty" | no | Scenery passes through. Anything else is ignored, marked *Not confirmed*, and left out of what the model is sent (§2.4a, §2.10). |
 
 A beat that fits no kind is `flavor`. The safe failure is "nothing happens
 mechanically", never a spurious roll.
@@ -109,6 +112,49 @@ A clause that states its own result ("I shoot him and he drops dead") is an
 `attempt` for the first half. The declared result is not a beat. The fork
 ignores it and the roll decides (`OUTCOME_AUTHORITY.md` §3.4). The beat carries
 a flag saying a result was declared, so the engine block can hold the line.
+
+### 2.4a Claims — decorate, don't decide
+
+Players co-author, and the scenery they add makes play better: the layout, the
+dust, the smell, "there were 4 apartments." But a player can also write the
+world's side of the turn: what's in a room, how something turned out, what
+someone else decided. One rule covers it (`OUTCOME_AUTHORITY.md` §3.5):
+
+> **If the fork rolls it or tracks it, the player can't declare it.**
+
+A clause that says something about the world, rather than something `{{user}}`
+does, is a `claim` beat, tagged with what it's about:
+
+| `about` | The player declares… | Example | What the fork does |
+| --- | --- | --- | --- |
+| `presence` | Who or what is in a place, or that nothing is | "There was nothing in the apartment" | Ignored. The arrival roll decides. |
+| `contents` | What a place holds, when the catalog covers it | "…but a box of 9mm ammo" | Ignored. Only a roll places catalog items. |
+| `outcome` | How something already in motion turns out, or a detail that would decide an outcome | "The Shambler collapsed", "There's a back door" | Ignored. State and rolls decide; until resolution covers it, the main model judges. |
+| `npc` | What another character decides, does, or feels | "Sal agrees to the price", "Maya takes the stairs" | Ignored. The world answers. |
+| `scenery` | Detail nothing rides on | "There were 4 apartments", "Dust everywhere" | Passed through, like `flavor`. |
+
+Ignored claims are marked *Not confirmed* in the chat and left out of the copy
+of the message sent to the model (§2.10). A player stating the result of
+`{{user}}`'s own attempt is not a `claim`; it is the `declaresResult` flag on
+that `attempt` (§2.4).
+
+**The gray case.** "There's a back door; I slip out." No roll owns exits, but the
+detail would decide whether `{{user}}` gets away. A declared detail that would
+change an outcome (an exit, a weapon to hand, a hiding place while something is
+hunting `{{user}}`) is tagged `outcome`, not `scenery`. When the pass genuinely
+can't tell, `scenery` is the safe failure: the model still treats the clause as
+a proposal only (`OUTCOME_AUTHORITY.md` §5), and nothing it narrates can mint a
+catalog item or override state.
+
+**Beats that depend on a claim resolve against the state.** "I picked it up,"
+where "it" is a box only the player declared, is a take of something no roll
+placed. A take is a `use`. The fork checks whether a roll placed that item here:
+a search result, loot from a body, something a vendor or an ally handed over.
+If the catalog covers the item (by name, or by type as in
+`OUTCOME_AUTHORITY.md` §3.1) and no roll placed one, the beat becomes a
+`search`: nothing is committed, the place's search action is offered, and the
+turn ends there (§2.6). Picking up uncatalogued scenery (a brick, a chair leg)
+is fine and carries no stats (`OUTCOME_AUTHORITY.md` §3.2).
 
 ### 2.5 When a roll happens
 
@@ -136,7 +182,7 @@ and offers the place's actions, and makes no arrival roll.
 Beats resolve in the order the player wrote them, all before the main model
 generates.
 
-- Free beats (`flavor`, `intent`, `stance`, `use`, `search`, `speech`) resolve
+- Free beats (`flavor`, `intent`, `stance`, `use`, `speech`, `claim`) resolve
   immediately and in order.
 - **A rolled beat (`move`, `attempt`) is a cut point.** If the roll leaves the
   rest of the message's premise intact — an `attempt` that succeeds, an arrival
@@ -144,6 +190,13 @@ generates.
   else (a partial, a fail, an encounter), **the turn ends at that beat.** The
   later beats are not carried out and are not queued; the player decides again
   once they see what happened.
+- **A `search` beat is always a cut point.** Its roll waits for the player to
+  choose the search action (§2.8), so the turn ends as `{{user}}` starts to
+  look. "I search the kitchen and head back out" searches nothing yet and
+  doesn't leave; the search action is offered and the player picks up from
+  there.
+- Beats past a cut are marked *Not reached* and left out of the copy of the
+  message the model is sent (§2.10).
 - The fork tells the model where the turn ends. The model narrates the beats up
   to the cut and its outcome, then stops. It does not narrate the beats past
   the cut as if they happened.
@@ -223,26 +276,52 @@ deterministically.
   `move` carries `to`; `attempt` carries `target` if there is one and
   `declaresResult: true` when the clause stated its own outcome (§2.4); `use`
   carries `item`; `search` carries `place`; `speech` carries `to` if it
-  addresses someone. Objects are matched to the inventory by type, as in
+  addresses someone; `claim` carries `about` (§2.4a). The pass labels a take
+  as `use` either way. Whether a roll placed the item, and so whether the take
+  becomes a `search`, is the fork's lookup, not the pass's judgment. Objects are matched to the inventory by type, as in
   `OUTCOME_AUTHORITY.md` §3.1, and unknown objects go to the §4.1b classifier.
 - **Output that doesn't parse, or a kind outside the vocabulary,** makes that
   beat `flavor`.
 
-### 2.10 Showing and correcting the parse
+### 2.10 Display, prompt, and corrections
 
-The HUD shows the parse next to the message: free beats greyed, a stance as a
-badge, each rolled beat with its result. The player can correct a beat the pass
-misread ("I only looked in, I didn't enter"). That is a correction of parsing,
-not of outcome (`OUTCOME_AUTHORITY.md` §4.3):
+**The stored message is never edited** (`OUTCOME_AUTHORITY.md` §4.1a). What the
+player sees and what the model is sent are both derived from it:
+
+| | Applied | Not reached | Not confirmed |
+| --- | --- | --- | --- |
+| **What** | Beats the turn resolved, and `scenery` claims | Everything after a cut point (§2.6) | `claim` beats other than `scenery`, and takes turned into a search (§2.4a), before the cut |
+| **Chat display** | Normal text | Folded under one faint line: *✂ Not reached — the turn ended at "I entered Apartment 202."* Expanding shows the original, with **Use as my next message** | Faintly marked in place, with the matching action beside it where there is one ([Search Apartment]) |
+| **Sent to the model** | As written | Left out | Left out |
+
+- **On every later turn too.** The cut and the omissions stay with the message,
+  so history never shows the model a declared find or a declared empty room,
+  and it can't drift toward them later.
+- **Use as my next message** copies the folded text into the input box. What was
+  cut is often still the plan once the danger is dealt with.
+- **Labels describe, never judge.** *Not reached* and *Not confirmed*, never
+  "illegal," "invalid," or anything that reads as an accusation. The dice
+  getting there first is ordinary play.
+- **The exact visuals are the fork's** (icons, wording, fading). The contract
+  requires only that the original is kept, the two states are labeled
+  distinctly, and the copy sent to the model leaves both out.
+- **The HUD shows the parse** beside the message: a stance as a badge, each
+  rolled beat with its result, the cut marker.
+
+**Corrections.** The player can correct a beat the pass misread ("I only looked
+in, I didn't enter"). That is a correction of parsing, not of outcome
+(`OUTCOME_AUTHORITY.md` §4.3):
 
 - A correction that changes a rolled beat's kind or target voids its roll, and
   the corrected beat resolves fresh.
 - A correction that leaves the kind and target the same keeps the pinned roll.
   Relabeling a beat is not a way to re-roll it.
+- A correction recomputes what is folded, marked, and sent. Because nothing was
+  deleted, a misparse costs one click, not the player's prose.
 
-### 2.11 Worked example
+### 2.11 Worked examples
 
-The message from §2.1, in the `RPG_STATS.md` §8 zombie world. `{{user}}` starts
+**A. The message from §2.1,** in the `RPG_STATS.md` §8 zombie world. `{{user}}` starts
 there with a Glock; assume they have since picked up the C8 carbine
 (`c8_carbine`, type `firearm.rifle`), have it equipped, and are standing in a hallway:
 
@@ -262,12 +341,45 @@ Two possible results for beat 4:
   model narrates the Shambler and stops. The `ready` stance applies to whatever
   the player does next. No search is offered while the encounter runs.
 
+**B. The player writes the world's side.** The same message, with two sentences
+added:
+
+> "…Raising my rifle, I entered one of the apartments. Apartment 202. There was
+> nothing in the apartment but a box of 9mm ammo. I picked it up for my M9
+> Beretta."
+
+Beats 1–4 as in A, then:
+
+| # | Beat | Kind | Fork action |
+| --- | --- | --- | --- |
+| 5 | "There was nothing in the apartment" | `claim: presence` | Ignored; the arrival roll decides |
+| 6 | "but a box of 9mm ammo" | `claim: contents` | Ignored; no roll placed it |
+| 7 | "I picked it up for my M9 Beretta" | `use` → `search` | No roll placed 9mm here, so the take becomes a search and a cut point. "My M9 Beretta" matches the Glock by type (`OUTCOME_AUTHORITY.md` §3.1), so there is nothing to refuse, and the state block keeps calling it a Glock. |
+
+- **Arrival: a Shambler.** Beat 4 is the cut. Beats 5–7 are folded as *Not
+  reached*, and the model is sent the message up to "Apartment 202." It
+  narrates the entry and the Shambler, and stops. The chat reads "…I entered
+  one of the apartments. Apartment 202." followed by the Shambler, with the
+  folded line underneath. The claims never come into play; the cut removed
+  them. A claim placed before the `move` ("202 was empty, so I walked in")
+  would be ignored anyway, and the roll would still produce the Shambler.
+- **Arrival: nothing.** The turn continues past beat 4. Beats 5 and 6 are marked
+  *Not confirmed*. Beat 7 becomes a search and ends the turn, so [Search
+  Apartment] appears beside the marked clauses. The model is sent the message
+  up to "Apartment 202," plus the arrival fact that the unit is empty and not
+  yet searched. It narrates the empty unit, rifle up, `{{user}}` starting to
+  look around, and stops. It neither confirms nor denies the box, because no
+  search has been rolled. If the player taps [Search Apartment] and the table
+  turns up 9mm, they have it then.
+
 ### 2.12 Graceful degradation
 
 - **No beat pass** (disabled, or the small model is unavailable): no automatic
-  rolls. The main model handles the message under the existing rules
-  (`protagonist_jeopardy`'s "a stated attempt is an attempt"), and HUD actions
-  still work when chosen by hand.
+  rolls, and nothing is folded or marked; the message is sent as written. The
+  main model handles it under the existing rules (`protagonist_jeopardy`'s "a
+  stated attempt is an attempt", and the engine block's "the player's
+  description of the world is a proposal", `OUTCOME_AUTHORITY.md` §5). HUD
+  actions still work when chosen by hand.
 - **No location signal:** a `move` can't commit a location. No arrival roll,
   no place actions; the manual "Search as…" choice still works.
 - **No encounter data** for the place: the location commits and actions are
@@ -291,6 +403,14 @@ Two possible results for beat 4:
   queue HUD actions or stay narrative only.
 - **Time in free beats.** Whether "I paused a bit" or "I wait an hour" should
   advance time, once time exists (§1).
+- **Claims the state agrees with.** "There was nothing in the apartment" is
+  marked *Not confirmed* even when the arrival roll comes back empty. Whether
+  the fork should unmark a claim the state happens to confirm, and how it
+  would tell reliably, is open.
+- **Improvised objects that share a catalog type.** A kitchen knife is
+  `melee.blade`, like the catalog's combat knife. Whether taking one is free
+  scenery or becomes a search prompt (§2.4a) is open. It matters once
+  improvised weapons carry stats (`OUTCOME_AUTHORITY.md` §10.1b).
 
 ---
 

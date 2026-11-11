@@ -13,17 +13,23 @@ numbers. Newest first.
 
 ---
 
-## 2026-11-11 — Resolution: attempt interpretation, the beat vocabulary (Draft v0)
+## 2026-11-11 — Resolution: attempt interpretation, the beat vocabulary, world-declaration guardrail (Draft v0)
 
 Drafts the first section of `contracts/RESOLUTION.md`: how the fork reads a
 player's message before generation. The message is split into **beats**, one per
 clause, and each beat gets one kind from a closed vocabulary — `flavor`,
-`intent`, `stance`, `move`, `attempt`, `use`, `search`, `speech`. The kind decides
-whether the fork does nothing, commits state, rolls, or brings up a HUD action.
-Only two things roll: the player's `attempt`, and the world's arrival roll on a
-`move`. Everything else is free. Drafted from the World Forge side ahead of the
-fork so the rest of the engine has a shape to build against; the dice, math and
-modifier sections stay placeholders. No agent spec changes.
+`intent`, `stance`, `move`, `attempt`, `use`, `search`, `speech`, `claim`. The
+kind decides whether the fork does nothing, commits state, rolls, or brings up a
+HUD action. Only two things roll: the player's `attempt`, and the world's arrival
+roll on a `move`. Everything else is free. It also adds the guardrail for a
+player writing the world's side of the turn ("there was nothing in the apartment
+but a box of 9mm"): **decorate, don't decide** — if the fork rolls it or tracks
+it, the player can't declare it. Such clauses, and everything past a cut, are
+never deleted: the stored message stays as written, the chat marks them *Not
+reached* / *Not confirmed*, and the copy sent to the model leaves them out.
+Drafted from the World Forge side ahead of the fork so the rest of the engine
+has a shape to build against; the dice, math and modifier sections stay
+placeholders. No agent spec changes.
 
 ### Added
 - `contracts/RESOLUTION.md` §2 — attempt interpretation: beats (only `{{user}}`
@@ -34,8 +40,22 @@ modifier sections stay placeholders. No agent spec changes.
   actions and the v0 stance list (`ready`, `quiet`, `hidden`, `at_ease`; lasts
   until changed, location change, or encounter end), automatic world-response
   rolls vs. explicit player-claim actions, the small-model **beat pass** (labels,
-  never decides; JSON output shape), showing and correcting the parse (relabeling
-  never re-rolls), a worked example, degradation, and open questions.
+  never decides; JSON output shape), a worked example, degradation, and open
+  questions.
+- `contracts/RESOLUTION.md` §2.4a — claims: the `claim` kind with its `about`
+  tags (`presence`, `contents`, `outcome`, `npc`, `scenery`), the gray case of a
+  declared detail that would decide an outcome, and dependent beats (taking an
+  item no roll placed becomes a `search`).
+- `contracts/RESOLUTION.md` §2.10 — display, prompt, and corrections: stored
+  message never edited; *Not reached* clauses folded with "Use as my next
+  message"; *Not confirmed* clauses marked in place beside the matching action;
+  both left out of the model's copy on every later turn; labels describe, never
+  judge; corrections recompute the display and never re-roll.
+- `contracts/RESOLUTION.md` §2.11 — second worked example (the player declares
+  an empty room and a found box of 9mm), with both arrival outcomes.
+- `contracts/OUTCOME_AUTHORITY.md` §3.5 — world declarations, the fifth kind of
+  claim: decorate, don't decide; scenery stays free; the gray case; refused by
+  omission, not by correction. §10.1c records the decisions.
 
 ### Changed
 - `contracts/RESOLUTION.md` — status is now Placeholder with §2 in Draft; §1
@@ -43,6 +63,11 @@ modifier sections stay placeholders. No agent spec changes.
   producer boundary names encounter chance per kind of place as authored data.
 - `contracts/OUTCOME_AUTHORITY.md` §4.1b — notes the beat pass as a second,
   separate small-model job with the same label-never-decide discipline.
+- `contracts/OUTCOME_AUTHORITY.md` §3 — "Four kinds of claim" → "Five kinds".
+  §4.1a — the fork never rewrites the **stored** message; the copy sent to the
+  model leaves out unreached and world-declaring clauses. §5 engine block — new
+  bullet: the player's description of the world is a proposal, not the world.
+- `contracts/RESOLUTION.md` §2.6 — a `search` beat is always a cut point.
 - `contracts/RPG_STATS.md` §3.12 — prose search suggestions come from the beat
   pass's `search` kind; §9 row updated; §10 adds the open question of
   encounter data for arrival rolls.

@@ -115,7 +115,7 @@ cannot write a result.
 
 ---
 
-## 3. Four kinds of claim
+## 3. Five kinds of claim
 
 ### 3.1 Possession claims — the thing exists, `{{user}}` doesn't have it
 
@@ -198,6 +198,39 @@ through."
   fork rolls first and injects the result (fail / partial / success), the same
   what/how split as the dice oracle.
 
+### 3.5 World declarations — writing the world's side
+
+"The apartment was empty." "There was a box of 9mm on the shelf." "Sal agrees to
+the price." "The Shambler collapses before it reaches me."
+
+Unlike §3.4, these aren't the result of `{{user}}`'s own attempt. The player is
+writing the world's side of the turn: who is present, what a place holds, what
+happened, what someone else decided.
+
+- **The rule: decorate, don't decide** (decided 2026-11-11). If the fork rolls
+  it or tracks it, the player can't declare it. That covers who or what is
+  present (the arrival roll), what catalog items a place holds (search and loot
+  rolls), outcomes, enemy state, and other characters' decisions. Those clauses
+  are ignored and the state decides.
+- **Scenery stays free.** Detail nothing rides on (the layout, the dust, the
+  smell, "there were 4 apartments") is legitimate co-authoring and passes
+  through untouched. It is the same principle as §3.2: the world is closed for
+  mechanics, not for objects.
+- **The gray case: a detail something rides on.** "There's a back door; I slip
+  out." No roll owns exits, but the detail would decide an outcome. It is
+  treated as a claim. Until resolution covers it, the main model judges whether
+  it's there, as with §3.4.
+- **Whatever depends on a claim resolves against the state.** Picking up the
+  declared box takes something no roll placed. The fork turns it into a search
+  prompt and commits nothing (`RESOLUTION.md` §2.4a).
+- **Who catches it:** the beat pass labels these clauses (`RESOLUTION.md`
+  §2.4a). The fork marks them in the chat display and leaves them out of the
+  copy of the message sent to the model (`RESOLUTION.md` §2.10). The main model
+  catches whatever the pass misses, through the engine block (§5).
+- **Refused by omission, not by correction.** The model never says "actually,
+  it wasn't empty," and the player is never told they did something wrong. The
+  world is simply what the state says, narrated in-story.
+
 ---
 
 ## 4. Consumer mechanisms — sketch, not implemented
@@ -231,8 +264,10 @@ The fork checks the parts of `{{user}}`'s message it can check **for certain**:
 On a hit, the fork **injects an authoritative fact** ("`{{user}}` has no
 carbine."; "`{{user}}` is downed: can speak and crawl, cannot fight.") so the
 model writes the failure inside the fiction. The refusal lives in the story,
-not in a UI notice (§10.1). The fork never rewrites or blocks the player's
-message.
+not in a UI notice (§10.1). The fork never rewrites or blocks the **stored**
+message. The copy it sends the model leaves out clauses the turn didn't reach
+and clauses that wrote the world's side (§3.5, `RESOLUTION.md` §2.10); the
+original is kept and shown to the player.
 
 This pass is deliberately narrow: a false positive refuses a legal action,
 which is worse than a miss the later layers will usually catch.
@@ -276,7 +311,7 @@ engine block.
 
 **A second small-model job: the beat pass.** Splitting `{{user}}`'s message
 into beats and labeling each one (flavor, intent, stance, move, attempt, use,
-search, speech) is specified in `RESOLUTION.md` §2.9. It is a separate call
+search, speech, claim) is specified in `RESOLUTION.md` §2.9. It is a separate call
 with the same discipline as this one: it labels, it never decides. The beat pass
 flags a clause that declares its own result (§3.4) but does not judge it.
 
@@ -408,6 +443,11 @@ posture blocks:
   note, no lecture.
 - **No narrated recovery.** Never write a downed or dead character, `{{user}}`
   or anyone else, back into action unless the state shows the recovery.
+- **The player's description of the world is a proposal, not the world.** When
+  a message says what a place holds, who is there, or how something turned out,
+  narrate from the injected state instead. Never confirm a find, an absence, or
+  an outcome only the message claims, and never correct the player out of
+  character. Scenery they add that nothing rides on can stay.
 - **Finds come from the roll.** When a search or a body is resolved, narrate what
   the injected result says was there, and no catalog item beyond it. An empty
   result is an empty room. Scenery the place would plausibly hold (a chair, a
@@ -534,6 +574,17 @@ any ally stands" until the field is settled.
   entries (same reason). *Later the same day:* fire mode moved forward as an
   ammunition-counting property only (`RPG_STATS.md` §3.8.2), because a live HUD
   decrements rounds by mode. Its combat effect stays deferred.
+
+### 10.1c Decided (2026-11-11)
+
+- **Decorate, don't decide** (§3.5). The player may add scenery nothing rides
+  on, but can't declare what the fork rolls or tracks: presence, a place's
+  contents, outcomes, enemy state, other characters' decisions.
+- **Display and prompt, not deletion** (§4.1a, `RESOLUTION.md` §2.10). The
+  stored message is never edited. Clauses the turn didn't reach, and clauses
+  that wrote the world's side, are marked in the display and left out of the
+  copy sent to the model. Labels describe what happened ("Not reached," "Not
+  confirmed") and never judge the player.
 
 ### 10.2 Open
 
