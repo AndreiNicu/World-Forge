@@ -13,6 +13,31 @@ numbers. Newest first.
 
 ---
 
+## 2026-11-11 — RPG Stats: searches are explicit HUD actions (Draft v0)
+
+Settles one of the `[[RPG_STATS]]` open questions: how a search gets matched to
+a scavenge table. Matching free prose ("I check the chemist's on the corner")
+against table names was brittle and left the roll to a guess. A search is now an
+explicit action in the fork's HUD. The player chooses it, the fork rolls and pins
+the table, and the result is injected as authoritative fact. Prose can suggest
+the matching action but never rolls one. Still Draft; no agent spec changes.
+
+### Changed
+- `contracts/RPG_STATS.md` §3.12 — "A search is an attempt" replaced by "A
+  search is a HUD action": offer (location matched against `name`/`aliases`
+  once per location change, plus a manual "Search as…" choice for unauthored
+  places, `fallback` backing "Other"), roll (resolve `check`, pin to the user
+  turn the action is sent with), inject (authoritative result, wording the
+  consumer's). New paragraphs: prose suggests but never rolls; the search is
+  still an act in the fiction; depleted places show as already searched.
+  `fallback` field description updated to match.
+- `contracts/RPG_STATS.md` §4.6 — the "how the model reports changes" note
+  records that table rolls are HUD actions, not observations.
+- `contracts/RPG_STATS.md` §10 — "Matching a search to a table" marked
+  resolved; "Location identity" notes the HUD now depends on it and sketches a
+  later additive producer field (authored named places listing their scavenge
+  tables).
+
 ## 2026-11-09 — RPG Stats: weapons, ammunition, durability, economy, scavenging, carry weight (Draft v0)
 
 Extends the `[[RPG_STATS]]` draft so weapons carry real bookkeeping that a live
