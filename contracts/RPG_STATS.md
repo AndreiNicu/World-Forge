@@ -1,6 +1,6 @@
 # RPG Stats Contract — `[[RPG_STATS]]`
 
-**Status:** Draft · **Version:** 0 · **Last updated:** 2026-11-09
+**Status:** Draft · **Version:** 0 · **Last updated:** 2026-11-11
 
 > **Shared contract — canonical source of truth:**
 > [`AndreiNicu/World-Forge`](https://github.com/AndreiNicu/World-Forge) → `contracts/RPG_STATS.md`.
@@ -673,22 +673,53 @@ to invent one.
 | `loot` | array | yes | Loot lines as in §3.5 (`item`, `chance`, `qty`, `loaded`, `durability`, ranges allowed), plus **vendor lines**: `{ "vendor": vendorId, "chance": 0–1 }`, naming a `wandering` vendor the search can turn up. |
 | `depletes` | bool | no | Default `true`: a place searched once stays searched (below). |
 | `check` | check object | no | As in `system.refill` (§3.2): `full` rolls the table as authored, `half` halves every line's `chance`, `none` finds nothing and still spends the time. Absent ⇒ no check; the table rolls as authored. |
-| `fallback` | bool | no | At most one table. Used for a search the consumer can't match to any table. |
+| `fallback` | bool | no | At most one table. Backs the "Other" entry of the search action's manual choice (below). |
 | `note` | string | no | One line, observable register (already picked over; the back room is locked). |
 
-**A search is an attempt.** `{{user}}` says what they search. The consumer
-matches the place against table `name` and `aliases`, using the player's message
-and the Scene Tracker location. The small-model classification pass
-(`OUTCOME_AUTHORITY.md` §4.1b) is a natural later helper for unmatched names.
-The consumer rolls the table, pins the roll to that user message (swipes replay
-it), and injects the result as authoritative fact. The model narrates finding
-it. If nothing matches and there is no `fallback` table, the search finds no
-catalog items: whatever the scene supports is scenery and carries no stats.
+**A search is a HUD action.** A scavenge table rolls only when the player
+triggers it explicitly, through a search action in the consumer's HUD. Free prose
+never rolls a table on its own. This keeps every find deterministic and tied to a
+deliberate act, the same reasoning as the fire-mode toggle (§10): rolling a table
+is bookkeeping, and bookkeeping belongs to an explicit control.
+
+1. **Offer.** When the Scene Tracker location changes, the consumer matches it
+   against table `name` and `aliases` and offers each match as an action
+   ("Search Pharmacy"). It always offers a manual choice as well ("Search as…",
+   listing every table), because most searchable places are never authored: the
+   apartment the party wandered into has no entry, and its name won't match. The
+   `fallback` table, if any, backs an "Other" entry. Matching runs once per
+   location change against a short string, not against every message. Without a
+   location signal there is nothing to match, so only the manual choice is
+   offered.
+2. **Roll.** Choosing an action is the attempt. The consumer resolves the
+   table's `check`, if it has one, rolls the loot, and pins the roll to the user
+   turn the action is sent with: the player's message, or a turn the consumer
+   sends for the action alone. Swipes replay it (`OUTCOME_AUTHORITY.md` §4.2).
+3. **Inject.** The result enters the prompt as authoritative fact, with the same
+   standing as the state block (§4.5): what was searched, what was found (with
+   quantities and state), and whether the place is now depleted. The wording is
+   the consumer's. One possible form:
+   `[Searched Pharmacy. Found: 1× Field Dressing, $14. Place depleted.]` The
+   model narrates finding exactly that and no catalog item beyond it (§4.6).
+
+**Prose suggests; it does not roll.** When `{{user}}` writes "I check the
+cruiser," the consumer may surface the matching action ("Search Police
+cruiser?"), by name and alias matching or later by the small-model
+classification pass (`OUTCOME_AUTHORITY.md` §4.1b). It never rolls without the
+player choosing the action. An unconfirmed prose search finds no catalog items:
+whatever the scene supports is scenery and carries no stats.
+
+**The search is still an act in the fiction.** The action is the attempt and
+the injected result is its outcome; the player can write around it ("while Maya
+keeps watch at the door"). Noise, the time it takes, and the table's `check`
+all still apply.
 
 **Depletion** is keyed by table and place: the table `id` plus the Scene
 Tracker's current location. Searching a depleted place finds nothing ("the
-shelves were cleared already"), including on a later visit. Without a location
-signal, depletion can't be tracked and is skipped. Places refilling over time is
+shelves were cleared already"), including on a later visit. The consumer shows a
+depleted place's action as already searched ("Pharmacy — searched") rather than
+hiding it, so empty shelves are never a surprise. Without a location signal,
+depletion can't be tracked and is skipped. Places refilling over time is
 deferred (§7).
 
 **Vendor lines** are how the world produces a wandering trader: a search of an
@@ -840,7 +871,10 @@ principle #13). Ordinary uncatalogued objects the scene supports stay free to
 pick up and carry no stats (`OUTCOME_AUTHORITY.md` §3.2).
 
 How the model reports changes (a tag, a scan, a UI action) is a consumer design
-question, out of scope for v0.
+question, out of scope for v0. One part is settled: **table rolls are HUD
+actions, not observations.** A search rolls its scavenge table only when the
+player chooses the search action (§3.12); the model's narration of searching
+never triggers one.
 
 ---
 
@@ -1298,9 +1332,13 @@ not trip `BODY_CYCLES.md` §7.1's generic-carrier trigger (§1.3).
 - **Location identity.** Scavenge depletion and fixed-vendor trade both key off
   the Scene Tracker's current location as a free-text string. Two names for the
   same pharmacy deplete separately, and a vendor's `location` must match
-  verbatim. A stable location id (the way `MEMORY_CONTRACT.md` gives NPCs one)
-  may be needed before v1.
-- **Matching a search to a table.** Name and alias matching is brittle against
-  free prose ("I check the chemist's on the corner"). The small-model
-  classification pass is a candidate helper, or the HUD could offer the matching
-  tables as a choice.
+  verbatim. The search action (§3.12) leans on it harder: the location is what
+  the HUD matches to decide which searches to offer. A stable location id (the
+  way `MEMORY_CONTRACT.md` gives NPCs one) is likely needed before v1. It would
+  also open an additive producer field later: authored named places, each
+  listing the scavenge tables it offers, so a known pharmacy offers its search
+  without any name matching.
+- ~~**Matching a search to a table.**~~ Resolved 2026-11-11: a search is an
+  explicit HUD action (§3.12). Free prose only suggests the matching action and
+  never rolls a table; the manual "Search as…" choice covers places whose names
+  match nothing.
