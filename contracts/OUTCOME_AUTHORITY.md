@@ -192,6 +192,9 @@ through."
 
 - **Resolution:** the first half is the attempt; the second half is ignored.
   The world decides the result.
+- **Kept out of the model's copy.** The declared half is marked *Not confirmed*
+  in the chat and left out of what the model is sent (`RESOLUTION.md` §2.10),
+  so the model never reads the kill it is about to roll for.
 - **Who catches it:** while combat resolution is deferred (`RPG_STATS.md` §7),
   the model judges the result, governed by `protagonist_jeopardy`'s
   "a stated attempt is an attempt." When pre-generation resolution exists, the
@@ -265,9 +268,10 @@ On a hit, the fork **injects an authoritative fact** ("`{{user}}` has no
 carbine."; "`{{user}}` is downed: can speak and crawl, cannot fight.") so the
 model writes the failure inside the fiction. The refusal lives in the story,
 not in a UI notice (§10.1). The fork never rewrites or blocks the **stored**
-message. The copy it sends the model leaves out clauses the turn didn't reach
-and clauses that wrote the world's side (§3.5, `RESOLUTION.md` §2.10); the
-original is kept and shown to the player.
+message. The copy it sends the model leaves out clauses the turn didn't reach,
+clauses that wrote the world's side, and the declared results of `{{user}}`'s
+own attempts (§3.4–§3.5, `RESOLUTION.md` §2.10); the original is kept and shown
+to the player.
 
 This pass is deliberately narrow: a false positive refuses a legal action,
 which is worse than a miss the later layers will usually catch.
@@ -581,8 +585,8 @@ any ally stands" until the field is settled.
   on, but can't declare what the fork rolls or tracks: presence, a place's
   contents, outcomes, enemy state, other characters' decisions.
 - **Display and prompt, not deletion** (§4.1a, `RESOLUTION.md` §2.10). The
-  stored message is never edited. Clauses the turn didn't reach, and clauses
-  that wrote the world's side, are marked in the display and left out of the
+  stored message is never edited. Clauses the turn didn't reach, clauses that
+  wrote the world's side, and declared results are marked in the display and left out of the
   copy sent to the model. Labels describe what happened ("Not reached," "Not
   confirmed") and never judge the player.
 

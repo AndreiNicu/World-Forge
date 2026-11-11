@@ -77,6 +77,9 @@ state, rolls, or brings up a HUD action. A clause that describes the world
 rather than something `{{user}}` does ("There were 4 apartments", "The apartment
 was empty") is a `claim` beat (§2.4a).
 
+A clause that restates or emphasizes the previous beat is part of that beat, not
+a new one. "I stabbed the zombie. Stabbed him good." is one stab and one roll.
+
 Only `{{user}}` makes beats. A clause that acts for another character ("Maya
 covers the stairs") is not `{{user}}`'s action. When it's an instruction to an
 ally, it is `speech`, and what the ally does is the world's response. When it
@@ -87,13 +90,13 @@ narrates the ally acting on their own, it is a `claim` about another character
 
 | Kind | What it is | Example | Rolls? | What the fork does |
 | --- | --- | --- | --- | --- |
-| `flavor` | Pausing, looking, breathing, thinking, feeling. No change to the world. | "I paused a bit to look around" | no | Nothing. The model narrates it. |
+| `flavor` | Pausing, looking around or looking for something, breathing, thinking, feeling. No change to the world. What `{{user}}` perceives *in* the world is a `claim` (§2.4a). | "I paused a bit to look around", "looking if there was anything to loot" | no | Nothing. The model narrates it. |
 | `intent` | A plan or decision about later: *will*, *going to*, *decide to*, *want to*. | "I decided that I will search them" | no | Nothing in v0. A plan is not an action. |
 | `stance` | A change to `{{user}}`'s own readiness or posture. | "Raising my rifle" | no | A free action (§2.7). Checks it's possible, then records the stance and shows it on the HUD. |
 | `move` | Entering or leaving a distinct place: a room, a building, a street, an area. | "I entered apartment 202" | **yes** | Commits the new location, makes the **arrival roll** (§2.5), and offers the place's HUD actions (search, trade). |
-| `attempt` | An action whose outcome is uncertain and matters: against resistance, risk, or opposition. | "I force the door", "I sneak past", "I shoot it" | **yes** | Rolls. How the check is chosen and resolved is the core roll and math (§1, placeholder). |
-| `use` | A deterministic action with an item or the party's own gear, including taking something a roll placed. | "I drink a dressing", "I swap magazines", "I equip the axe", "I take the shotgun it dropped" | usually no | Runs the legality check (`OUTCOME_AUTHORITY.md` §4.1a), then commits. Rolls only where the contract already asks for a check (refill, `RPG_STATS.md` §3.8.4). Taking an item no roll placed becomes a `search` (§2.4a). |
-| `search` | Searching a place for things. | "I search the kitchen" | no, by itself | Brings up the matching search action (`RPG_STATS.md` §3.12) and ends the turn there (§2.6). The table rolls only when the player chooses it. |
+| `attempt` | An action whose outcome is uncertain and matters: against resistance, risk, or opposition. | "I force the door", "I sneak past", "I fire three shots" | **yes** | Rolls. How the check is chosen and resolved is the core roll and math (§1, placeholder). A repeated action carries a `count` (§2.9). |
+| `use` | A deterministic action with an item or the party's own gear, including taking something a roll placed and searching a defeated enemy. | "I drink a dressing", "I swap magazines", "I take the shotgun it dropped", "I go through his pockets" | usually no | Runs the legality check (`OUTCOME_AUTHORITY.md` §4.1a), then commits. Rolls only where the contract already asks for a check (refill, `RPG_STATS.md` §3.8.4). Taking an item no roll placed becomes a `search`; searching a body takes the loot its defeat rolled (§2.4a). |
+| `search` | A committed search of a **place**: search, rummage, go through, check. | "I search the kitchen", "I check the cruiser" | no, by itself | Brings up the matching search action (`RPG_STATS.md` §3.12) and ends the turn there (§2.6). The table rolls only when the player chooses it. Looking around is `flavor`; searching a body is a `use`. |
 | `speech` | Words `{{user}}` says, including instructions to allies and requests to trade. | "Anyone in here?", "Maya, cover the stairs" | no | Nothing by default. A line meant to make someone do something they otherwise wouldn't (persuade, lie, intimidate) is an `attempt`. A trade request to a vendor brings up the trade action (`RPG_STATS.md` §3.10.3). |
 | `claim` | A statement about the world rather than something `{{user}}` does: who's there, what a place holds, how something turned out, what someone else decided, or plain scenery. | "There were 4 apartments", "The apartment was empty" | no | Scenery passes through. Anything else is ignored, marked *Not confirmed*, and left out of what the model is sent (§2.4a, §2.10). |
 
@@ -111,7 +114,11 @@ the kitchen" is a `search`.
 A clause that states its own result ("I shoot him and he drops dead") is an
 `attempt` for the first half. The declared result is not a beat. The fork
 ignores it and the roll decides (`OUTCOME_AUTHORITY.md` §3.4). The beat carries
-a flag saying a result was declared, so the engine block can hold the line.
+a flag saying a result was declared, so the engine block can hold the line, and
+the declared half is marked and left out of the model's copy exactly like a
+claim (§2.10). That includes results stated in a separate sentence ("It went
+down in a blink") and results folded into the action's wording ("three shots
+*into* the zombie").
 
 ### 2.4a Claims — decorate, don't decide
 
@@ -131,6 +138,7 @@ does, is a `claim` beat, tagged with what it's about:
 | `contents` | What a place holds, when the catalog covers it | "…but a box of 9mm ammo" | Ignored. Only a roll places catalog items. |
 | `outcome` | How something already in motion turns out, or a detail that would decide an outcome | "The Shambler collapsed", "There's a back door" | Ignored. State and rolls decide; until resolution covers it, the main model judges. |
 | `npc` | What another character decides, does, or feels | "Sal agrees to the price", "Maya takes the stairs" | Ignored. The world answers. |
+| `state` | A number or possession the fork tracks for `{{user}}` or the party: rounds, HP, what's in the pack | "…and it clicked empty", "I'm barely scratched", "I still had two mags" | Ignored. The fork's numbers win (`OUTCOME_AUTHORITY.md` §3.1, §3.3). |
 | `scenery` | Detail nothing rides on | "There were 4 apartments", "Dust everywhere" | Passed through, like `flavor`. |
 
 Ignored claims are marked *Not confirmed* in the chat and left out of the copy
@@ -146,6 +154,15 @@ can't tell, `scenery` is the safe failure: the model still treats the clause as
 a proposal only (`OUTCOME_AUTHORITY.md` §5), and nothing it narrates can mint a
 catalog item or override state.
 
+**Perception counts as a claim.** "I thought I heard noises upstairs" describes
+the world through `{{user}}`'s senses. `{{user}}`'s thoughts and feelings are
+the player's, but what is actually upstairs is the world's, and a model handed
+"noises upstairs" will put something there: the model as encounter table again.
+A perception of something in the world is a `claim` (usually `presence`),
+hedged or not. Acting on it stays the player's choice: "I went to investigate"
+is a `move` that rolls arrival upstairs like any other, and that roll decides
+whether anything made a noise.
+
 **Beats that depend on a claim resolve against the state.** "I picked it up,"
 where "it" is a box only the player declared, is a take of something no roll
 placed. A take is a `use`. The fork checks whether a roll placed that item here:
@@ -155,6 +172,13 @@ If the catalog covers the item (by name, or by type as in
 `search`: nothing is committed, the place's search action is offered, and the
 turn ends there (§2.6). Picking up uncatalogued scenery (a brick, a chair leg)
 is fine and carries no stats (`OUTCOME_AUTHORITY.md` §3.2).
+
+**Searching a body takes what the defeat rolled.** Bestiary loot rolls when an
+instance is defeated (`RPG_STATS.md` §3.5), so a body already holds whatever it
+holds. "I search him", aimed at a defeated enemy, is a `use` that takes that
+loot: no new roll, no search action, no cut. Carry limits apply as to any take.
+Aimed at an enemy that isn't defeated, the legality check catches it ("it's
+still moving"). `search` is for places.
 
 ### 2.5 When a roll happens
 
@@ -190,6 +214,14 @@ generates.
   else (a partial, a fail, an encounter), **the turn ends at that beat.** The
   later beats are not carried out and are not queued; the player decides again
   once they see what happened.
+- **Inside an encounter, a failed `attempt` doesn't cut.** Missing a shot
+  doesn't stop `{{user}}` reloading. The beats resolve in order, and a beat that
+  depended on the failed one is caught by the legality check instead: searching
+  a Shambler that didn't go down fails because it isn't defeated. How many
+  actions fit in one turn of a fight is a question of time and combat (§1,
+  placeholder); until that exists, the fork resolves the beats in order and the
+  model narrates the enemy's response after them. An arrival roll that starts an
+  encounter still cuts: the fight begins at that beat.
 - **A `search` beat is always a cut point.** Its roll waits for the player to
   choose the search action (§2.8), so the turn ends as `{{user}}` starts to
   look. "I search the kitchen and head back out" searches nothing yet and
@@ -273,13 +305,22 @@ deterministically.
   ```
 
   Per kind: `stance` carries `stance` and, if a weapon is named, `object`;
-  `move` carries `to`; `attempt` carries `target` if there is one and
-  `declaresResult: true` when the clause stated its own outcome (§2.4); `use`
-  carries `item`; `search` carries `place`; `speech` carries `to` if it
-  addresses someone; `claim` carries `about` (§2.4a). The pass labels a take
-  as `use` either way. Whether a roll placed the item, and so whether the take
-  becomes a `search`, is the fork's lookup, not the pass's judgment. Objects are matched to the inventory by type, as in
+  `move` carries `to`; `attempt` carries `target` if there is one, `count`
+  when the clause repeats the action ("three shots" is three trigger pulls),
+  and `declaresResult: true` when the clause stated its own outcome (§2.4);
+  `use` carries `item`; `search` carries `place`; `speech` carries `to` if it
+  addresses someone; `claim` carries `about` (§2.4a), and for `about: state`
+  the quantity it contradicts where it can (`"rounds"`, `"hp"`). The pass
+  labels a take as `use` either way. Whether a roll placed the item, and so
+  whether the take becomes a `search`, is the fork's lookup, not the pass's
+  judgment. Objects are matched to the inventory by type, as in
   `OUTCOME_AUTHORITY.md` §3.1, and unknown objects go to the §4.1b classifier.
+- **The fork counts what it resolved, once.** Trigger pulls in the player's
+  message are resolved and deducted before generation: `count` × the fire
+  mode's `rounds`, stopping when the inserted magazine runs dry, so a third
+  pull on two rounds clicks. The model's narration of those same shots is not
+  counted again (`RPG_STATS.md` §4.6). Otherwise "I fire three times" followed by
+  "she fires three times" takes six rounds.
 - **Output that doesn't parse, or a kind outside the vocabulary,** makes that
   beat `flavor`.
 
@@ -290,7 +331,7 @@ player sees and what the model is sent are both derived from it:
 
 | | Applied | Not reached | Not confirmed |
 | --- | --- | --- | --- |
-| **What** | Beats the turn resolved, and `scenery` claims | Everything after a cut point (§2.6) | `claim` beats other than `scenery`, and takes turned into a search (§2.4a), before the cut |
+| **What** | Beats the turn resolved, and `scenery` claims | Everything after a cut point (§2.6) | `claim` beats other than `scenery`, declared results of `{{user}}`'s own attempts (§2.4), and takes turned into a search (§2.4a), before the cut |
 | **Chat display** | Normal text | Folded under one faint line: *✂ Not reached — the turn ended at "I entered Apartment 202."* Expanding shows the original, with **Use as my next message** | Faintly marked in place, with the matching action beside it where there is one ([Search Apartment]) |
 | **Sent to the model** | As written | Left out | Left out |
 
@@ -372,6 +413,67 @@ Beats 1–4 as in A, then:
   search has been rolled. If the player taps [Search Apartment] and the table
   turns up 9mm, they have it then.
 
+**C. Perception and a second move.**
+
+> "I stepped into the house, looking if there was anything around to loot. I
+> thought I heard noises upstairs and I went to investigate."
+
+| # | Beat | Kind | Fork action |
+| --- | --- | --- | --- |
+| 1 | "I stepped into the house" | `move` | Location → the house; arrival roll; [Search House] offered |
+| 2 | "looking if there was anything around to loot" | `flavor` | None. Looking isn't searching, and beat 1 already offered the search action. |
+| 3 | "I thought I heard noises upstairs" | `claim: presence` | *Not confirmed*; nothing is upstairs until a roll says so |
+| 4 | "I went to investigate" | `move` | Location → upstairs; arrival roll |
+
+- **The house holds something:** the turn ends at the door; beats 2–4 are
+  folded as *Not reached*.
+- **The house is empty:** the turn continues. Beat 3 is marked, and beat 4 rolls
+  arrival upstairs. Whatever that roll finds is what made the noise; if it finds
+  nothing, there was no noise. The model never reads "noises upstairs," so it
+  can't put something there itself. Two arrival rolls in one turn, for a place
+  inside a place, are open questions (§2.13).
+
+**D. Shots, a click, and a reload, in a fight.** `{{user}}` holds the §8 Glock
+with **2 rounds** in the inserted magazine, an **empty** spare magazine, and 11
+loose 9mm, and is fighting a Shambler.
+
+> "I fired 3 more shots into the zombie and clicked on quickly tried to reload."
+
+| # | Beat | Kind | Fork action |
+| --- | --- | --- | --- |
+| 1 | "I fired 3 more shots into the zombie" | `attempt`, `count: 3`, `declaresResult` | Three pulls; the Glock has no `fireModes`, so one round each (`RPG_STATS.md` §3.8.2). Two rounds fire, the third pull clicks. The fork deducts the two rounds now. "Into the zombie" is marked; the roll decides the hits. |
+| 2 | "clicked" | `claim: state` | *Not confirmed*. It happens to match here; the fork's count is what's true either way. |
+| 3 | "quickly tried to reload" | `use` (reload) | The legality check fails: no magazine in inventory holds a round. Fact injected: no loaded magazine, 11 loose rounds. |
+
+A miss on beat 1 doesn't cut (§2.6, inside an encounter). The model narrates two
+shots, the dry click, a hand finding only the empty spare, and the Shambler's
+response. Its narration of the shots isn't counted again (§2.9). Refilling the
+spare is its own action next turn, with its check (`RPG_STATS.md` §3.8.4). The
+garbled "clicked on quickly" is the player's text; the pass labels what it can
+and the rest falls to `flavor`.
+
+**E. A kill, a body, and money the player found themselves.**
+
+> "I stabbed the fucking zombie. Stabbed him good. It went down in a blink and I
+> began searching him. I already found 50 bucks on him. He must've been someone
+> before all of this."
+
+| # | Beat | Kind | Fork action |
+| --- | --- | --- | --- |
+| 1 | "I stabbed the fucking zombie. Stabbed him good." | `attempt`, `declaresResult` | One stab, one roll. "Stabbed him good" restates beat 1 and merges into it (§2.2); "good" is a declared result, marked. |
+| 2 | "It went down in a blink" | declared result of beat 1 | *Not confirmed*; the roll decides |
+| 3 | "I began searching him" | `use` (search a body) | If the Shambler is defeated, takes the loot its defeat rolled; if not, fails the legality check |
+| 4 | "I already found 50 bucks on him" | `claim: contents` | *Not confirmed*. The §8 Shambler's dollar line is a 30% chance of $2–18, so it could never have carried $50; and what it did carry was rolled at defeat, not declared. |
+| 5 | "He must've been someone before all of this" | `flavor` | None |
+
+- **The stab kills:** the body's rolled loot is taken: a field dressing on a 10%
+  line, a few dollars on a 30% line, both, or nothing. The model narrates what
+  was actually found, not $50, and the reflection reaches it in the player's
+  own voice.
+- **The stab fails:** no cut, because it's an encounter. The search fails the
+  legality check because the Shambler is still moving, the $50 stays *Not
+  confirmed*, and the reflection still applies; it never depended on the kill.
+
 ### 2.12 Graceful degradation
 
 - **No beat pass** (disabled, or the small model is unavailable): no automatic
@@ -397,6 +499,11 @@ Beats 1–4 as in A, then:
   like `depletes`.
 - **Rolls per turn.** Whether a message can trigger any number of rolls, as
   long as each one leaves the premise intact, or whether there is a cap.
+  Example C already rolls arrival twice in one turn.
+- **Places inside places.** Upstairs in a house, the back room of a store:
+  whether each is its own location with its own encounter chance and
+  depletion, or shares its parent's. Tied to location identity
+  (`RPG_STATS.md` §10).
 - **World-authored stances.** Whether `system` in `RPG_STATS.md` may add
   stances to the v0 four, and how a stance's modifier is declared.
 - **Intent with mechanics.** Whether a stated plan ("search all four") should

@@ -859,7 +859,11 @@ and the user can confirm or correct it.
 **Shots are observed, rounds are counted.** The model reports trigger pulls
 ("fires twice"); the consumer multiplies by the current fire mode's `rounds` and
 decrements the inserted magazine. The model never reports a remaining-rounds
-figure, the same way it never reports an HP total.
+figure, the same way it never reports an HP total. **Nothing is counted
+twice:** trigger pulls the player's message declared are resolved and deducted
+before generation (`RESOLUTION.md` §2.9), and the model's narration of those
+same shots is not counted again. Observation counts only shots the fork didn't
+already resolve.
 
 **Narration never mints catalog items.** A catalog item enters the campaign only
 through a fork roll (bestiary loot, a scavenge table, a wandering vendor's

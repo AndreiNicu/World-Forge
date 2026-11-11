@@ -74,6 +74,33 @@ placeholders. No agent spec changes.
 - `contracts/README.md`, `CLAUDE.md` — RESOLUTION.md described as Placeholder
   with §2 Draft.
 
+### Fixed
+Found by tracing three sample player messages through the rules before merge;
+they are now worked examples C–E in `contracts/RESOLUTION.md` §2.11.
+- **Double-counted rounds.** Shots in the player's message and the model's
+  narration of the same shots could both be deducted. `attempt` gains `count`;
+  the fork resolves declared pulls before generation and never re-counts them
+  from narration (`RESOLUTION.md` §2.9, `RPG_STATS.md` §4.6).
+- **Declared results reached the model.** The result half of an attempt
+  ("…into the zombie", "It went down in a blink") is now marked *Not confirmed*
+  and left out of the model's copy like a claim (`RESOLUTION.md` §2.4, §2.10;
+  `OUTCOME_AUTHORITY.md` §3.4, §4.1a, §10.1c).
+- **Looking was read as searching.** "Looking for anything to loot" is
+  `flavor`; only a committed search of a place is a `search`, so it no longer
+  cuts the rest of the turn (§2.3).
+- **Perceptions planted encounters.** "I thought I heard noises upstairs" is a
+  `claim: presence`, so the model never invents what made the noise (§2.4a).
+- **Tracked-state claims had no tag.** New `about: state` for rounds, HP, and
+  inventory claims ("it clicked empty") (§2.4a).
+- **Fights over-cut.** Inside an encounter a failed `attempt` no longer ends the
+  turn; dependent beats are caught by the legality check (§2.6).
+- **Restatements could double-roll.** "Stabbed him good" merges into the
+  previous beat (§2.2).
+- **Bodies were treated as places.** Searching a defeated enemy is a `use` that
+  takes the loot its defeat rolled; no new roll, no cut (§2.3, §2.4a).
+- `RESOLUTION.md` §2.13 — rolls-per-turn made concrete; new open question on
+  places inside places.
+
 ## 2026-11-11 — RPG Stats: searches are explicit HUD actions (Draft v0)
 
 Settles one of the `[[RPG_STATS]]` open questions: how a search gets matched to
