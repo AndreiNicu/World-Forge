@@ -704,8 +704,8 @@ is bookkeeping, and bookkeeping belongs to an explicit control.
 
 **Prose suggests; it does not roll.** When `{{user}}` writes "I check the
 cruiser," the consumer may surface the matching action ("Search Police
-cruiser?"), by name and alias matching or later by the small-model
-classification pass (`OUTCOME_AUTHORITY.md` §4.1b). It never rolls without the
+cruiser?"), by name and alias matching or through the beat pass, which labels
+the clause a `search` (`RESOLUTION.md` §2.3, §2.9). It never rolls without the
 player choosing the action. An unconfirmed prose search finds no catalog items:
 whatever the scene supports is scenery and carries no stats.
 
@@ -1303,7 +1303,7 @@ reloads' worth of ammunition, and the second one has to be refilled first.
 | `[[BODY_CYCLES]]` carrier, cycle seed payload | `BODY_CYCLES.md` |
 | `[[RPG_STATS]]` carrier, stat system, item catalog (weapons, magazines, ammunition), starting sheets, bestiary, currency and vendors | this document |
 | Item `type` / `nature` vocabulary, possession and legality checks on weapons and money | `OUTCOME_AUTHORITY.md` (Draft) |
-| Dice, math, modifiers, time, combat, attempt parsing — how the engine uses this payload | `RESOLUTION.md` (Placeholder, fork-authored) |
+| Dice, math, modifiers, time, combat, attempt parsing — how the engine uses this payload | `RESOLUTION.md` (§2 attempt interpretation Draft, rest Placeholder; fork-owned) |
 | Who decides outcomes; what `{{user}}`'s message can change | `OUTCOME_AUTHORITY.md` (Draft) |
 
 All are independently versioned. `[[RPG_STATS]]` reuses existing conventions on
@@ -1342,3 +1342,8 @@ not trip `BODY_CYCLES.md` §7.1's generic-carrier trigger (§1.3).
   explicit HUD action (§3.12). Free prose only suggests the matching action and
   never rolls a table; the manual "Search as…" choice covers places whose names
   match nothing.
+- **Encounter data for arrival rolls.** `RESOLUTION.md` §2.5 has the fork roll
+  what's in a place when the party enters it, which needs an authored
+  encounter chance per kind of place, referencing bestiary entries. Not yet a
+  field here. Likely candidates: encounter lines on the scavenge tables
+  (§3.12), or a separate table keyed the same way. Its own PR.

@@ -13,6 +13,42 @@ numbers. Newest first.
 
 ---
 
+## 2026-11-11 — Resolution: attempt interpretation, the beat vocabulary (Draft v0)
+
+Drafts the first section of `contracts/RESOLUTION.md`: how the fork reads a
+player's message before generation. The message is split into **beats**, one per
+clause, and each beat gets one kind from a closed vocabulary — `flavor`,
+`intent`, `stance`, `move`, `attempt`, `use`, `search`, `speech`. The kind decides
+whether the fork does nothing, commits state, rolls, or brings up a HUD action.
+Only two things roll: the player's `attempt`, and the world's arrival roll on a
+`move`. Everything else is free. Drafted from the World Forge side ahead of the
+fork so the rest of the engine has a shape to build against; the dice, math and
+modifier sections stay placeholders. No agent spec changes.
+
+### Added
+- `contracts/RESOLUTION.md` §2 — attempt interpretation: beats (only `{{user}}`
+  makes them; a clause acting for an ally is `speech` or ignored), the eight-kind
+  vocabulary with roll/fork-action per kind, mood-not-tense classification
+  (declared results flagged and ignored), the two roll sources, cut points (a
+  rolled beat ends the turn unless its result leaves the premise intact), free
+  actions and the v0 stance list (`ready`, `quiet`, `hidden`, `at_ease`; lasts
+  until changed, location change, or encounter end), automatic world-response
+  rolls vs. explicit player-claim actions, the small-model **beat pass** (labels,
+  never decides; JSON output shape), showing and correcting the parse (relabeling
+  never re-rolls), a worked example, degradation, and open questions.
+
+### Changed
+- `contracts/RESOLUTION.md` — status is now Placeholder with §2 in Draft; §1
+  list marks each item's state; "stance" added to the modifier stack; the
+  producer boundary names encounter chance per kind of place as authored data.
+- `contracts/OUTCOME_AUTHORITY.md` §4.1b — notes the beat pass as a second,
+  separate small-model job with the same label-never-decide discipline.
+- `contracts/RPG_STATS.md` §3.12 — prose search suggestions come from the beat
+  pass's `search` kind; §9 row updated; §10 adds the open question of
+  encounter data for arrival rolls.
+- `contracts/README.md`, `CLAUDE.md` — RESOLUTION.md described as Placeholder
+  with §2 Draft.
+
 ## 2026-11-11 — RPG Stats: searches are explicit HUD actions (Draft v0)
 
 Settles one of the `[[RPG_STATS]]` open questions: how a search gets matched to

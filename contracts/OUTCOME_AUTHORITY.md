@@ -1,6 +1,6 @@
 # Outcome Authority Contract — who decides what happened
 
-**Status:** Draft · **Version:** 0 · **Last updated:** 2026-11-09
+**Status:** Draft · **Version:** 0 · **Last updated:** 2026-11-11
 
 > **Shared contract — canonical source of truth:**
 > [`AndreiNicu/World-Forge`](https://github.com/AndreiNicu/World-Forge) → `contracts/OUTCOME_AUTHORITY.md`.
@@ -273,6 +273,12 @@ the fork does that by lookup.
 
 Result declarations and other fuzzy claims stay with the main model and the
 engine block.
+
+**A second small-model job: the beat pass.** Splitting `{{user}}`'s message
+into beats and labeling each one (flavor, intent, stance, move, attempt, use,
+search, speech) is specified in `RESOLUTION.md` §2.9. It is a separate call
+with the same discipline as this one: it labels, it never decides. The beat pass
+flags a clause that declares its own result (§3.4) but does not judge it.
 
 **Not yet scoped: creating items during play.** Gameplay may need to build new
 items and weapons that the pipeline never authored (crafting, a found prototype,
