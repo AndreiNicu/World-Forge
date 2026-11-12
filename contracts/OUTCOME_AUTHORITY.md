@@ -315,7 +315,7 @@ engine block.
 
 **A second small-model job: the beat pass.** Splitting `{{user}}`'s message
 into beats and labeling each one (flavor, intent, stance, move, attempt, use,
-search, speech, claim) is specified in `RESOLUTION.md` §2.9. It is a separate call
+search, speech, claim, wait) is specified in `RESOLUTION.md` §2.9. It is a separate call
 with the same discipline as this one: it labels, it never decides. The beat pass
 flags a clause that declares its own result (§3.4) but does not judge it.
 
@@ -456,6 +456,10 @@ posture blocks:
   the injected result says was there, and no catalog item beyond it. An empty
   result is an empty room. Scenery the place would plausibly hold (a chair, a
   brick, a kitchen knife) is still there, and carries no mechanics.
+- **A question about what's here is answered from the state.** "Is there
+  anything useful?" gets what's in plain sight and, for a place not yet
+  searched, a pointer to the search. Never a list of catalog items the state
+  doesn't show.
 - **Counter-guardrail, stated with equal weight (non-optional content):** this
   is not licence to refuse. Legal actions resolve normally. Improvising with
   ordinary objects the scene supports is allowed and carries no mechanics. The

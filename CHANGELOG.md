@@ -18,10 +18,11 @@ numbers. Newest first.
 Drafts the first section of `contracts/RESOLUTION.md`: how the fork reads a
 player's message before generation. The message is split into **beats**, one per
 clause, and each beat gets one kind from a closed vocabulary — `flavor`,
-`intent`, `stance`, `move`, `attempt`, `use`, `search`, `speech`, `claim`. The
-kind decides whether the fork does nothing, commits state, rolls, or brings up a
-HUD action. Only two things roll: the player's `attempt`, and the world's arrival
-roll on a `move`. Everything else is free. It also adds the guardrail for a
+`intent`, `stance`, `move`, `attempt`, `use`, `search`, `speech`, `claim`,
+`wait`. The kind decides whether the fork does nothing, commits state, rolls, or
+brings up a HUD action. Only two things roll: the player's `attempt`, and the
+world's response to `{{user}}` being somewhere (the arrival roll on a `move`,
+the time roll on a `wait`). Everything else is free. It also adds the guardrail for a
 player writing the world's side of the turn ("there was nothing in the apartment
 but a box of 9mm"): **decorate, don't decide** — if the fork rolls it or tracks
 it, the player can't declare it. Such clauses, and everything past a cut, are
@@ -33,7 +34,7 @@ placeholders. No agent spec changes.
 
 ### Added
 - `contracts/RESOLUTION.md` §2 — attempt interpretation: beats (only `{{user}}`
-  makes them; a clause acting for an ally is `speech` or ignored), the eight-kind
+  makes them; a clause acting for an ally is `speech` or ignored), the closed
   vocabulary with roll/fork-action per kind, mood-not-tense classification
   (declared results flagged and ignored), the two roll sources, cut points (a
   rolled beat ends the turn unless its result leaves the premise intact), free
@@ -100,6 +101,34 @@ they are now worked examples C–E in `contracts/RESOLUTION.md` §2.11.
   takes the loot its defeat rolled; no new roll, no cut (§2.3, §2.4a).
 - `RESOLUTION.md` §2.13 — rolls-per-turn made concrete; new open question on
   places inside places.
+
+A second round of six sample messages (now worked examples F–K) found eight
+more:
+- **Quoted dialogue was stripped.** `"It's clear, nothing in here!"` was tagged a
+  claim and removed from the model's copy. Quoted speech is never checked for
+  claims; the world answers a wrong or false line in the fiction (§2.2, §2.4a).
+- **Negated actions rolled.** "I don't go in yet" no longer reads as a `move`
+  (§2.2).
+- **Conditionals had no kind.** "If anything moves, I shoot it" is `intent` and
+  sets stance `ready` (§2.2, §2.3).
+- **Orders to companions were dropped.** A party member's narrated action
+  ("Maya searches the kitchen") is an instruction from `{{user}}`, kept in the
+  model's copy; `npc` claims are now for characters outside the party (§2.2,
+  §2.4a).
+- **Prose could settle trades.** A trade offered in prose fills in the trade
+  action and commits only when confirmed; haggling stays `speech` until it
+  exists (`RESOLUTION.md` §2.8, `RPG_STATS.md` §3.10.3).
+- **Time passing had no kind.** New `wait` kind with `duration` and an
+  automatic time roll once encounter data exists; a cut point when it
+  interrupts (§2.3, §2.5, §2.6).
+- **OOC text wasn't excluded.** The beat pass skips out-of-character notes;
+  they reach the model unchanged (§2.2).
+- **Questions invited invented loot.** "Is there anything useful?" is
+  perception, answered from the state (§2.2; `OUTCOME_AUTHORITY.md` §5 new
+  bullet).
+- `RESOLUTION.md` §2.13 — new open questions: conditionals that fire
+  (overwatch), split parties, skipped travel; encounter data now also covers
+  time.
 
 ## 2026-11-11 — RPG Stats: searches are explicit HUD actions (Draft v0)
 

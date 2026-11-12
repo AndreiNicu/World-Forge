@@ -623,6 +623,11 @@ through an explicit HUD trade action. A **wandering** instance is present by
 construction for as long as it exists. A trade attempted away from the vendor
 fails (`OUTCOME_AUTHORITY.md` §4.1a): Sal can't be sold to from across the map.
 
+Whatever the signal, a trade **commits only through the trade action**. A trade
+offered in prose ("I offer him my Glock and 200 bucks") brings that action up
+with the offer filled in, and nothing changes hands until the player confirms
+it there (`RESOLUTION.md` §2.8).
+
 ### 3.11 Item copies and their state
 
 Stateful items (§3.3) are tracked **per copy**. The catalog `id` says *what* an
