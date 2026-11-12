@@ -220,9 +220,20 @@ happened, what someone else decided.
   through untouched. It is the same principle as §3.2: the world is closed for
   mechanics, not for objects.
 - **The gray case: a detail something rides on.** "There's a back door; I slip
-  out." No roll owns exits, but the detail would decide an outcome. It is
-  treated as a claim. Until resolution covers it, the main model judges whether
-  it's there, as with §3.4.
+  out." No roll owns exits, but the detail would get `{{user}}` past something.
+  It is treated as a claim. Until resolution covers it, the main model judges
+  whether it's there, as with §3.4. A complication the player puts on
+  `{{user}}` ("in the dark", "blindly") decides nothing in their favor and is
+  scenery.
+- **A perceived presence asks; it doesn't decide** (decided 2026-11-12). "I
+  heard a noise" invites the world in. The fork answers with the roll it would
+  make anyway, a short time roll here or the arrival roll for the place named,
+  and the roll decides what was there. Absence claims ("it was empty") never
+  ask; they stay ignored (`RESOLUTION.md` §2.4a).
+- **Expectations about other characters are claims.** "Knowing he would give me
+  the knives for 100" is `{{user}}`'s thought with the vendor's decision inside
+  it. It is ignored like any other declaration of what someone else does
+  (`RESOLUTION.md` §2.4a).
 - **Whatever depends on a claim resolves against the state.** Picking up the
   declared box takes something no roll placed. The fork turns it into a search
   prompt and commits nothing (`RESOLUTION.md` §2.4a).
@@ -594,6 +605,18 @@ any ally stands" until the field is settled.
   copy sent to the model. Labels describe what happened ("Not reached," "Not
   confirmed") and never judge the player.
 
+### 10.1d Decided (2026-11-12)
+
+- **A perceived presence asks for the world's roll** (§3.5, `RESOLUTION.md`
+  §2.4a). The fork's own roll confirms or denies it, so the beat pass still
+  judges nothing.
+- **Journeys roll once, as a whole** (`RESOLUTION.md` §2.5). Setting out makes
+  the journey roll; narrating the road rolls nothing; a skip the fork carries
+  out makes the journey roll before jumping to the arrival. A skip passes over
+  the narration, never the road.
+- **The price stands** (`RESOLUTION.md` §2.8). Persuasion about a price is
+  haggling: no roll in v0, and the model is told the price hasn't moved.
+
 ### 10.2 Open
 
 - **Where premise refusal lives.** It applies to every world, with or without
@@ -625,18 +648,13 @@ any ally stands" until the field is settled.
   (`RESOLUTION.md` §2.11 example B). Whether the fork should unmark a claim the
   state happens to confirm, and how it would tell reliably, is open. Leaving it
   marked is safe but reads oddly; unmarking it needs a comparison the beat pass
-  is not allowed to make.
+  is not allowed to make. A perceived presence is already settled: the roll it
+  asks for confirms or denies it (§10.1d).
 - **Improvised objects that share a catalog type** (§3.1, §3.2). A kitchen
   knife is `melee.blade`, like the catalog's combat knife. Matched by type, a
   take of one becomes a search prompt (`RESOLUTION.md` §2.4a); treated as
   scenery, it's free and carries no stats. It matters once improvised weapons
   carry stats (§10.1b), and it overlaps with creating items during play.
-- **Skipped travel** (§1.2). "(OOC: can we skip ahead to the settlement?)" is an
-  out-of-fiction request, and this contract doesn't police that path. But a
-  skip the fork carries out is not a chat edit: if a journey between known
-  places would roll for encounters, skipping it is a free way past danger.
-  Whether a skip still rolls the journey (once encounter data exists,
-  `RPG_STATS.md` §10) is open.
 
 ---
 

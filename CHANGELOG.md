@@ -136,6 +136,34 @@ more:
   world-authored stances, split parties; encounter data extended to time
   rolls. Moved to `OUTCOME_AUTHORITY.md` §10.2: claims the state agrees with,
   improvised objects that share a catalog type, skipped travel.
+- **Third test round** (a drive, a noise and an empty gun, a haggle):
+  - `RESOLUTION.md` §2.2 — speaker tags join the quote they attribute; a lead-in
+    ("But then, it happened.") joins the beat it introduces, so an omitted
+    claim doesn't leave the model a cliffhanger to fill; travel along the way is
+    `flavor`, not a `move` per bend.
+  - `RESOLUTION.md` §2.5 — **journeys**: setting out makes one journey roll for
+    the road; narrating the trip rolls nothing; arriving is its own `move`; a
+    skip the fork carries out rolls the journey first. Settles skipped travel
+    (removed from `OUTCOME_AUTHORITY.md` §10.2).
+  - `RESOLUTION.md` §2.4a — **a perceived presence asks, it doesn't decide**:
+    "I heard a noise" makes a short time roll here, or the named place's arrival
+    roll now (pinned for entry), and the roll decides what was there; confirmed
+    perceptions stay in the model's copy; absence claims never ask; without
+    encounter data, perceptions pass through as proposals. Complications the
+    player puts on `{{user}}` ("in the dark") are `scenery`; the gray case
+    covers details that would get `{{user}}` past something. Expectations about
+    what someone outside the party will do ("knowing he would") are
+    `claim: npc`.
+  - `RESOLUTION.md` §2.3, §2.8 — persuasion about a price is haggling: `speech`,
+    no roll in v0, and the model is told the price stands.
+    `RPG_STATS.md` §3.10.3 says the same.
+  - `RESOLUTION.md` §2.6, §2.9, §2.10, §2.12 — perceived-presence cut rule;
+    `journey`, `perceived`, `absent`, `place` fields; a pull that clicks rolls
+    nothing; confirmed perceptions shown as applied; degradation.
+  - `RESOLUTION.md` §2.11 — example C reworked for pinned perception rolls; new
+    examples L (the drive), M (the noise and the empty Glock), N (the haggle).
+  - `OUTCOME_AUTHORITY.md` §3.5, new §10.1d — the decisions above.
+    `RPG_STATS.md` §10 — encounter data extended to journey rolls.
 
 ## 2026-11-11 — RPG Stats: searches are explicit HUD actions (Draft v0)
 

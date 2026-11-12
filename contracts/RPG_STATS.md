@@ -626,7 +626,9 @@ fails (`OUTCOME_AUTHORITY.md` §4.1a): Sal can't be sold to from across the map.
 Whatever the signal, a trade **commits only through the trade action**. A trade
 offered in prose ("I offer him my Glock and 200 bucks") brings that action up
 with the offer filled in, and nothing changes hands until the player confirms
-it there (`RESOLUTION.md` §2.8).
+it there (`RESOLUTION.md` §2.8). Prices don't move in prose: an offer below the
+price opens the trade action short of it, and the model is told the price
+stands. Haggling is deferred (§7).
 
 ### 3.11 Item copies and their state
 
@@ -1354,11 +1356,12 @@ not trip `BODY_CYCLES.md` §7.1's generic-carrier trigger (§1.3).
   explicit HUD action (§3.12). Free prose only suggests the matching action and
   never rolls a table; the manual "Search as…" choice covers places whose names
   match nothing.
-- **Encounter data for arrival and time rolls.** `RESOLUTION.md` §2.5 has the
-  fork roll what's in a place when the party enters it (`move`) and what finds
-  them while they stay (`wait`, scaled by duration). Both need an authored
-  encounter chance, per kind of place and per span of time, referencing
-  bestiary entries. Not yet a field here. Likely candidates: encounter lines on
+- **Encounter data for arrival, time, and journey rolls.** `RESOLUTION.md` §2.5
+  has the fork roll what's in a place when the party enters it (`move`), what
+  finds them while they stay (`wait`, scaled by duration), and what meets them
+  on the road (the journey roll, scaled by distance, duration, or kind of
+  route). All three need an authored encounter chance, per kind of place and
+  per span of time or route, referencing bestiary entries. Not yet a field here. Likely candidates: encounter lines on
   the scavenge tables (§3.12), or a separate table keyed the same way. Its own
   PR.
 - **Re-entry.** Going back into a place already visited: does arrival roll
