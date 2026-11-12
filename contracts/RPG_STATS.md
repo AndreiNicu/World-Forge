@@ -1,6 +1,6 @@
 # RPG Stats Contract — `[[RPG_STATS]]`
 
-**Status:** Draft · **Version:** 0 · **Last updated:** 2026-11-11
+**Status:** Draft · **Version:** 0 · **Last updated:** 2026-11-12
 
 > **Shared contract — canonical source of truth:**
 > [`AndreiNicu/World-Forge`](https://github.com/AndreiNicu/World-Forge) → `contracts/RPG_STATS.md`.
@@ -664,6 +664,14 @@ item is; the copy says *which one*.
 - **Non-default starting state needs a reason in `buildNote`.** An empty gun or a
   worn blade at the opening moment is an authored decision, like `current < max`
   on a resource.
+- **The weapon in hand is fork state.** A sheet can have a weapon in each of
+  several slots, and "I fire" has to spend rounds from one of them. The
+  consumer keeps, per party sheet, the slot key of the weapon currently in
+  hand, or none. It is set when the player readies a weapon
+  (`RESOLUTION.md` §2.7) and cleared when that slot empties. It starts as
+  none and is never authored: with nothing in hand, the consumer uses the only
+  equipped weapon that fits the action, if there is exactly one. Like stance,
+  it lives beside the campaign state and is not a commit.
 
 ### 3.12 `scavenge[]` — searching the world
 
@@ -842,7 +850,7 @@ trail.
 
 The model never sees the raw carrier (§2). The consumer injects a compact
 **state block** each turn. It covers the party's current resources, equipment,
-and `buildNote`. For weapons: the equipped weapon's mode, rounds in the inserted
+and `buildNote`. For weapons: which one is in hand (§3.11), the equipped weapon's mode, rounds in the inserted
 magazine (or loaded, for `internal` feed), how many loaded magazines remain, and
 any copy that is `broken`. "Last magazine" and "no loaded magazines, 45 loose
 rounds" are exactly the facts the model must not drift from. Money is shown with
@@ -1339,7 +1347,10 @@ not trip `BODY_CYCLES.md` §7.1's generic-carrier trigger (§1.3).
 - **How mode switches and reloads are reported** — narration observation, a HUD
   control, or both. A HUD control is the cleaner fit for out-of-fiction
   bookkeeping like a fire-mode toggle; a reload under fire is an in-fiction
-  attempt and probably belongs to narration.
+  attempt and probably belongs to narration. *Partly settled 2026-11-12:* one
+  the **player** writes is a `gear` beat with `op: reload`, `refill`, or `mode`,
+  resolved before generation (`RESOLUTION.md` §2.3). Still open: the HUD
+  control, and reloads the model narrates for other characters.
 - **Location identity.** Scavenge depletion and fixed-vendor trade both key off
   the Scene Tracker's current location as a free-text string. Two names for the
   same pharmacy deplete separately, and a vendor's `location` must match
@@ -1367,9 +1378,10 @@ not trip `BODY_CYCLES.md` §7.1's generic-carrier trigger (§1.3).
 - **Re-entry.** Going back into a place already visited: does arrival roll
   again (the world moved on) or not (it was cleared)? Possibly a per-table
   setting, like `depletes`.
-- **World-authored stances.** `RESOLUTION.md` §2.7 defines four v0 stances
-  (`ready`, `quiet`, `hidden`, `at_ease`). Whether `system` may add a world's
-  own (`warded`, `in formation`), and how a stance's modifier would be declared.
+- **World-authored stances.** `RESOLUTION.md` §2.7 defines four v0 stance axes
+  (`weapon`, `noise`, `cover`, `posture`). Whether `system` may add a world's
+  own axes or values (`warded`, `in formation`), and how a stance's modifier
+  would be declared.
 - **Split parties.** Party location is one value in fork state, so "We split up"
   (`RESOLUTION.md` §2.11 example H) has nowhere to go: where Maya's search
   happens, which place an arrival roll belongs to, and whose location the

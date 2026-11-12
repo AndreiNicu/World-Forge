@@ -1,6 +1,6 @@
 # Outcome Authority Contract — who decides what happened
 
-**Status:** Draft · **Version:** 0 · **Last updated:** 2026-11-11
+**Status:** Draft · **Version:** 0 · **Last updated:** 2026-11-12
 
 > **Shared contract — canonical source of truth:**
 > [`AndreiNicu/World-Forge`](https://github.com/AndreiNicu/World-Forge) → `contracts/OUTCOME_AUTHORITY.md`.
@@ -117,6 +117,18 @@ cannot write a result.
 
 ## 3. Five kinds of claim
 
+"Claim" here means anything a message asserts that the state must answer. Only
+two of the five are `claim` beats in the beat vocabulary (`RESOLUTION.md`
+§2.3); the others surface as a failed legality check on an ordinary beat:
+
+| Claim | Where it shows up in the beat pass | Caught by |
+| --- | --- | --- |
+| Possession (§3.1) | Any beat that names an object: `gear`, `check` (`with`), `stance` (`object`), `trade` (`gives`) | The legality check (§4.1a) |
+| Premise (§3.2) | The same beats, naming an object the catalog doesn't list | The classification pass and the absent list (§4.1b) |
+| Outcome denial (§3.3) | A `claim` beat with `about: state`; an action the status forbids (`stance`, `move`, `check`); an instruction asking a party member for one | Marked and left out; the legality check; the status restated each turn (§4.4) |
+| Result declaration (§3.4) | A `claim` beat with `about: outcome` and `own: true`, beside the `check` it follows | Marked and left out; the roll decides |
+| World declaration (§3.5) | A `claim` beat with `about` `presence`, `contents`, `outcome`, `npc`, or `opening` | Marked and left out, answered by a roll, or sent as a proposal (`opening`) |
+
 ### 3.1 Possession claims — the thing exists, `{{user}}` doesn't have it
 
 "I draw my Glock" with no Glock in inventory or equipment. "I use a field
@@ -181,6 +193,11 @@ world. A spell in a world with no magic.
   invented to punish the try (§5 counter-guardrail). The model narrates the
   damage as the world's response; the fork picks it up as an observation and
   commits it (§2.2 writer 3).
+- **A party member's recovery can't be ordered either.** Directing companions
+  is ordinary play, and "Maya shakes it off and gets up" reads as an
+  instruction to a party member (`RESOLUTION.md` §2.2). The fork checks what
+  the instruction asks for against Maya's own sheet. Her status forbids it, so
+  the fact is injected and she stays down.
 - **Who catches it:** the fork, by injecting the status as authoritative fact
   every turn while it holds (§4.4). The model, by never narrating a recovery
   the state doesn't show.
@@ -192,9 +209,11 @@ through."
 
 - **Resolution:** the first half is the attempt; the second half is ignored.
   The world decides the result.
-- **Kept out of the model's copy.** The declared half is marked *Not confirmed*
-  in the chat and left out of what the model is sent (`RESOLUTION.md` §2.10),
-  so the model never reads the kill it is about to roll for.
+- **Kept out of the model's copy.** The declared half is its own `claim` beat
+  (`about: outcome`, `own: true`, `RESOLUTION.md` §2.4). It is marked *Not
+  confirmed* in the chat and left out of what the model is sent
+  (`RESOLUTION.md` §2.10), so the model never reads the kill it is about to
+  roll for.
 - **Who catches it:** while combat resolution is deferred (`RPG_STATS.md` §7),
   the model judges the result, governed by `protagonist_jeopardy`'s
   "a stated attempt is an attempt." When pre-generation resolution exists, the
@@ -221,8 +240,11 @@ happened, what someone else decided.
   mechanics, not for objects.
 - **The gray case: a detail something rides on.** "There's a back door; I slip
   out." No roll owns exits, but the detail would get `{{user}}` past something.
-  It is treated as a claim. Until resolution covers it, the main model judges
-  whether it's there, as with §3.4. A complication the player puts on
+  It is a claim about an **opening** (`about: opening`, `RESOLUTION.md` §2.4a).
+  Until resolution covers it, the main model judges whether it's there, so
+  this is the one claim that stays in the model's copy: it is sent with a fact
+  marking it as the player's proposal, and the turn ends there, so the fork
+  commits nothing that depends on it. A complication the player puts on
   `{{user}}` ("in the dark", "blindly") decides nothing in their favor and is
   scenery.
 - **A perceived presence asks; it doesn't decide** (decided 2026-11-12). "I
@@ -259,7 +281,10 @@ The fork checks the parts of `{{user}}`'s message it can check **for certain**:
 
 - a named catalog item (by `name`) when nothing of its **type** is in
   inventory or equipment (§3.1);
-- an action while `{{user}}`'s status forbids it (`downed`, `dead`);
+- an action while `{{user}}`'s status forbids it (`downed`, `dead`), judged by
+  the beat's kind against the status's `allows` (§6);
+- an instruction asking a party member for a beat kind their own status
+  forbids (`RESOLUTION.md` §2.2);
 - an ability whose `cost` exceeds the current resource;
 - firing a weapon with nothing loaded (an empty inserted magazine, no magazine
   inserted, an empty `internal` feed, or no units left for a `direct` feed —
@@ -325,8 +350,8 @@ Result declarations and other fuzzy claims stay with the main model and the
 engine block.
 
 **A second small-model job: the beat pass.** Splitting `{{user}}`'s message
-into beats and labeling each one (flavor, intent, stance, move, attempt, use,
-search, speech, claim, wait) is specified in `RESOLUTION.md` §2.9. It is a separate call
+into beats and labeling each one (flavor, intent, speech, stance, gear, move,
+wait, check, search, trade, claim) is specified in `RESOLUTION.md` §2.9. It is a separate call
 with the same discipline as this one: it labels, it never decides. The beat pass
 flags a clause that declares its own result (§3.4) but does not judge it.
 
@@ -504,7 +529,8 @@ recovery rule gets recovered by narration, which is the outcome-denial hole
   "default": "dead",
   "persona": {
     "state": "downed",
-    "allows": ["speak", "crawl"],          // what a downed character can still do
+    "posture": "prone",                    // pins the stance axis while the status holds
+    "allows": ["speech", "move", "gear.consume"],  // beat kinds still open: speaking, crawling, using a consumable
     "recovery": [                           // the ONLY ways out of downed
       { "by": "ability", "tag": "revive" }, // an ability tagged revive (Maya's Triage)
       { "by": "item",    "tag": "revive" }, // an item tagged revive
@@ -515,7 +541,15 @@ recovery rule gets recovered by narration, which is the outcome-denial hole
 }
 ```
 
-- **`allows`** feeds the legality check (§4.1) and the state block (§4.4).
+- **`allows`** feeds the legality check (§4.1) and the state block (§4.4). Its
+  entries are **beat kinds** from `RESOLUTION.md` §2.3, optionally narrowed to
+  one operation (`"gear.consume"`), so the check compares a label with a list
+  and judges nothing. `flavor`, `intent`, and `claim` are never actions and
+  are never forbidden. Every other kind not listed fails: attempted, and it
+  fails (§3.3).
+- **`posture`** pins that stance axis (`RESOLUTION.md` §2.7). A downed
+  character's `move` is a crawl because they're prone, and "I get up" is a
+  `stance` beat the status refuses.
 - **`recovery`** is closed: nothing outside the list ends the status. A revive
   ability is itself an attempt the fork resolves.
 - **`allDown`** is authored from Master Design Section 6's permitted shapes of a
@@ -617,6 +651,18 @@ any ally stands" until the field is settled.
 - **The price stands** (`RESOLUTION.md` §2.8). Persuasion about a price is
   haggling: no roll in v0, and the model is told the price hasn't moved.
 
+### 10.1e Decided (2026-11-12, later)
+
+- **`allows` is written in beat kinds** (§6). A status lists the kinds still
+  open, optionally narrowed to one `gear` operation, and may pin `posture`.
+- **An opening is the one claim the model sees** (§3.5). A declared detail
+  that would get `{{user}}` past something is sent as a proposal for the model
+  to judge, and ends the turn.
+- **A declared result is a claim beat** (§3.4), marked and left out by the same
+  rule as a world declaration.
+- **Instructions are checked against the ally's sheet** (§3.3), so a party
+  member's recovery can't be ordered.
+
 ### 10.2 Open
 
 - **Where premise refusal lives.** It applies to every world, with or without
@@ -634,8 +680,8 @@ any ally stands" until the field is settled.
 - **Creating items during play** (§4.1b). Crafting, modifying, or finding items
   the pipeline never authored, so a plausible uncatalogued object can gain
   stats. Outside the pipeline's scope; needs its own investigation.
-- **The `allows` vocabulary.** Free strings, or a small fixed set the legality
-  check can act on.
+- ~~**The `allows` vocabulary.**~~ Resolved 2026-11-12: beat kinds (§6,
+  §10.1e).
 - **Statuses beyond downed.** Broken limbs, bleeding, restrained, blinded, each
   with its own `allows` and the cost of acting against it. The broken-leg case
   in §3.3 needs these, so `RPG_STATS.md`'s reserved `statuses` field is
@@ -652,7 +698,7 @@ any ally stands" until the field is settled.
   asks for confirms or denies it (§10.1d).
 - **Improvised objects that share a catalog type** (§3.1, §3.2). A kitchen
   knife is `melee.blade`, like the catalog's combat knife. Matched by type, a
-  take of one becomes a search prompt (`RESOLUTION.md` §2.4a); treated as
+  take of one brings up a search prompt (`RESOLUTION.md` §2.4a); treated as
   scenery, it's free and carries no stats. It matters once improvised weapons
   carry stats (§10.1b), and it overlaps with creating items during play.
 
