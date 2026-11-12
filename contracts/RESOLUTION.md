@@ -237,7 +237,7 @@ what's in a place, or what finds the party there, if the world says so: an
 encounter chance per kind of place (and, for waiting, per span of time), most
 likely as lines on the scavenge tables (`RPG_STATS.md` §3.12), referencing
 bestiary entries. That field belongs in `RPG_STATS.md` and is not specified
-there yet (§2.13). Until it is, a `move` commits the location and offers the
+there yet (`RPG_STATS.md` §10). Until it is, a `move` commits the location and offers the
 place's actions with no arrival roll, and a `wait` passes without one.
 
 ### 2.6 Order and cut points
@@ -304,7 +304,7 @@ placeholder). A stance word in a `move` beat ("I slip into 202 quietly") sets
 the stance first, then moves, so it applies to the arrival roll.
 
 An unrecognised stance is ignored. Whether a world may author its own stances
-(`warded`, `in formation`) is open (§2.13).
+(`warded`, `in formation`) is open (`RPG_STATS.md` §10).
 
 ### 2.8 Automatic rolls and explicit actions
 
@@ -479,7 +479,7 @@ Beats 1–4 as in A, then:
   arrival upstairs. Whatever that roll finds is what made the noise; if it finds
   nothing, there was no noise. The model never reads "noises upstairs," so it
   can't put something there itself. Two arrival rolls in one turn, for a place
-  inside a place, are open questions (§2.13).
+  inside a place, are open questions (§2.13; `RPG_STATS.md` §10).
 
 **D. Shots, a click, and a reload, in a fight.** `{{user}}` holds the §8 Glock
 with **2 rounds** in the inserted magazine, an **empty** spare magazine, and 11
@@ -557,7 +557,7 @@ Northgate (`RPG_STATS.md` §8), where the Beretta is $1,400.
 
 | # | Beat | Kind | Fork action |
 | --- | --- | --- | --- |
-| 1 | "We split up" | `speech`, `instruction` | Sent. Split parties are open (§2.13). |
+| 1 | "We split up" | `speech`, `instruction` | Sent. Split parties are open (`RPG_STATS.md` §10). |
 | 2 | "Maya searches the kitchen" | `speech`, `instruction`, `to: Maya` | Sent. If she goes, her search is the kitchen's search action, chosen like any other. |
 | 3 | "while I haggle with the trader for the Beretta" | `speech`, `to: Okoro` | Brings up the trade action. No price change: haggling isn't in v0. |
 | 4 | "I offer him my Glock and 200 bucks" | `speech` (trade offer) | The legality check finds $35, not $200; the fact is injected. The trade action opens with the Glock offered. Nothing commits until confirmed. |
@@ -608,7 +608,8 @@ something that was never there, and the barricade still standing.
 
 The model can describe what's in plain sight (a stripped bed, a cabinet hanging
 open) and point at the search. It never answers "yes, a box of ammo." Whether a
-skipped journey still rolls for encounters on the way is open (§2.13).
+skipped journey still rolls for encounters on the way is open
+(`OUTCOME_AUTHORITY.md` §10.2).
 
 ### 2.12 Graceful degradation
 
@@ -627,22 +628,14 @@ skipped journey still rolls for encounters on the way is open (§2.13).
 
 ### 2.13 Open questions
 
-- **Encounter data.** The shape of the per-place encounter chance that the
-  arrival roll needs, the per-span-of-time chance the time roll needs, and
-  whether they live on the scavenge tables or on their own. An `RPG_STATS.md`
-  field; its own PR.
-- **Re-entry.** Does going back into a place already visited roll arrival again
-  (the world moved on) or not (it was cleared)? Possibly a per-table setting,
-  like `depletes`.
+Questions about how the engine reads and resolves a turn live here. Questions
+about authored data or state shape live in `RPG_STATS.md` §10, and questions
+about what the player may claim or bypass live in `OUTCOME_AUTHORITY.md` §10.2.
+Each is recorded once, in the file that will settle it.
+
 - **Rolls per turn.** Whether a message can trigger any number of rolls, as
   long as each one leaves the premise intact, or whether there is a cap.
   Example C already rolls arrival twice in one turn.
-- **Places inside places.** Upstairs in a house, the back room of a store:
-  whether each is its own location with its own encounter chance and
-  depletion, or shares its parent's. Tied to location identity
-  (`RPG_STATS.md` §10).
-- **World-authored stances.** Whether `system` in `RPG_STATS.md` may add
-  stances to the v0 four, and how a stance's modifier is declared.
 - **Intent with mechanics.** Whether a stated plan ("search all four") should
   queue HUD actions or stay narrative only.
 - **Time in free beats.** Whether "I paused a bit" should advance time once
@@ -650,20 +643,19 @@ skipped journey still rolls for encounters on the way is open (§2.13).
 - **Conditionals that fire.** Whether "If anything moves, I shoot it" should
   resolve automatically when the condition happens (overwatch), or stay a
   stance until the player acts. A question for combat (§1).
-- **Split parties.** "We split up" puts party members in different places. The
-  party currently has one location, so where Maya's search happens, and which
-  place an arrival roll belongs to, needs a shape.
-- **Skipped travel.** "Can we skip ahead to the settlement?" Whether a journey
-  between known places rolls for encounters on the way, so that skipping isn't
-  a free way past danger.
-- **Claims the state agrees with.** "There was nothing in the apartment" is
-  marked *Not confirmed* even when the arrival roll comes back empty. Whether
-  the fork should unmark a claim the state happens to confirm, and how it
-  would tell reliably, is open.
-- **Improvised objects that share a catalog type.** A kitchen knife is
-  `melee.blade`, like the catalog's combat knife. Whether taking one is free
-  scenery or becomes a search prompt (§2.4a) is open. It matters once
-  improvised weapons carry stats (`OUTCOME_AUTHORITY.md` §10.1b).
+
+**Tracked in the owning contract:**
+
+| Question | Where |
+| --- | --- |
+| Encounter data for the arrival and time rolls | `RPG_STATS.md` §10 |
+| Re-entry: does a revisited place roll arrival again | `RPG_STATS.md` §10 |
+| Places inside places (upstairs, a back room) | `RPG_STATS.md` §10, under location identity |
+| World-authored stances | `RPG_STATS.md` §10 |
+| Split parties | `RPG_STATS.md` §10 |
+| Claims the state agrees with | `OUTCOME_AUTHORITY.md` §10.2 |
+| Improvised objects that share a catalog type | `OUTCOME_AUTHORITY.md` §10.2 |
+| Skipped travel | `OUTCOME_AUTHORITY.md` §10.2 |
 
 ---
 

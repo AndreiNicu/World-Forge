@@ -1346,13 +1346,28 @@ not trip `BODY_CYCLES.md` §7.1's generic-carrier trigger (§1.3).
   way `MEMORY_CONTRACT.md` gives NPCs one) is likely needed before v1. It would
   also open an additive producer field later: authored named places, each
   listing the scavenge tables it offers, so a known pharmacy offers its search
-  without any name matching.
+  without any name matching. **Places inside places** sharpen it: upstairs in a
+  house, the back room of a store. Is each its own location with its own
+  encounter chance and depletion, or does it share its parent's?
+  (`RESOLUTION.md` §2.11 example C rolls arrival for both in one turn.)
 - ~~**Matching a search to a table.**~~ Resolved 2026-11-11: a search is an
   explicit HUD action (§3.12). Free prose only suggests the matching action and
   never rolls a table; the manual "Search as…" choice covers places whose names
   match nothing.
-- **Encounter data for arrival rolls.** `RESOLUTION.md` §2.5 has the fork roll
-  what's in a place when the party enters it, which needs an authored
-  encounter chance per kind of place, referencing bestiary entries. Not yet a
-  field here. Likely candidates: encounter lines on the scavenge tables
-  (§3.12), or a separate table keyed the same way. Its own PR.
+- **Encounter data for arrival and time rolls.** `RESOLUTION.md` §2.5 has the
+  fork roll what's in a place when the party enters it (`move`) and what finds
+  them while they stay (`wait`, scaled by duration). Both need an authored
+  encounter chance, per kind of place and per span of time, referencing
+  bestiary entries. Not yet a field here. Likely candidates: encounter lines on
+  the scavenge tables (§3.12), or a separate table keyed the same way. Its own
+  PR.
+- **Re-entry.** Going back into a place already visited: does arrival roll
+  again (the world moved on) or not (it was cleared)? Possibly a per-table
+  setting, like `depletes`.
+- **World-authored stances.** `RESOLUTION.md` §2.7 defines four v0 stances
+  (`ready`, `quiet`, `hidden`, `at_ease`). Whether `system` may add a world's
+  own (`warded`, `in formation`), and how a stance's modifier would be declared.
+- **Split parties.** Party location is one value in fork state, so "We split up"
+  (`RESOLUTION.md` §2.11 example H) has nowhere to go: where Maya's search
+  happens, which place an arrival roll belongs to, and whose location the
+  Scene Tracker follows all need a shape.

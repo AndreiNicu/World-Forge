@@ -129,6 +129,13 @@ more:
 - `RESOLUTION.md` §2.13 — new open questions: conditionals that fire
   (overwatch), split parties, skipped travel; encounter data now also covers
   time.
+- **Open questions recorded once, in the owning file.** `RESOLUTION.md` §2.13
+  keeps the engine questions (rolls per turn, intent with mechanics, time in
+  free beats, conditionals that fire) and points to the rest. Moved to
+  `RPG_STATS.md` §10: re-entry, places inside places (under location identity),
+  world-authored stances, split parties; encounter data extended to time
+  rolls. Moved to `OUTCOME_AUTHORITY.md` §10.2: claims the state agrees with,
+  improvised objects that share a catalog type, skipped travel.
 
 ## 2026-11-11 — RPG Stats: searches are explicit HUD actions (Draft v0)
 

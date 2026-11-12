@@ -620,6 +620,23 @@ any ally stands" until the field is settled.
   to generalize to them.
 - **Oracle facts.** Dice-oracle rolls are manual and already fixed once rolled;
   confirm a swipe never re-rolls them either.
+- **Claims the state agrees with** (§3.5). "There was nothing in the apartment"
+  is marked *Not confirmed* even when the arrival roll comes back empty
+  (`RESOLUTION.md` §2.11 example B). Whether the fork should unmark a claim the
+  state happens to confirm, and how it would tell reliably, is open. Leaving it
+  marked is safe but reads oddly; unmarking it needs a comparison the beat pass
+  is not allowed to make.
+- **Improvised objects that share a catalog type** (§3.1, §3.2). A kitchen
+  knife is `melee.blade`, like the catalog's combat knife. Matched by type, a
+  take of one becomes a search prompt (`RESOLUTION.md` §2.4a); treated as
+  scenery, it's free and carries no stats. It matters once improvised weapons
+  carry stats (§10.1b), and it overlaps with creating items during play.
+- **Skipped travel** (§1.2). "(OOC: can we skip ahead to the settlement?)" is an
+  out-of-fiction request, and this contract doesn't police that path. But a
+  skip the fork carries out is not a chat edit: if a journey between known
+  places would roll for encounters, skipping it is a free way past danger.
+  Whether a skip still rolls the journey (once encounter data exists,
+  `RPG_STATS.md` §10) is open.
 
 ---
 
