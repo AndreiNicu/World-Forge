@@ -13,6 +13,75 @@ numbers. Newest first.
 
 ---
 
+## 2026-11-12 — Resolution: beat vocabulary revised against RPG_STATS and OUTCOME_AUTHORITY (Draft v0)
+
+Cross-checking the beat vocabulary against the two contracts it serves turned up
+eight places where a label couldn't carry what the fork needs. Most had one
+cause: a kind meant both "what the clause is" and "what the fork does", so kinds
+kept converting into each other (`use` → `search`, `speech` → `attempt`,
+`stance` → `attempt`, `intent` → sets a stance). The revision makes **a kind a
+route**: a beat never changes kind once labeled, and what varies inside a kind
+is a field. The vocabulary is now eleven kinds — `flavor`, `intent`, `speech`,
+`stance`, `gear`, `move`, `wait`, `check`, `search`, `trade`, `claim`. Still a
+Draft; nothing reads it.
+
+### Changed
+
+- `contracts/RESOLUTION.md` §2.3 — **`attempt` is renamed `check`** (the old
+  name collided with `OUTCOME_AUTHORITY.md`'s "the message is an attempt") and
+  gains `with`, the item or ability the action uses, so abilities and their
+  `cost` have a kind. **`use` is renamed `gear`** and gains a closed `op` list
+  (`consume`, `equip`, `reload`, `refill`, `mode`, `take`, `loot`, `drop`,
+  `give`), one per commit in `RPG_STATS.md` §4.4. The table is grouped by route.
+- `contracts/RESOLUTION.md` §2.7 — **stance is four independent axes**
+  (`weapon`, `noise`, `cover`, `posture`) instead of one value, so `quiet` no
+  longer erases `ready`. `at_ease` becomes a reset. A readiness conditional is
+  a `stance` beat with `when`, not an `intent` with a side effect.
+- `contracts/RESOLUTION.md` §2.4, §2.4a — a declared result is its own `claim`
+  beat (`about: outcome`, `own: true`) rather than "not a beat", so nothing is
+  ever partly sent. A take of something no roll placed stays a `gear` beat that
+  fails its lookup, instead of becoming a `search`.
+- `contracts/RESOLUTION.md` §2.9, §2.11 — per-kind fields as a table; the input
+  gains `{{user}}`'s abilities; worked examples A–N relabelled (D splits "into
+  the zombie" into its own beat; H merges two trade clauses into one offer).
+- `contracts/OUTCOME_AUTHORITY.md` §6 — `allows` is written in beat kinds,
+  optionally narrowed to one `gear` operation, and a status may pin `posture`.
+  Closes the "`allows` vocabulary" open question (§10.2).
+- `contracts/OUTCOME_AUTHORITY.md` §4.1b — the beat-kind list.
+- `contracts/RPG_STATS.md` §10 — player-written reloads, refills, and mode
+  switches are `gear` beats (partly settles "how mode switches and reloads are
+  reported"); the world-authored-stances question now refers to axes.
+
+### Added
+
+- `contracts/RESOLUTION.md` §2.3, §2.6 — a **`trade` kind**, the sibling of
+  `search`: it brings up the trade action, commits only on confirmation, and is
+  always a cut point. Trade offers were previously an unlabelled case of
+  `speech`.
+- `contracts/RESOLUTION.md` §2.4a — **`about: opening`** for a declared detail
+  that would get `{{user}}` past something (a back door). It is the one claim
+  sent to the model, flagged as a proposal, and it ends the turn.
+- `contracts/RESOLUTION.md` §2.2 — instructions to party members carry `asks`,
+  and the fork runs the legality check against the ally's own sheet.
+- `contracts/RPG_STATS.md` §3.11, §4.5 — **the weapon in hand**, per-sheet fork
+  state naming the slot a fired or swung weapon comes from.
+- `contracts/OUTCOME_AUTHORITY.md` §3 — a table mapping the five kinds of claim
+  onto beat kinds; §10.1e records the four decisions.
+
+### Fixed
+
+- **A party member could undo an outcome.** "Maya shakes it off and gets up"
+  was an instruction and stayed in the model's copy; it is now checked against
+  her status (`OUTCOME_AUTHORITY.md` §3.3).
+- **The gray case was handled two ways.** RESOLUTION left a back-door claim out
+  of the model's copy while OUTCOME_AUTHORITY §3.5 had the model judge it.
+- **"I get up" contradicted §2.7.** Example I failed it against `downed` while
+  §2.7 ignored unrecognised stances; posture is now an axis.
+- **"I fired" didn't say which weapon.** With a rifle and a pistol both
+  equipped, nothing said whose rounds to deduct.
+
+---
+
 ## 2026-11-11 — Resolution: attempt interpretation, the beat vocabulary, world-declaration guardrail (Draft v0)
 
 Drafts the first section of `contracts/RESOLUTION.md`: how the fork reads a
