@@ -13,6 +13,158 @@ numbers. Newest first.
 
 ---
 
+## 2026-11-11 — Resolution: attempt interpretation, the beat vocabulary, world-declaration guardrail (Draft v0)
+
+Drafts the first section of `contracts/RESOLUTION.md`: how the fork reads a
+player's message before generation. The message is split into **beats**, one per
+clause, and each beat gets one kind from a closed vocabulary — `flavor`,
+`intent`, `stance`, `move`, `attempt`, `use`, `search`, `speech`, `claim`,
+`wait`. The kind decides whether the fork does nothing, commits state, rolls, or
+brings up a HUD action. Only two things roll: the player's `attempt`, and the
+world's response to `{{user}}` being somewhere (the arrival roll on a `move`,
+the time roll on a `wait`). Everything else is free. It also adds the guardrail for a
+player writing the world's side of the turn ("there was nothing in the apartment
+but a box of 9mm"): **decorate, don't decide** — if the fork rolls it or tracks
+it, the player can't declare it. Such clauses, and everything past a cut, are
+never deleted: the stored message stays as written, the chat marks them *Not
+reached* / *Not confirmed*, and the copy sent to the model leaves them out.
+Drafted from the World Forge side ahead of the fork so the rest of the engine
+has a shape to build against; the dice, math and modifier sections stay
+placeholders. No agent spec changes.
+
+### Added
+- `contracts/RESOLUTION.md` §2 — attempt interpretation: beats (only `{{user}}`
+  makes them; a clause acting for an ally is `speech` or ignored), the closed
+  vocabulary with roll/fork-action per kind, mood-not-tense classification
+  (declared results flagged and ignored), the two roll sources, cut points (a
+  rolled beat ends the turn unless its result leaves the premise intact), free
+  actions and the v0 stance list (`ready`, `quiet`, `hidden`, `at_ease`; lasts
+  until changed, location change, or encounter end), automatic world-response
+  rolls vs. explicit player-claim actions, the small-model **beat pass** (labels,
+  never decides; JSON output shape), a worked example, degradation, and open
+  questions.
+- `contracts/RESOLUTION.md` §2.4a — claims: the `claim` kind with its `about`
+  tags (`presence`, `contents`, `outcome`, `npc`, `scenery`), the gray case of a
+  declared detail that would decide an outcome, and dependent beats (taking an
+  item no roll placed becomes a `search`).
+- `contracts/RESOLUTION.md` §2.10 — display, prompt, and corrections: stored
+  message never edited; *Not reached* clauses folded with "Use as my next
+  message"; *Not confirmed* clauses marked in place beside the matching action;
+  both left out of the model's copy on every later turn; labels describe, never
+  judge; corrections recompute the display and never re-roll.
+- `contracts/RESOLUTION.md` §2.11 — second worked example (the player declares
+  an empty room and a found box of 9mm), with both arrival outcomes.
+- `contracts/OUTCOME_AUTHORITY.md` §3.5 — world declarations, the fifth kind of
+  claim: decorate, don't decide; scenery stays free; the gray case; refused by
+  omission, not by correction. §10.1c records the decisions.
+
+### Changed
+- `contracts/RESOLUTION.md` — status is now Placeholder with §2 in Draft; §1
+  list marks each item's state; "stance" added to the modifier stack; the
+  producer boundary names encounter chance per kind of place as authored data.
+- `contracts/OUTCOME_AUTHORITY.md` §4.1b — notes the beat pass as a second,
+  separate small-model job with the same label-never-decide discipline.
+- `contracts/OUTCOME_AUTHORITY.md` §3 — "Four kinds of claim" → "Five kinds".
+  §4.1a — the fork never rewrites the **stored** message; the copy sent to the
+  model leaves out unreached and world-declaring clauses. §5 engine block — new
+  bullet: the player's description of the world is a proposal, not the world.
+- `contracts/RESOLUTION.md` §2.6 — a `search` beat is always a cut point.
+- `contracts/RPG_STATS.md` §3.12 — prose search suggestions come from the beat
+  pass's `search` kind; §9 row updated; §10 adds the open question of
+  encounter data for arrival rolls.
+- `contracts/README.md`, `CLAUDE.md` — RESOLUTION.md described as Placeholder
+  with §2 Draft.
+
+### Fixed
+Found by tracing three sample player messages through the rules before merge;
+they are now worked examples C–E in `contracts/RESOLUTION.md` §2.11.
+- **Double-counted rounds.** Shots in the player's message and the model's
+  narration of the same shots could both be deducted. `attempt` gains `count`;
+  the fork resolves declared pulls before generation and never re-counts them
+  from narration (`RESOLUTION.md` §2.9, `RPG_STATS.md` §4.6).
+- **Declared results reached the model.** The result half of an attempt
+  ("…into the zombie", "It went down in a blink") is now marked *Not confirmed*
+  and left out of the model's copy like a claim (`RESOLUTION.md` §2.4, §2.10;
+  `OUTCOME_AUTHORITY.md` §3.4, §4.1a, §10.1c).
+- **Looking was read as searching.** "Looking for anything to loot" is
+  `flavor`; only a committed search of a place is a `search`, so it no longer
+  cuts the rest of the turn (§2.3).
+- **Perceptions planted encounters.** "I thought I heard noises upstairs" is a
+  `claim: presence`, so the model never invents what made the noise (§2.4a).
+- **Tracked-state claims had no tag.** New `about: state` for rounds, HP, and
+  inventory claims ("it clicked empty") (§2.4a).
+- **Fights over-cut.** Inside an encounter a failed `attempt` no longer ends the
+  turn; dependent beats are caught by the legality check (§2.6).
+- **Restatements could double-roll.** "Stabbed him good" merges into the
+  previous beat (§2.2).
+- **Bodies were treated as places.** Searching a defeated enemy is a `use` that
+  takes the loot its defeat rolled; no new roll, no cut (§2.3, §2.4a).
+- `RESOLUTION.md` §2.13 — rolls-per-turn made concrete; new open question on
+  places inside places.
+
+A second round of six sample messages (now worked examples F–K) found eight
+more:
+- **Quoted dialogue was stripped.** `"It's clear, nothing in here!"` was tagged a
+  claim and removed from the model's copy. Quoted speech is never checked for
+  claims; the world answers a wrong or false line in the fiction (§2.2, §2.4a).
+- **Negated actions rolled.** "I don't go in yet" no longer reads as a `move`
+  (§2.2).
+- **Conditionals had no kind.** "If anything moves, I shoot it" is `intent` and
+  sets stance `ready` (§2.2, §2.3).
+- **Orders to companions were dropped.** A party member's narrated action
+  ("Maya searches the kitchen") is an instruction from `{{user}}`, kept in the
+  model's copy; `npc` claims are now for characters outside the party (§2.2,
+  §2.4a).
+- **Prose could settle trades.** A trade offered in prose fills in the trade
+  action and commits only when confirmed; haggling stays `speech` until it
+  exists (`RESOLUTION.md` §2.8, `RPG_STATS.md` §3.10.3).
+- **Time passing had no kind.** New `wait` kind with `duration` and an
+  automatic time roll once encounter data exists; a cut point when it
+  interrupts (§2.3, §2.5, §2.6).
+- **OOC text wasn't excluded.** The beat pass skips out-of-character notes;
+  they reach the model unchanged (§2.2).
+- **Questions invited invented loot.** "Is there anything useful?" is
+  perception, answered from the state (§2.2; `OUTCOME_AUTHORITY.md` §5 new
+  bullet).
+- `RESOLUTION.md` §2.13 — new open questions: conditionals that fire
+  (overwatch), split parties, skipped travel; encounter data now also covers
+  time.
+- **Open questions recorded once, in the owning file.** `RESOLUTION.md` §2.13
+  keeps the engine questions (rolls per turn, intent with mechanics, time in
+  free beats, conditionals that fire) and points to the rest. Moved to
+  `RPG_STATS.md` §10: re-entry, places inside places (under location identity),
+  world-authored stances, split parties; encounter data extended to time
+  rolls. Moved to `OUTCOME_AUTHORITY.md` §10.2: claims the state agrees with,
+  improvised objects that share a catalog type, skipped travel.
+- **Third test round** (a drive, a noise and an empty gun, a haggle):
+  - `RESOLUTION.md` §2.2 — speaker tags join the quote they attribute; a lead-in
+    ("But then, it happened.") joins the beat it introduces, so an omitted
+    claim doesn't leave the model a cliffhanger to fill; travel along the way is
+    `flavor`, not a `move` per bend.
+  - `RESOLUTION.md` §2.5 — **journeys**: setting out makes one journey roll for
+    the road; narrating the trip rolls nothing; arriving is its own `move`; a
+    skip the fork carries out rolls the journey first. Settles skipped travel
+    (removed from `OUTCOME_AUTHORITY.md` §10.2).
+  - `RESOLUTION.md` §2.4a — **a perceived presence asks, it doesn't decide**:
+    "I heard a noise" makes a short time roll here, or the named place's arrival
+    roll now (pinned for entry), and the roll decides what was there; confirmed
+    perceptions stay in the model's copy; absence claims never ask; without
+    encounter data, perceptions pass through as proposals. Complications the
+    player puts on `{{user}}` ("in the dark") are `scenery`; the gray case
+    covers details that would get `{{user}}` past something. Expectations about
+    what someone outside the party will do ("knowing he would") are
+    `claim: npc`.
+  - `RESOLUTION.md` §2.3, §2.8 — persuasion about a price is haggling: `speech`,
+    no roll in v0, and the model is told the price stands.
+    `RPG_STATS.md` §3.10.3 says the same.
+  - `RESOLUTION.md` §2.6, §2.9, §2.10, §2.12 — perceived-presence cut rule;
+    `journey`, `perceived`, `absent`, `place` fields; a pull that clicks rolls
+    nothing; confirmed perceptions shown as applied; degradation.
+  - `RESOLUTION.md` §2.11 — example C reworked for pinned perception rolls; new
+    examples L (the drive), M (the noise and the empty Glock), N (the haggle).
+  - `OUTCOME_AUTHORITY.md` §3.5, new §10.1d — the decisions above.
+    `RPG_STATS.md` §10 — encounter data extended to journey rolls.
+
 ## 2026-11-11 — RPG Stats: searches are explicit HUD actions (Draft v0)
 
 Settles one of the `[[RPG_STATS]]` open questions: how a search gets matched to

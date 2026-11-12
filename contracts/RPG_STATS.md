@@ -623,6 +623,13 @@ through an explicit HUD trade action. A **wandering** instance is present by
 construction for as long as it exists. A trade attempted away from the vendor
 fails (`OUTCOME_AUTHORITY.md` §4.1a): Sal can't be sold to from across the map.
 
+Whatever the signal, a trade **commits only through the trade action**. A trade
+offered in prose ("I offer him my Glock and 200 bucks") brings that action up
+with the offer filled in, and nothing changes hands until the player confirms
+it there (`RESOLUTION.md` §2.8). Prices don't move in prose: an offer below the
+price opens the trade action short of it, and the model is told the price
+stands. Haggling is deferred (§7).
+
 ### 3.11 Item copies and their state
 
 Stateful items (§3.3) are tracked **per copy**. The catalog `id` says *what* an
@@ -704,8 +711,8 @@ is bookkeeping, and bookkeeping belongs to an explicit control.
 
 **Prose suggests; it does not roll.** When `{{user}}` writes "I check the
 cruiser," the consumer may surface the matching action ("Search Police
-cruiser?"), by name and alias matching or later by the small-model
-classification pass (`OUTCOME_AUTHORITY.md` §4.1b). It never rolls without the
+cruiser?"), by name and alias matching or through the beat pass, which labels
+the clause a `search` (`RESOLUTION.md` §2.3, §2.9). It never rolls without the
 player choosing the action. An unconfirmed prose search finds no catalog items:
 whatever the scene supports is scenery and carries no stats.
 
@@ -859,7 +866,11 @@ and the user can confirm or correct it.
 **Shots are observed, rounds are counted.** The model reports trigger pulls
 ("fires twice"); the consumer multiplies by the current fire mode's `rounds` and
 decrements the inserted magazine. The model never reports a remaining-rounds
-figure, the same way it never reports an HP total.
+figure, the same way it never reports an HP total. **Nothing is counted
+twice:** trigger pulls the player's message declared are resolved and deducted
+before generation (`RESOLUTION.md` §2.9), and the model's narration of those
+same shots is not counted again. Observation counts only shots the fork didn't
+already resolve.
 
 **Narration never mints catalog items.** A catalog item enters the campaign only
 through a fork roll (bestiary loot, a scavenge table, a wandering vendor's
@@ -1303,7 +1314,7 @@ reloads' worth of ammunition, and the second one has to be refilled first.
 | `[[BODY_CYCLES]]` carrier, cycle seed payload | `BODY_CYCLES.md` |
 | `[[RPG_STATS]]` carrier, stat system, item catalog (weapons, magazines, ammunition), starting sheets, bestiary, currency and vendors | this document |
 | Item `type` / `nature` vocabulary, possession and legality checks on weapons and money | `OUTCOME_AUTHORITY.md` (Draft) |
-| Dice, math, modifiers, time, combat, attempt parsing — how the engine uses this payload | `RESOLUTION.md` (Placeholder, fork-authored) |
+| Dice, math, modifiers, time, combat, attempt parsing — how the engine uses this payload | `RESOLUTION.md` (§2 attempt interpretation Draft, rest Placeholder; fork-owned) |
 | Who decides outcomes; what `{{user}}`'s message can change | `OUTCOME_AUTHORITY.md` (Draft) |
 
 All are independently versioned. `[[RPG_STATS]]` reuses existing conventions on
@@ -1337,8 +1348,29 @@ not trip `BODY_CYCLES.md` §7.1's generic-carrier trigger (§1.3).
   way `MEMORY_CONTRACT.md` gives NPCs one) is likely needed before v1. It would
   also open an additive producer field later: authored named places, each
   listing the scavenge tables it offers, so a known pharmacy offers its search
-  without any name matching.
+  without any name matching. **Places inside places** sharpen it: upstairs in a
+  house, the back room of a store. Is each its own location with its own
+  encounter chance and depletion, or does it share its parent's?
+  (`RESOLUTION.md` §2.11 example C rolls arrival for both in one turn.)
 - ~~**Matching a search to a table.**~~ Resolved 2026-11-11: a search is an
   explicit HUD action (§3.12). Free prose only suggests the matching action and
   never rolls a table; the manual "Search as…" choice covers places whose names
   match nothing.
+- **Encounter data for arrival, time, and journey rolls.** `RESOLUTION.md` §2.5
+  has the fork roll what's in a place when the party enters it (`move`), what
+  finds them while they stay (`wait`, scaled by duration), and what meets them
+  on the road (the journey roll, scaled by distance, duration, or kind of
+  route). All three need an authored encounter chance, per kind of place and
+  per span of time or route, referencing bestiary entries. Not yet a field here. Likely candidates: encounter lines on
+  the scavenge tables (§3.12), or a separate table keyed the same way. Its own
+  PR.
+- **Re-entry.** Going back into a place already visited: does arrival roll
+  again (the world moved on) or not (it was cleared)? Possibly a per-table
+  setting, like `depletes`.
+- **World-authored stances.** `RESOLUTION.md` §2.7 defines four v0 stances
+  (`ready`, `quiet`, `hidden`, `at_ease`). Whether `system` may add a world's
+  own (`warded`, `in formation`), and how a stance's modifier would be declared.
+- **Split parties.** Party location is one value in fork state, so "We split up"
+  (`RESOLUTION.md` §2.11 example H) has nowhere to go: where Maya's search
+  happens, which place an arrival roll belongs to, and whose location the
+  Scene Tracker follows all need a shape.
