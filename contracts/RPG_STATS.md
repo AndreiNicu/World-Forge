@@ -1,6 +1,6 @@
 # RPG Stats Contract — `[[RPG_STATS]]`
 
-**Status:** Draft · **Version:** 0 · **Last updated:** 2026-11-12
+**Status:** Draft · **Version:** 0 · **Last updated:** 2026-11-13
 
 > **Shared contract — canonical source of truth:**
 > [`AndreiNicu/World-Forge`](https://github.com/AndreiNicu/World-Forge) → `contracts/RPG_STATS.md`.
@@ -93,9 +93,11 @@ campaign.
   restate the lore entry.
 - **Not combat rules.** v0 defines what a character *has*, and the
   bookkeeping of what they carry: rounds loaded, magazines full or empty, a
-  blade's wear, money in the pocket (§3.8–§3.11). How damage, hit chance, and
-  initiative resolve is deliberately absent (§7). Weapon logistics work without
-  combat resolution; weapon numbers do not.
+  blade's wear, money in the pocket (§3.8–§3.11). It also carries the data the
+  enemy side of a fight runs on: a bestiary entry's attacks, speed, and tactics
+  (§3.5). How that data resolves lives in `RESOLUTION.md` §3, and hit chance,
+  damage math, and initiative are still absent (§7). Weapon logistics work
+  without combat resolution; weapon numbers do not.
 
 ### 1.4 Arc and sandbox
 
@@ -313,7 +315,7 @@ and `carry` field is ignored.
 | `durability` | object | no | Wear: `{ "max": int, "perUse"?: int, "atZero": "broken" \| "destroyed" }` (§3.9). |
 | `recover` | number | no | `0–1`. Chance each spent unit is recovered after the encounter (arrows, bolts, throwing knives; §3.8.3). Default `0`. |
 | `tags` | string[] | no | Free world vocabulary (`"medical"`, `"quest"`, `"rare"`). |
-| `combat` | object | — | **Reserved** for weapon and armor numbers (damage, range, accuracy, armor value, what a fire mode does to a hit). Not defined in v0; consumers ignore it. |
+| `combat` | object | — | **Reserved** for weapon and armor numbers (damage, range, accuracy, armor value, what a fire mode does to a hit). Not defined in v0; consumers ignore it. A weapon's damage is expected to take the same number-or-range shape as a bestiary attack's `damage` (§3.5), because enemies with weapons attack with these numbers (`RESOLUTION.md` §3.4). |
 
 The catalog exists because inventory, equipment, and loot all point at the same
 things. Without one list, the same carbine is described three slightly different
@@ -371,12 +373,31 @@ discarded when the encounter ends (§4.3).
 | `resources` | object | yes | `resourceKey → value`, where value is a number or a range (§3.6). It sets `max`; an instance spawns at `current = max`. |
 | `attributes`, `proficiencies` | object | no | As on sheets; values may be ranges. |
 | `abilities` | array | no | As on sheets. |
-| `equipment` | object | no | As on sheets. Instances **do not track** ammunition, magazines, or durability: an enemy's weapon never runs dry or breaks, and the instance is discarded at encounter end anyway. |
+| `equipment` | object | no | As on sheets. Instances **do not track** ammunition, magazines, or durability: an enemy's weapon never runs dry or breaks, and the instance is discarded at encounter end anyway. An equipped weapon is a source of attacks once its `combat` numbers exist (`RESOLUTION.md` §3.4). |
+| `attacks` | array | no | Natural attacks, for creatures without weapons (below). |
+| `speed` | int | no | Range bands the instance moves per `close` (`RESOLUTION.md` §3.3). Default `1`. |
+| `tactics` | string[] | no | Ordered intents; the first that applies is taken each exchange (below). Default `["attack", "close"]`. |
+| `fleeAtHpPct` | int | no | `1–99`. HP percentage at or below which `flee` applies, where `tactics` lists it. Absent ⇒ never flees. |
 | `loot` | array | no | `{ "item": itemId, "chance": 0–1, "qty"?: number \| range, "loaded"?: number \| range, "durability"?: number \| range }`. Each line rolls independently when an instance is defeated. `qty` defaults to `1`. `loaded` and `durability` set the state of a dropped stateful item (a magazine with `{ "base": 12, "spread": 10 }` rounds left, a carbine at half wear); absent ⇒ pristine. Currency drops are ordinary loot lines on the currency item. |
 | `note` | string | no | One or two lines on how it fights, in observable register (slow but grabs; travels in packs). Not the lore. |
 | `unique` | bool | no | At most one instance per encounter, and its defeat is committed to campaign state (§4.4). Default `false`; `true` is expected for bosses. |
 | `npc` | string | no | The `MEMORY_CONTRACT.md` slug of a named character this entry fights *as*. Links the fight to the character's lorebook voice and memory. See below. |
-| `phases` | array | no | Boss phases: `{ "atHpPct": 1–99, "note": string }`, fired once each as HP falls past the threshold. |
+| `phases` | array | no | Boss phases: `{ "atHpPct": 1–99, "note": string, "tactics"?: string[] }`, fired once each as HP falls past the threshold. A phase's `tactics` replaces the entry's from then on. |
+
+**Attacks and tactics.** These are the data the enemy side of a fight runs on;
+how they resolve is `RESOLUTION.md` §3.
+
+- **`attacks[]`** — each is `{ "key": string, "label"?: string, "damage":
+  number | range, "reach": "melee" | "ranged", "weight"?: number }`. `key` is
+  unique per entry. `damage` follows §3.6 and is rolled per hit. A `melee`
+  attack reaches only the party member the instance is engaged with; a
+  `ranged` attack reaches any band. When several reach, `weight` (default `1`)
+  sets the odds of each. An entry that fights with weapons needs no `attacks`;
+  one with neither has nothing to attack with.
+- **`tactics`** — an ordered list from the closed intent set `attack`,
+  `close`, `cover`, `withdraw`, `flee` (`RESOLUTION.md` §3.4). Each intent
+  applies under a fixed condition the consumer checks; the author sets only the
+  priority. Unknown intents are ignored.
 
 **Named versus nameless.** Interchangeable enemies (a Shambler, a nameless rogue
 operator) are bestiary entries and nothing else. A named villain with a
@@ -803,10 +824,17 @@ difference and *offer* an update (§7). It never applies one silently.
 
 When combat starts, the consumer creates a **working copy**. It holds the
 participating sheets, plus one instance per spawned enemy, each with its
-range-rolled numbers. All combat changes go to the working copy. Swipes,
-regenerations, and rewinds inside the fight revise or discard working-copy
-changes. They never touch campaign state, so a re-roll can't permanently cost
-anything.
+range-rolled numbers, its range band and the party member it's engaged with,
+whether it's in cover, and which boss phases have fired (`RESOLUTION.md` §3.3–
+§3.4). All combat changes go to the working copy, and none of them touch
+campaign state until the encounter ends.
+
+**Swipes and regenerations replay the exchange.** Every roll in an exchange,
+the party's and the enemies', is pinned to the user message that made it
+(`OUTCOME_AUTHORITY.md` §4.2), so a swipe asks for new prose and gets the same
+results. Rewinding or deleting messages inside the fight discards the
+working-copy changes those messages made, and editing a user message makes it
+a new attempt that rolls again (`OUTCOME_AUTHORITY.md` §1.2).
 
 Rounds fired, magazines swapped, fire-mode switches, refills, and wear during
 the fight all go to the working copy too. A live HUD shows the working copy.
@@ -858,7 +886,9 @@ the currency `symbol`. With `system.carry`: each party member's load against
 their limit and the encumbrance tier in force, with its `note`. While the party
 is trading: the vendor's funds and stock with current values. After a search:
 what it turned up. During combat it adds the encounter: each instance's name,
-rough condition, and `note`, plus any boss `phases` note that has fired. Exact
+rough condition, range band (and who it's engaged with), and `note`, plus any
+boss `phases` note that has fired. Each exchange's resolved results arrive
+beside it as their own block (`RESOLUTION.md` §3.6). Exact
 numbers versus descriptive condition ("badly hurt") is a consumer presentation
 choice. The block is authoritative fact, the same standing as the dice oracle's
 injected facts (`DICE_ORACLE.md` §1).
@@ -870,6 +900,12 @@ ranges, loot, and whatever later combat resolution needs. The model's part is
 observational, the same split as `BODY_CYCLES.md` §1.2. It can report that
 `{{user}}` drank a dressing or took a bite. The consumer turns that into a change,
 and the user can confirm or correct it.
+
+**Inside an encounter, the enemy side isn't observed.** The fork resolves what
+each enemy does and what it costs before generation (`RESOLUTION.md` §3), and
+the model narrates the injected result. Its narration of the fight is not
+parsed for damage. Observation covers what the world does outside a fight: a
+fall, a fire, a hazard.
 
 **Shots are observed, rounds are counted.** The model reports trigger pulls
 ("fires twice"); the consumer multiplies by the current fire mode's `rounds` and
@@ -1007,6 +1043,14 @@ Absence never errors, matching every other seam:
       never `"dead"`. If it is ruled in, it says so explicitly.
 - [ ] Every bestiary entry that names a cast member carries `npc`. A bestiary
       `note` doesn't restate its Tier 1 lore entry.
+- [ ] Every bestiary entry that fights has a source of attacks: `attacks`, or
+      an equipped weapon (which attacks once its `combat` numbers exist,
+      `RESOLUTION.md` §3.4). Attack `key`s are unique per
+      entry, every `reach` is `melee` or `ranged`, and `damage` ranges stay
+      ≥ 0. `speed` is ≥ 1. `tactics` (on the entry and on each phase) uses
+      only `attack`, `close`, `cover`, `withdraw`, `flee`, and `flee` appears
+      only where `fleeAtHpPct` is set. `tactics` and `phases` agree with the
+      `note`: an enemy described as fighting from cover lists `cover`.
 - [ ] No starting values appear in prose lorebook entries or cards. The carrier
       is the single source, and a number in prose becomes a second, stale copy.
 
@@ -1019,9 +1063,11 @@ mechanics among them (combat, refill time, encumbrance effects, repair checks,
 restocking) are specified in [`RESOLUTION.md`](./RESOLUTION.md), written from
 the fork side. Any new authored data they need is added here.
 
-- **Combat resolution** — damage, hit chance, initiative, turn order. Needs the
-  reserved item `combat` field and, per `DICE_ORACLE.md` §7.3, likely
-  server-authoritative rolls.
+- **Combat resolution** — hit chance, damage math, armor, initiative, and the
+  exchange budget. The enemy side's structure (exchange order, range bands,
+  intents, targeting) is drafted in `RESOLUTION.md` §3, with its data in §3.5
+  here. The numbers need the reserved item `combat` field and, per
+  `DICE_ORACLE.md` §7.3, likely server-authoritative rolls.
 - **Statuses** — bleeding, infected, stunned. The `statuses` field is reserved.
 - **Levels, XP, and growth** — how `max` and ranks rise. v0 already allows `max`
   to change through `target: "max"` effects; systematic growth is later.
@@ -1079,6 +1125,14 @@ about what to leave.
 The opening state is built for tension on purpose: `{{user}}` has a Glock with
 9 rounds in the magazine, one empty spare, and 11 loose rounds in a pocket. Two
 reloads' worth of ammunition, and the second one has to be refilled first.
+
+The bestiary shows the fight data (`RESOLUTION.md` §3). The zombies have
+natural `attacks` and the default tactics: hit what's in reach, otherwise come
+closer. The Runner's `speed: 2` is its note made mechanical. The Rogue Operator
+and Colonel Hale fight with their equipped weapons, so they have no `attacks`
+and can't attack until weapon `combat` numbers exist; their `tactics` are there
+already. The operator takes cover first and breaks off at a quarter of its HP,
+and Hale stays back until his phase at 50% switches him to closing in.
 
 ```json
 {
@@ -1211,20 +1265,26 @@ reloads' worth of ammunition, and the second one has to be refilled first.
   "bestiary": [
     { "id": "shambler", "name": "Shambler", "tier": "common",
       "resources": { "hp": { "base": 40, "spread": 10 } },
+      "attacks": [ { "key": "claw", "label": "Grab and claw", "damage": { "base": 8, "spread": 3 }, "reach": "melee", "weight": 3 },
+                   { "key": "bite", "label": "Bite", "damage": { "base": 14, "spread": 4 }, "reach": "melee" } ],
       "note": "Slow, relentless, dangerous when it gets hands on you. Comes in numbers.",
       "loot": [ { "item": "field_dressing", "chance": 0.1 },
                 { "item": "dollar", "chance": 0.3, "qty": { "base": 10, "spread": 8 } } ] },
     { "id": "runner", "name": "Runner", "tier": "common",
       "resources": { "hp": { "base": 30, "spread": 8 } },
+      "attacks": [ { "key": "claw", "label": "Claw", "damage": { "base": 7, "spread": 3 }, "reach": "melee" } ],
+      "speed": 2,
       "note": "Recently turned. Fast, closes distance before you can aim." },
     { "id": "bloated", "name": "Bloated", "tier": "elite",
       "resources": { "hp": { "base": 110, "spread": 20 } },
+      "attacks": [ { "key": "slam", "label": "Slam", "damage": { "base": 16, "spread": 5 }, "reach": "melee" } ],
       "note": "Swollen and slow. Bursts when it drops, and anyone close gets sprayed." },
     { "id": "rogue_operator", "name": "Rogue Operator", "tier": "elite",
       "resources": { "hp": { "base": 120, "spread": 15 } },
       "proficiencies": { "rifles": { "base": 3, "spread": 1 }, "hand_to_hand": 3 },
       "equipment": { "main": "c8_carbine", "secondary": "glock_17", "armor": "stab_vest" },
-      "note": "Trained, works in pairs, uses cover and flanks.",
+      "tactics": ["flee", "cover", "attack", "close"], "fleeAtHpPct": 25,
+      "note": "Trained, works in pairs, uses cover and flanks. Breaks off when badly hurt.",
       "loot": [ { "item": "c8_carbine", "chance": 0.4, "durability": { "base": 180, "spread": 80 } },
                 { "item": "stanag_30", "chance": 0.7, "qty": { "base": 2, "spread": 1 },
                   "loaded": { "base": 15, "spread": 15 } },
@@ -1236,8 +1296,10 @@ reloads' worth of ammunition, and the second one has to be refilled first.
       "resources": { "hp": { "base": 300, "spread": 0 } },
       "proficiencies": { "rifles": 5, "hand_to_hand": 4 },
       "equipment": { "main": "c8_carbine", "secondary": "glock_17", "armor": "stab_vest" },
+      "tactics": ["cover", "withdraw", "attack"],
       "note": "Fights from behind his men until there are none left.",
-      "phases": [ { "atHpPct": 50, "note": "His last guards are down; he stops giving orders and fights himself." } ],
+      "phases": [ { "atHpPct": 50, "note": "His last guards are down; he stops giving orders and fights himself.",
+                    "tactics": ["attack", "close"] } ],
       "loot": [ { "item": "military_stim", "chance": 1.0 },
                 { "item": "stanag_30", "chance": 1.0, "qty": 3 } ] }
   ],
@@ -1338,7 +1400,9 @@ not trip `BODY_CYCLES.md` §7.1's generic-carrier trigger (§1.3).
 - **How the model reports changes** (§4.6) — a turn tag in the `npcmem` style,
   a scan prompt, or UI-only with model suggestions.
 - **Exact numbers or descriptive condition** in the state block (§4.5), and
-  whether that is a world choice (a carrier field) or a user setting.
+  whether that is a world choice (a carrier field) or a user setting. The
+  combat exchange block gives both: the number and a severity band
+  (`RESOLUTION.md` §3.6). The bands themselves are not yet fixed.
 - **Whether `attributes` earn their place in v1** or wait until combat needs them.
 - **Carrier size.** A large bestiary plus catalog in one entry is fine for the
   consumer but heavy to hand-edit, and weapons, magazines, rounds, and vendors
