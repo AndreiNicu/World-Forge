@@ -13,6 +13,56 @@ numbers. Newest first.
 
 ---
 
+## 2026-11-13 — Resolution: combat, the enemy side (Draft v0)
+
+The beat vocabulary resolved the player's side of a fight before generation,
+but left the enemy's response to the narration, with damage read back as an
+observation. That made the model the jeopardy dial: the habit that yields to
+`{{user}}` would decide how often the enemy hits them (principle #13). The fork
+now resolves the enemy side too, before generation. Each enemy rolls its own
+attack, the fork picks the target, and the model writes how it happens but
+never whether, who, or how much. Attack math, defense, damage, and armor stay
+placeholders with the core roll. Still a Draft; nothing reads it.
+
+### Added
+
+- `contracts/RESOLUTION.md` §3 — **combat: the enemy side.** The exchange (one
+  user message and its reply; party first, then each enemy that can act, both
+  sides pinned to the message); three **range bands** per enemy instance
+  (`engaged` / `near` / `far`); **enemy intent** from a closed set (`attack`,
+  `close`, `cover`, `withdraw`, `flee`), picked by the first applicable entry
+  in an authored `tactics` list, with boss phases able to switch it;
+  **fork-side targeting** (engaged, then whoever hurt it, then random among the
+  reachable); one attack formula for both sides; party members acting on
+  instructions; the **"no more harm, no less"** narration rule with a severity
+  band; encounter end; degradation; and the open questions this surfaced
+  (exchange budget, moving within a fight, melee reach, defense, initiative,
+  companions without orders, attacks on the downed, talking an enemy down).
+- `contracts/RPG_STATS.md` §3.5 — bestiary fields `attacks[]`, `speed`,
+  `tactics`, `fleeAtHpPct`, and `phases[].tactics`; matching producer rules in
+  §6; the §8 worked example gains attacks, the Runner's speed, and tactics for
+  the Rogue Operator and Colonel Hale.
+- `contracts/OUTCOME_AUTHORITY.md` §10.1f — the decisions, and a §5 engine-block
+  bullet for narrating a fight as resolved.
+
+### Changed
+
+- `contracts/RPG_STATS.md` §4.3 — **swipes replay the exchange** instead of
+  discarding working-copy changes, applying the pending `OUTCOME_AUTHORITY.md`
+  §9 row; the working copy tracks band, engagement, cover, and fired phases.
+  §4.5 shows each enemy's band; §4.6 and `OUTCOME_AUTHORITY.md` §2.2 (writer 3)
+  stop reading the enemy side back from the narration inside an encounter.
+- `contracts/RESOLUTION.md` §2.6 — the fork resolves the enemy side after the
+  player's beats; §2.9 — an instruction carries its asked kind's fields
+  (`target` for a `check`). The trailing sections renumber to §4–§5 (nothing
+  referenced them by number).
+- `contracts/README.md`, `CLAUDE.md` — RESOLUTION status: §2–§3 Draft.
+
+### Fixed
+
+- `contracts/OUTCOME_AUTHORITY.md` §8 — combat resolution pointed at
+  `RPG_STATS.md`; it belongs to `RESOLUTION.md`.
+
 ## 2026-11-12 — Resolution: beat vocabulary revised against RPG_STATS and OUTCOME_AUTHORITY (Draft v0)
 
 Cross-checking the beat vocabulary against the two contracts it serves turned up

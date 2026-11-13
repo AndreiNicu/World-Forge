@@ -1,6 +1,6 @@
 # Resolution Contract — how attempts become outcomes
 
-**Status:** Placeholder, with §2 (attempt interpretation) in Draft · **Version:** 0 · **Last updated:** 2026-11-12
+**Status:** Placeholder, with §2 (attempt interpretation) and §3 (combat: the enemy side) in Draft · **Version:** 0 · **Last updated:** 2026-11-13
 
 > **Shared contract — canonical source of truth:**
 > [`AndreiNicu/World-Forge`](https://github.com/AndreiNicu/World-Forge) → `contracts/RESOLUTION.md`.
@@ -13,11 +13,11 @@
 > belongs to the SillyTavern fork's side, which owns the runtime internals it
 > describes. World Forge only produces the data the engine consumes
 > (`RPG_STATS.md`, `DICE_ORACLE.md`); how that data is handled at runtime is the
-> fork's to define. §2 (attempt interpretation) was drafted early so the rest of
-> the engine has a shape to build against. It is a Draft: nothing reads it, and
-> the fork may revise it here as it builds. The other sections have no content
-> yet. No agent spec references this document and nothing in this repo depends
-> on it.
+> fork's to define. §2 (attempt interpretation) and §3 (combat: how the enemy
+> side of a fight resolves) were drafted early so the rest of the engine has a
+> shape to build against. They are Drafts: nothing reads them, and the fork may
+> revise them here as it builds. The other sections have no content yet. No
+> agent spec references this document and nothing in this repo depends on it.
 
 ---
 
@@ -36,8 +36,10 @@ something" and "the fork commits a result."
   show why the odds are what they are. *Placeholder.*
 - **Time** — what a beat or round is in chat play; refill and reload duration;
   initiative and turn order. *Placeholder.*
-- **Combat** — attack, damage, armor, what a fire mode does to a hit (the
-  reserved `combat` field in `RPG_STATS.md` §3.3). *Placeholder.*
+- **Combat** — the exchange, range bands, and how enemies act and are
+  narrated: **§3, Draft.** Attack math, damage, armor, and what a fire mode does
+  to a hit (the reserved `combat` field in `RPG_STATS.md` §3.3) are still
+  *placeholder*, with the core roll.
 - **Dice grammar** — dice notation and roll syntax, shared with the dice oracle
   where it can be. *Placeholder.*
 - **Attempt interpretation** — how `{{user}}`'s message is split into beats,
@@ -103,7 +105,8 @@ on who they are:
   `asks`, the kind of beat the instruction would be if the ally did it
   (`search`, `move`, `check`, `stance`, `gear`). It stays in the model's copy.
   Whether the ally does it is the world's response, and if she does something a
-  roll owns (a search), it goes through the same action `{{user}}`'s would.
+  roll owns (a search), it goes through the same action `{{user}}`'s would. In
+  a fight, the fork resolves it before generation (§3.5).
   **An instruction can't ask for what the ally's state forbids.** The fork runs
   the legality check for the asked kind against the ally's own sheet
   (`OUTCOME_AUTHORITY.md` §4.1a). "Maya shakes it off and gets up", with Maya
@@ -397,10 +400,9 @@ generates.
 - **Inside an encounter, a failed `check` doesn't cut.** Missing a shot
   doesn't stop `{{user}}` reloading. The beats resolve in order, and a beat that
   depended on the failed one is caught by the legality check instead: searching
-  a Shambler that didn't go down fails because it isn't defeated. How many
-  actions fit in one turn of a fight is a question of time and combat (§1,
-  placeholder); until that exists, the fork resolves the beats in order and the
-  model narrates the enemy's response after them. An arrival roll that starts an
+  a Shambler that didn't go down fails because it isn't defeated. The fork then
+  resolves the enemy side (§3.2), and the model narrates both. How many actions
+  fit in one exchange is still open (§3.9). An arrival roll that starts an
   encounter still cuts: the fight begins at that beat.
 - **A perceived presence that rolls** (§2.4a) is a cut point when it's here and
   finds something: the encounter starts at that beat. One about somewhere else
@@ -529,7 +531,7 @@ deterministically.
   | --- | --- |
   | `flavor` | `question: true` for a question to the narrator. |
   | `intent` | None. |
-  | `speech` | `to` if it addresses someone; `quoted: true` for quoted words; `instruction: true` for a direction to a party member, with `asks` (the kind it would be if they did it) (§2.2). |
+  | `speech` | `to` if it addresses someone; `quoted: true` for quoted words; `instruction: true` for a direction to a party member, with `asks` (the kind it would be if they did it) and the fields that kind takes ("Maya, shoot the big one" carries `asks: check` and its `target`) (§2.2). |
   | `stance` | The axis it sets (`weapon`, `noise`, `cover`, `posture`) with its value, or `at_ease: true`; `object` if a weapon is named; `when` for a conditional (§2.7). |
   | `gear` | `op` (§2.3); `item`; for `give`, `to`; for `mode`, `mode`; for `loot`, `target`. |
   | `move` | `to`; `journey: true` when it sets out for a place it doesn't reach in the same beat. |
@@ -895,7 +897,7 @@ Each is recorded once, in the file that will settle it.
   time exists (§1). Longer spans ("I wait an hour") are a `wait` (§2.3).
 - **Conditionals that fire.** Whether "If anything moves, I shoot it" should
   resolve automatically when the condition happens (overwatch), or stay a
-  stance until the player acts. A question for combat (§1).
+  stance until the player acts. A question for combat (§3.9).
 
 **Tracked in the owning contract:**
 
@@ -912,7 +914,258 @@ Each is recorded once, in the file that will settle it.
 
 ---
 
-## 3. Boundary with the producer
+## 3. Combat: the enemy side — Draft
+
+Decided 2026-11-13. This section covers how an exchange is ordered, where
+enemies are, what they do, who they do it to, and how the result reaches the
+model. The numbers behind it — the attack roll, what defense is made of, damage,
+armor — belong to the core roll and math (§1) and are still placeholders here.
+
+### 3.1 The problem
+
+§2 resolves the player's side of a fight before generation. If the enemy's side
+were left to the narration, the model would decide whether the Shambler's bite
+lands, and the fork would only read the damage back (`OUTCOME_AUTHORITY.md`
+§2.2, writer 3). That makes the model the jeopardy dial: the same habit that
+yields to `{{user}}` would decide how often the enemy hits them (producer
+`CLAUDE.md` principle #13). The player's side would be mechanical and the
+enemy's would be a mood.
+
+So **the fork resolves both sides before generation**: what each enemy does,
+to whom, whether it lands, and for how much. The model writes how it happens.
+It is the dice oracle's split applied to a fight, "roll the shape, not the
+choreography" (`DICE_ORACLE.md` §6.1).
+
+### 3.2 The exchange
+
+Inside an encounter, **one user message and the reply to it are one
+exchange.** Before generation, the fork resolves it in this order:
+
+1. **`{{user}}`'s beats**, in the order written (§2.6). An enemy they defeat
+   doesn't act.
+2. **Party members acting on an instruction** in this message (§3.5), in the
+   order the instructions were written.
+3. **Each enemy instance still able to act** takes one action (§3.4), in
+   instance order (`Shambler 1` before `Shambler 2`). An earlier action's
+   result applies to later ones.
+4. **The results commit to the working copy** (`RPG_STATS.md` §4.3) and reach
+   the model as one block of facts (§3.6).
+
+- **Both sides are pinned to the user's message** (`OUTCOME_AUTHORITY.md`
+  §4.2). A swipe replays the whole exchange, the enemy's rolls included, and
+  asks only for different prose.
+- **Enemies act even when the player rolls nothing.** A message that only talks,
+  reloads, or hesitates still gives every enemy its action. Spending an
+  exchange on something else is a choice, and the enemy answers it.
+- **The party acts first.** The player's message is the party's move and the
+  world answers it. Surprise, ambush, and an alerted enemy acting first are
+  initiative, which is open (§3.9). Until it's settled, the exchange whose
+  arrival roll starts an encounter has no enemy actions: the turn ends at that
+  beat (§2.6), and the first full exchange is the player's next message.
+- **How much fits in one exchange** — three shots, a reload, and a dive for
+  cover in one message — is the exchange budget, which is open (§3.9).
+
+### 3.3 Range bands
+
+Each enemy instance is in one of three **range bands**, relative to the party:
+
+| Band | Meaning |
+| --- | --- |
+| `engaged` | Within arm's reach of one party member. Melee range. The instance records **which** party member it is engaged with. |
+| `near` | Across a room or a yard: a few seconds' rush. |
+| `far` | Across a street or a field: ranged weapons only. |
+
+- **The party shares one position.** Bands are per enemy instance, not per
+  party member, except that an `engaged` instance names the member it's
+  engaged with. Distances per party member wait on split parties
+  (`RPG_STATS.md` §10).
+- **Starting band.** Instances start at `near` until encounter data sets the
+  band (`RPG_STATS.md` §10). The arrival roll is the expected place to set it,
+  along with whether the enemy is alerted.
+- **Enemies change band** through their own actions: `close` moves `speed`
+  bands toward the party, `withdraw` moves one band away (§3.4).
+- **The party changing band** ("I back away", "I rush him") has no beat kind
+  yet. It is open (§3.9).
+- **Reach.** A `melee` attack reaches only the party member the instance is
+  engaged with. A `ranged` attack reaches any band. What range does to the
+  odds is a modifier (§1, placeholder).
+- Each instance's band shows in the state block (`RPG_STATS.md` §4.5) and on
+  the HUD.
+
+### 3.4 An enemy's action
+
+Each enemy instance that can act takes one action. The fork picks it in four
+steps: **intent, target, roll, damage.** None of them is the model's.
+
+**Intent.** What the enemy does this exchange, from a closed list:
+
+| Intent | Applies when | What happens |
+| --- | --- | --- |
+| `attack` | One of its attacks reaches a party member (§3.3) | The attack resolves (below). |
+| `close` | It isn't engaged and no attack reaches | It moves `speed` bands toward the party. Reaching `engaged`, it engages its target. |
+| `cover` | It isn't in cover | It is in cover until it moves. What cover does to the odds is a modifier (§1, placeholder). |
+| `withdraw` | It's engaged and has a `ranged` attack | It moves to `near`. |
+| `flee` | Its HP is at or below its `fleeAtHpPct` | It leaves the encounter. It isn't defeated, so it drops no loot. |
+
+The bestiary entry's **`tactics`** is an ordered list of these intents, and
+**the first one that applies is taken** (`RPG_STATS.md` §3.5). Authors set the
+priority; the fork judges only the fixed conditions in the table. Nothing is
+model-chosen and no condition language is authored.
+
+- **Default `["attack", "close"]`** when `tactics` is absent: hit what's in
+  reach, otherwise come closer. That is every Shambler.
+- A trained enemy might be `["cover", "attack", "close"]`: it gets into cover
+  first, then shoots from it.
+- `flee` applies only to an entry with `fleeAtHpPct`, and only where it is
+  listed in `tactics`.
+- **Boss phases switch tactics.** A phase with its own `tactics` replaces the
+  entry's list from the moment it fires. "Fights from behind his men until
+  there are none left" becomes a list, not a hope.
+- **If no intent applies, the instance holds** and does nothing this exchange.
+
+**Target.** The party member an `attack` (or the engagement at the end of a
+`close`) is aimed at. The fork picks:
+
+1. the party member the instance is engaged with;
+2. otherwise the one who damaged it most recently this exchange;
+3. otherwise one at random among the party members its attack can reach.
+
+**The model never picks the target.** A fact that says "someone takes 9" ends
+up on whoever the model would rather hurt, which is never `{{user}}`. Downed
+party members aren't targeted while that is open (§3.9): `atZero` is authored
+from the world's posture boundary (`RPG_STATS.md` §3.7), and a finishing blow on
+a downed character would need to be authored the same way.
+
+**Which attack.** When several of an instance's attacks reach, the fork picks
+one at random, weighted by each attack's `weight` (default `1`).
+
+**Roll.** The attack rolls against the target's **defense** and lands in one of
+the three bands: success, partial, fail. How the roll works, what defense is
+made of (stance `cover` and `posture`, armor, perhaps an attribute), and what a
+partial does to an enemy attack belong to the core roll (§1, placeholder).
+
+**Damage.** A hit rolls the attack's `damage` (a number or a range,
+`RPG_STATS.md` §3.6), reduced by the target's armor (placeholder), and commits
+to the target's working copy. `atZero` applies as usual.
+
+**One attack formula for both sides.** An enemy with `equipment` attacks with
+its equipped weapon exactly as `{{user}}` would: the weapon's `combat` numbers
+(reserved, `RPG_STATS.md` §3.3) and the instance's own proficiency. Its weapon
+never runs dry or wears (`RPG_STATS.md` §3.5). Creatures without weapons have
+natural `attacks`. An instance with neither a natural attack nor a weapon with
+`combat` numbers has nothing to attack with, and `attack` never applies to it.
+
+**Named enemies.** A bestiary entry with `npc` is portrayed from that
+character's own material (`RPG_STATS.md` §3.5), but the fork still picks its
+intent and resolves its results. Its `tactics` and `phases` are the authored
+frame the portrayal stands on, the same way a card is.
+
+### 3.5 Party members in a fight
+
+- **`{{user}}`** acts through their beats (§2).
+- **A party member given an instruction** this exchange ("Maya, shoot the big
+  one") acts on it in step 2 of the exchange (§3.2). The fork checks the asked
+  kind against her own sheet (§2.2) and resolves it as it would `{{user}}`'s:
+  her proficiency, her weapon, her rounds. Until refusal is settled (§3.9), an
+  instruction her state allows is carried out, and the model voices how she
+  does it.
+- **A party member with no instruction** takes no mechanical action until
+  companion behavior is settled (§3.9). The model may write her bracing,
+  shouting, or staying close, but she deals no damage and makes no roll.
+- **Every party member can be targeted** (§3.4). Damage to a companion commits
+  to her sheet like damage to `{{user}}`.
+
+### 3.6 The exchange reaches the model: no more harm, no less
+
+The fork injects each exchange's results as one block of authoritative fact,
+with the standing of the state block (`RPG_STATS.md` §4.5). It lists, in the
+order resolved:
+
+- each party roll and its result;
+- each enemy's action: its intent, its target, the band, the damage, and the
+  **severity** the target is left at;
+- band changes, defeats, flights, and any boss phase that fired.
+
+**Severity** is a short descriptive band derived from `current / max`
+(unhurt, lightly hurt, badly hurt, barely standing, downed), given beside the
+number so the prose and the HP stay in step. The exact bands and wording are
+the consumer's (`RPG_STATS.md` §10). One possible form:
+
+> `[Exchange — Shot 1 hits Shambler 1 (badly hurt). Shot 2 misses. Shambler 1 claws {{user}}: hit, 9 damage — {{user}} lightly hurt. Shambler 2 closes to arm's reach of Maya.]`
+
+The model narrates **exactly** the block:
+
+- **No less.** A rolled hit lands, at its severity. Writing nine damage as
+  "barely a scratch" is rescue from consequence. A miss is a miss.
+- **No more.** No hits, wounds, or effects the block doesn't list, and no
+  enemy acts beyond its injected action. That is sourceless adversity,
+  which `protagonist_jeopardy` already rules out.
+- **The model owns the choreography:** how the lunge looks, what the Colonel
+  shouts, what the cover is, the sound and the blood. Never whether, who, or
+  how much.
+
+The engine block that carries this rule is `outcome_authority`
+(`OUTCOME_AUTHORITY.md` §5), still a sketch.
+
+**The fight isn't read back for damage.** Inside an encounter the enemy side is
+already resolved, so the model's narration of it is not parsed for damage or
+hits (`OUTCOME_AUTHORITY.md` §2.2, writer 3). Outside encounters, observation
+works as `RPG_STATS.md` §4.6 describes: a fall, a fire, a hazard.
+
+### 3.7 Encounter end
+
+An encounter ends when no enemy instance is left able to act: each one
+defeated or fled. The working copy then commits (`RPG_STATS.md` §4.3). The party
+leaving a fight — fleeing, or simply walking away from enemies that can't
+follow — is open (§3.9).
+
+### 3.8 Graceful degradation
+
+- **No instance in the encounter can attack** (no natural `attacks`, no weapon
+  with `combat` numbers): the enemy side falls back to the behavior before this
+  section. The model narrates the enemy's response, and its harm is read back
+  as an observation (`RPG_STATS.md` §4.6).
+- **No core roll implemented:** no enemy side. Same fallback.
+- **No beat pass** (§2.12): no exchange is resolved. The model handles the fight
+  under `protagonist_jeopardy`.
+- **No `tactics`:** the default `["attack", "close"]`. No `speed`: `1`.
+
+### 3.9 Open questions
+
+- **The exchange budget.** How much the player can do in one exchange before
+  the enemy answers. The likely shape is a time budget with the beats past it
+  cut as *Not reached* (§2.6), but nothing is decided.
+- **Moving within a fight.** "I back away", "I rush him", "I fall back to the
+  stairs": no beat kind changes the party's band. `move` is entering or leaving
+  a place (§2.3), and travel along the way is `flavor`. Settled with the
+  exchange budget.
+- **Melee reach on the player's side.** "I stab the Shambler" while it's `near`:
+  a legality failure, or an implied close and then a stab.
+- **The core roll and defense** (§1). The attack roll, what defense is made of,
+  what a partial does to an attack (either side), armor reduction, and armor
+  wear.
+- **Initiative and surprise.** Whether an alerted enemy acts on the exchange an
+  encounter starts, whether a surprised one loses its first, and what `quiet`
+  stance does to it.
+- **Companions.** What a party member with no instruction does, and whether one
+  may refuse an order mid-fight.
+- **Attacks on downed characters.** Whether an enemy can target a downed party
+  member, and what a hit does to someone already at the floor. Authored from
+  the posture boundary if it exists at all.
+- **Talking an enemy down.** A successful intimidation or plea that switches an
+  enemy's intent to `withdraw` or `flee`.
+- **Statuses from attacks.** A grab that holds, a bite that infects. Waits on
+  statuses (`OUTCOME_AUTHORITY.md` §10.2).
+- **Morale** beyond `fleeAtHpPct`: fleeing when the others fall, or when the
+  leader does.
+- **Overwatch** (§2.13).
+- **Leaving a fight** (§3.7).
+- **A fleeing `unique` enemy.** Its HP doesn't persist yet (`RPG_STATS.md`
+  §7), so it comes back whole.
+
+---
+
+## 4. Boundary with the producer
 
 World Forge authors **starting values and world data** (stats, items, sheets,
 bestiary, vendors, scavenge tables). It never authors resolution rules, never
@@ -922,11 +1175,11 @@ range, an encounter chance per kind of place), that field is added to
 `RPG_STATS.md` and produced there; this document defines only how the engine
 uses it.
 
-## 4. Relationship to the other contracts
+## 5. Relationship to the other contracts
 
 | Concern | Governed by |
 | --- | --- |
-| What exists: stats, items, sheets, bestiary, economy | `RPG_STATS.md` (Draft) |
+| What exists: stats, items, sheets, bestiary (including attacks, speed, tactics), economy | `RPG_STATS.md` (Draft) |
 | Who decides: attempts vs. results, pinned rolls, legality | `OUTCOME_AUTHORITY.md` (Draft) |
-| How an attempt resolves: beats, dice, math, modifiers, parsing | this document (§2 Draft, rest Placeholder) |
+| How an attempt resolves: beats, the enemy side of a fight, dice, math, modifiers, parsing | this document (§2 and §3 Draft, rest Placeholder) |
 | Stateless narrative roll tables | `DICE_ORACLE.md` |

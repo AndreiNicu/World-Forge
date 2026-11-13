@@ -1,6 +1,6 @@
 # Outcome Authority Contract — who decides what happened
 
-**Status:** Draft · **Version:** 0 · **Last updated:** 2026-11-12
+**Status:** Draft · **Version:** 0 · **Last updated:** 2026-11-13
 
 > **Shared contract — canonical source of truth:**
 > [`AndreiNicu/World-Forge`](https://github.com/AndreiNicu/World-Forge) → `contracts/OUTCOME_AUTHORITY.md`.
@@ -107,7 +107,13 @@ Campaign state changes **only** through:
    items**: what a search, a body, or a stranger yields comes from a fork roll
    (`RPG_STATS.md` §3.12, §4.6), and narration the roll didn't produce isn't
    committed. This is the model-side counterpart of a possession claim. Left
-   open, the model becomes the loot table.
+   open, the model becomes the loot table. **Inside an encounter this writer
+   doesn't apply to the enemy side** (decided 2026-11-13): what each enemy does
+   and what it costs is a fork roll (writer 1) made before generation
+   (`RESOLUTION.md` §3), and the model narrates the injected result without
+   being read back. Left to observation, the model would be the jeopardy dial.
+   Writer 3 covers what the world does outside a fight: a fall, a fire, a
+   hazard.
 
 `{{user}}`'s message text is not on this list. It can *propose* an action the
 fork then resolves (drink a dressing → the fork checks inventory → commit). It
@@ -492,6 +498,11 @@ posture blocks:
   the injected result says was there, and no catalog item beyond it. An empty
   result is an empty room. Scenery the place would plausibly hold (a chair, a
   brick, a kitchen knife) is still there, and carries no mechanics.
+- **A fight is narrated as resolved: no more harm, no less.** When an exchange
+  block is injected (`RESOLUTION.md` §3.6), every hit lands at its stated
+  severity, every miss misses, and no hit, wound, or enemy action is added
+  beyond it. The choreography is the model's; whether, who, and how much are
+  not.
 - **A question about what's here is answered from the state.** "Is there
   anything useful?" gets what's in plain sight and, for a place not yet
   searched, a pointer to the search. Never a list of catalog items the state
@@ -579,8 +590,9 @@ any ally stands" until the field is settled.
 - **Out-of-fiction cheating.** Editing JSON, editing or deleting messages,
   branching a chat. Not detected, not prevented. The player owns the chat.
 - **Ironman / rewind locks.** Not planned; same reason.
-- **Combat resolution.** Belongs to `RPG_STATS.md` when it lands. This document
-  only fixes the rule that a resolution, once made, holds.
+- **Combat resolution.** Belongs to `RESOLUTION.md` (§3 drafts the enemy
+  side), with its data in `RPG_STATS.md`. This document only fixes the rule
+  that a resolution, once made, holds.
 - **Narrowing creativity.** Uncatalogued objects, clever plans, and legal
   actions the author didn't foresee are all fine. The rule is about results,
   not about what may be tried.
@@ -591,7 +603,8 @@ any ally stands" until the field is settled.
 
 | Passage | Change |
 | --- | --- |
-| §4.3 working copy | Swipes replay pinned rolls (§4.2); only out-of-fiction edits re-roll. |
+| §4.3 working copy | Swipes replay pinned rolls (§4.2); only out-of-fiction edits re-roll. **Applied 2026-11-13** with the enemy side of combat (`RESOLUTION.md` §3), covering both sides' rolls. |
+| §4.6 rolls and observations | Inside an encounter the enemy side is rolled, not observed (§2.2 writer 3). **Applied 2026-11-13.** |
 | §4.6 rolls and observations | Corrections are parse-only, UI-only, never against a roll (§4.3). |
 | §3.7 `atZero` | `downed` gains `allows`, `recovery`, `allDown` (§6). |
 | §4.5 what the model sees | Status lines with allowed actions are restated each turn (§4.4). |
@@ -663,6 +676,26 @@ any ally stands" until the field is settled.
 - **Instructions are checked against the ally's sheet** (§3.3), so a party
   member's recovery can't be ordered.
 
+### 10.1f Decided (2026-11-13)
+
+The enemy side of combat, drafted in `RESOLUTION.md` §3:
+
+- **The fork resolves the enemy side before generation**, with its own attack
+  rolls against the target's defense. The model writes how it happens, never
+  whether, who, or how much. Harm is not derived from the player's roll alone.
+- **The model never picks the target.** The fork does: whoever the enemy is
+  engaged with, then whoever hurt it most recently, then at random among the
+  party members it can reach.
+- **No more harm, no less.** A rolled hit is narrated as a hit at its
+  severity; nothing the exchange block doesn't list is added (§5).
+- **Three range bands** per enemy instance (`engaged`, `near`, `far`), and
+  enemy intent from an authored `tactics` priority list over a closed set of
+  intents, the first that applies taken.
+- **One attack formula for both sides.** An armed enemy attacks with its
+  weapon's numbers and its own proficiency, as `{{user}}` would.
+- **Both sides of an exchange are pinned** to the user's message (§4.2), and
+  the enemy side isn't read back from the narration (§2.2 writer 3).
+
 ### 10.2 Open
 
 - **Where premise refusal lives.** It applies to every world, with or without
@@ -711,5 +744,6 @@ any ally stands" until the field is settled.
 | Stat system, sheets, items, bestiary, campaign state | `RPG_STATS.md` |
 | Rolled facts injected as authoritative context | `DICE_ORACLE.md` |
 | Who decides outcomes, and what `{{user}}`'s message can and cannot change | this document |
+| How attempts and the enemy side of a fight resolve | `RESOLUTION.md` (§2–§3 Draft) |
 | The disposition (yield, auto-success, rescue) | producer `CLAUDE.md` principle #13, `protagonist_jeopardy` |
 | `{{user}}` as reference data, never impersonation | producer `CLAUDE.md` principle #14 |
