@@ -47,7 +47,7 @@ The Interviewer asks about:
 6. Arcs — hidden information rules, dramatic beats, NPC shifts, entry and exit triggers, tone and pacing
 7. Technical specifications — cards, lorebooks, depth_prompt assessment per character
 8. Test scenarios (Section 7b) — three to five specific roleplay moments the user intends to play through
-9. **Intimacy & Sexuality (Section 8)** — world-level posture toward sex, per-character intimacy substrate, per-arc thematic functions and scene types, tonal hard rules for intimate content. Conditional on the world containing intimate scenes.
+9. **Intimacy & Sexuality (Section 8)** — the adults-only confirmation (asked first, no opt-out), world-level posture toward sex, the **Erotic Register** (`restrained` / `explicit` / `pornographic` — how explicitly scenes are rendered, independent of what they are for) with a verbatim **Erotic Lexicon** at the upper two values, per-character intimacy substrate, per-arc thematic functions (including **Indulgence**) and scene types, tonal hard rules for intimate content. Conditional on the world containing intimate scenes.
 10. **Runtime Directives (Section 9)** — optional engine-steering asks about how the model must behave turn-by-turn (e.g., "combat must feel slow and costly"), each with a wrong-response example and a scope. The Prompt Engineer must address every one in the Chat Completion Preset. Most worlds leave this empty; misplaced answers (world facts, single-character behavior, style) are routed to their proper sections instead.
 
 If the user resists developing a section, the Interviewer adds an explicit note in the document marking it for Refiner review rather than silently filling gaps.

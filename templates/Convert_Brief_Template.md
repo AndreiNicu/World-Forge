@@ -127,6 +127,7 @@ Fill in every section below. Delete instructional text in brackets before submit
 - **`Operative belief`** per relationship carries across **only** when it's between two preserved characters AND doesn't reference `{{user}}`. Beliefs about `{{user}}` get stripped (`{{user}}` has changed); beliefs between preserved characters whose dynamic shifted because the protagonist changed get surfaced for your decision during the Converter's interview.
 - **`Trauma trajectory (arc worlds)`** per intimate character is arc-coupled and always stripped. The base `Trauma map` (trigger + response, no trajectory) carries across normally. Sandbox sources never had a trajectory authored, so this rule is a no-op for sandbox preservation.
 - **`Protagonist Intimate Embodiment`** (Section 3) is always regenerated with the protagonist — stature, anatomy, stamina, and valence belong to whoever `{{user}}` now is. The world's **stock-register hard rules** (Section 8a) carry across regardless: they bind the prose to whatever bodies the world authors, so they survive a protagonist swap even though the bodies do not.
+- **`Intimate anatomy`** per intimate character (present when the source's Erotic Register is `explicit` or `pornographic`) rides the embodied baseline and carries across unchanged, in the source lexicon's own words. If you are lowering the new world's register to `restrained` (Section 4h), it is dropped rather than carried.
 - **`Embodied baseline`** per intimate character carries across unchanged — age and body history, build and scale, arousal and recovery mechanics. It describes that character's own body, which a protagonist swap does not alter, so it transfers verbatim including its observable register and its both-directions framing.
 - **`Physical dyad`** is a *pairing* property, not a character property, so it splits. Dyads computed against `{{user}}` (height, build, stamina, age gap, experience) are **always stripped with a reauthor marker** — the other half of the pairing has been replaced, which voids every differential. Dyads between two preserved characters carry across unchanged, and are dropped only if a partner is dropped or role-shifted out of the pairing.
 
@@ -154,6 +155,10 @@ Fill in every section below. Delete instructional text in brackets before submit
 ### 4h. Section 8 — Intimacy (world-level)
 
 [`n/a (no intimacy in source or new world)` | `preserve world-level posture and hard rules` | `regenerate world-level posture and hard rules` | `add intimacy where source had none` | `drop intimacy where source had it`]
+
+[**Erotic Register:** `keep the source's` | `change to restrained / explicit / pornographic` | `n/a`. World-level, so it carries by default along with the Erotic Lexicon — sample lines **verbatim** — and the evasion rules. If you are raising it into `explicit` or `pornographic`, write your 2–4 sample lines, named vocabulary, and banned stand-ins in Section 6 below. Per-arc register overrides never carry in a reframe (the arcs regenerate). *Rebaseline:* keeps the register, the lexicon, and the per-arc overrides.]
+
+[**Adults-only confirmation:** confirm here that every character, NPC, and `{{user}}` with intimate presence in the **new** world is 18 or older, with a stated age, and adult in body and manner. This is asked fresh in every conversion — reframe and rebaseline alike — and is never inherited from the source.]
 
 [If `preserve`: the source's world-level posture and hard rules transfer. Per-character substrate transfers via Section 4e for preserved characters. Per-arc / standing intimate function is always regenerated downstream — those are arc/sandbox-shaped, and the arc/sandbox spine is being regenerated.]
 

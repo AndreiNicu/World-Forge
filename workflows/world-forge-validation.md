@@ -35,6 +35,8 @@ Validates four layers: prose quality, tier integrity + lorebook entry quality, L
 - Tier 3 Intimacy Register restating substrate already in Tier 2 = immediate rejection
 - INTIMACY_FUNCTION entry (per-arc `INTIMACY_FUNCTION_Arc[N]` in arc mode, or the standing `INTIMACY_FUNCTION` in sandbox mode) missing thematic function name or prose register specification = rejection
 - Sexual NPC with no intimate substrate (no full profile and no §6.5 compact stat block) = rejection (coverage gap)
+- Any character, NPC, or protagonist with intimate substrate and no stated age of 18+, or written as a child in body or manner = immediate rejection at every register (Editor Step 4.9a — the entry is removed, not repaired)
+- Declared Erotic Register not carried: missing/wrong `Erotic register:` line, missing `EROTIC_LEXICON` or paraphrased sample lines at `explicit` / `pornographic`, evasion rules without both counter-guardrails, or a lexicon / evasion rules in a `restrained` file = rejection (Editor Step 4.9b–d)
 
 ```
 LOOP:  (each return increments the ledger's `3 Editor` Round)
@@ -102,6 +104,8 @@ IF no failures → ARC TRANSITION AUDITOR SIGN-OFF
 Generates sample intimate scenes using the drafts as runtime context — as a **cold read** (plausible failure pre-committed per scenario, expected outcome out of view during generation, every PASS evidence-cited and counterfactual-probed), over a test matrix whose scenario classes go beyond the canonical intimate beats (trigger-collision, function-shift, boundary, hard-limit probe, substrate near-miss) — and audits against two lenses:
 - **Primary lens — voice fidelity:** does the character behave like themselves during sex? Substrate fidelity, trauma map fidelity, voice continuity, hard limit integrity.
 - **Secondary lens — thematic register match:** does the scene serve its declared function? Function fidelity, prose register match, direction fidelity, arc atmosphere preservation.
+
+Where the world declares an Erotic Register, the audit scenes are written **at** that register (a register probe per character at `explicit` / `pornographic`) and Step 3J checks it in both directions: the five evasion reflexes (stand-in, cutaway, hedging, compression, interiority retreat), and the over-correction (interchangeable intimate anatomy, parts-list recitation, escalation past what the scene or a limit allows). Function and register are audited independently.
 
 When the lenses conflict, voice fidelity wins. Function/substrate contradictions at the Master Design level are escalated to the user, not patched at the draft level.
 
