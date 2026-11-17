@@ -27,6 +27,7 @@ SANDBOX-MODE ENTRY TYPES (worlds with no narrative arc — one always-active San
 - WORLD_PULSE (the TENSION analog — a sustained "the world is alive and reactive" directive, never a countdown) → position: 4, depth: 2-4
 - Roster NPC compact stat block (essence / presence / unique voice fingerprint / signature line / stance / hook) → position: 0 or 1 (same as other NPC profiles)
 - Sandbox standing intimacy: INTIMACY_FUNCTION (no arc suffix) → position: 1, constant: true, ignoreBudget: true
+- EROTIC_LEXICON (arc: EROTIC_LEXICON_Arc[N]; sandbox: no suffix) — only where the effective Erotic Register is explicit or pornographic → position: 1, constant: false, keyed on intimate lead-in words plus the lexicon's own vocabulary (constant: true is a permitted non-default where the primary function is Indulgence)
 - A sandbox world has NO CHARACTER_STATE, NPC_SHIFT, DRAMATIC_BEAT, or arc-trigger entries — there is no arc.
 - Tone/atmosphere directives → position: 2 or 3
 

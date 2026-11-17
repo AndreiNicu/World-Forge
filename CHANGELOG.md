@@ -13,6 +13,116 @@ numbers. Newest first.
 
 ---
 
+## 2026-11-16 — The Erotic Register: opt-in explicit and pornographic worlds, Indulgence, adults-only gate (#97)
+
+Until now the intimacy machinery treated erotic payoff itself as a failure: the
+Intimacy Architect did not write "spicy content for its own sake", the Auditor
+failed any scene that "reads as titillation", no thematic function meant
+*pleasure as the point*, and nothing in the pipeline said how explicitly a scene
+should be rendered — so every world got the model's trained register
+(euphemism, a drift into interiority at the moment of the act, an early fade).
+Users building sex-forward sandboxes and erotica arcs asked for the opposite,
+without giving up distinct characters and bodies. This adds one opt-in axis to
+the existing pipeline rather than a parallel one. **A world that does not
+declare a register behaves exactly as before.**
+
+The seam is the same substrate + prohibition + audit triad as the stock-register
+rule, because euphemism is a trained reflex and a declaration alone does not
+displace it. One thing in this change is *not* opt-in: the adults-only gate now
+applies to every world with intimate content, at every register.
+
+### Added
+
+- `templates/World_Seed_Template.md` §8a — **`Erotic Register`**
+  (`restrained` | `explicit` | `pornographic`), independent of the thematic
+  function; **`Erotic Lexicon`** (2–4 verbatim sample lines, named vocabulary,
+  banned stand-ins), required at the upper two values; the recommended
+  **evasion rules** (three at `explicit`, five at `pornographic`) with two
+  non-optional counter-rules (*explicit is not generic*; *the register is
+  rendering, not escalation*); and an **adults-only confirmation** with no
+  opt-out. §8b — a per-arc `Erotic register this arc` override and an eleventh
+  thematic function, **Indulgence**. §4 — an `Intimate anatomy` sub-field of the
+  embodied baseline for the upper two registers.
+- `agent_roles/06_The_Intimacy_Architect.md` — **§6.8 The Evasion Prohibition**
+  (the five evasion reflexes: stand-in, cutaway, hedging, compression,
+  interiority retreat; the separating rule; both counter-guardrails);
+  **`EROTIC_LEXICON_Arc[N]` / `EROTIC_LEXICON`** Tier 3 entry (§7 Entry 5, §7S
+  Entry 4) carrying the seed's sample lines verbatim; an `Erotic register:` line
+  in every `INTIMACY_FUNCTION`; the intimate-anatomy bullet in Entry 3 Half A
+  and the §6.5 roster block; an adults-only halt in Section 4.
+- `agent_roles/03d_The_Intimacy_Auditor.md` — the **register probe** scenario
+  class and **Step 3J (erotic register fidelity)**, checked in both directions:
+  the five evasions, and the over-correction (interchangeable intimate anatomy,
+  parts-list recitation, narrator vocabulary in a character's mouth,
+  escalation, bleed; over-rendering in a `restrained` arc). Diagnosis rows,
+  report section, sign-off lines.
+- `agent_roles/03_The_Editor.md` — **Step 4.9**: 4.9a adults-only (unconditional
+  hard fail, every register), 4.9b register presence and placement, 4.9c
+  lexicon fidelity (sample lines character-for-character against the Master
+  Design), 4.9d substrate at register (missing intimate anatomy, a banned
+  stand-in anywhere in an intimacy draft, a rule contradicting the register).
+- `agent_roles/05a_Block_Library.md` + `templates/Chat_Completion_Preset_template.json`
+  — NSFW block: a verbatim **adults-only line** closing subsection 5 (every
+  register), and a conditional **subsection 6, Erotic Register & Rendering**,
+  which states the world default and defers to the active `INTIMACY_FUNCTION`
+  register line (so per-arc overrides need no preset edit).
+- `agent_roles/01_The_Refiner.md` — Step 2 intimacy gap checks (adults-only
+  halt; `unstated` register recorded without halting; lexicon halt at the upper
+  registers) and the Master Design **Section 10 `Intimacy Rendering (Erotic
+  Register)` record** the Intimacy Architect and Prompt Engineer read.
+- `wiki/Agentic-Tools-and-Models.md` §3.6 — what the pipeline cannot do: make a
+  build-time or runtime model comply with a declared register.
+- `CLAUDE.md` — principle #15 and its cross-file consistency row.
+
+### Changed
+
+- `agent_roles/06_The_Intimacy_Architect.md` — "You are not a generic erotica
+  writer" now targets *generic*, not erotic: where the world declares
+  Indulgence or a `pornographic` register, erotic payoff is a declared purpose.
+  Entry 3 rule 1 distinguishes plainly **naming** anatomy (the register) from
+  **explaining physiology** (still the clinical failure) and requires the
+  baseline to be written in the lexicon's vocabulary. Entry 5 separates
+  narration vocabulary (the lexicon) from each character's spoken vocabulary.
+- `agent_roles/03d_The_Intimacy_Auditor.md` — "titillation has failed" is now
+  conditional on the declared function; audit scenes are written **at** the
+  declared register instead of "need not be sexually explicit"; Step 3I's
+  clinical-intrusion check no longer flags plain anatomical naming.
+- `agent_roles/00_The_Interviewer.md` — Section 8 opens with the adults-only
+  confirmation, asks the register without a preferred answer, captures the
+  lexicon verbatim, proposes the evasion rules with both counter-rules, and
+  accepts Indulgence as a complete answer; Section 4 asks intimate anatomy at
+  the upper registers; the prose-register prompt no longer steers toward
+  "neither pornographic nor romantic".
+- `agent_roles/05_The_Prompt_Engineer.md` (Workstream B step 5b, Pass 2, sign-off,
+  resync) and `agent_roles/revise/05_The_Prompt_Engineer_mini.md` (Trigger B
+  content; rule 7 — a register change is a resync concern, not a toggle).
+- Revise cascade — `agent_roles/revise/00_The_Reviser.md`
+  (`intimacy_register_modify` carries the register case and its every-arc /
+  every-profile cascade), `02b_The_Intimacy_Architect_mini.md` (delta 3a-ii),
+  `03_The_Editor_mini.md` (Step 4.9 on touched drafts + all-or-none check),
+  `03d_The_Intimacy_Auditor_mini.md` (delta 3d).
+- Convert — `agent_roles/Converter/00_The_Converter.md` and
+  `templates/Convert_Brief_Template.md`: register, lexicon, and evasion rules
+  preserve (sample lines verbatim); per-arc overrides strip in a reframe and
+  keep in rebaseline; intimate anatomy rides the embodied baseline; the
+  adults-only confirmation is asked fresh in every conversion.
+- `agent_roles/Brainstormer/00_The_Brainstormer.md` — the explicitness leaning
+  now uses the register enum (it previously offered `fade-to-black / explicit /
+  clinical`, which nothing downstream read).
+- `workflows/world-forge-discovery.md`, `-drafting.md`, `-validation.md`,
+  `templates/Lorebook_creation.md` — phase descriptions and entry defaults.
+
+### Behavior change for existing worlds
+
+- **Adults-only gate (all worlds with Section 8).** A character with intimate
+  substrate and no stated age of 18+ now halts at the Refiner and hard-fails at
+  the Editor. Existing worlds are unaffected until rebuilt, revised, or
+  resynced; a resync adds the verbatim adults-only line to the NSFW block.
+- Nothing else changes without a declared register: `unstated` authors no
+  lexicon, no evasion rules, and no sixth NSFW subsection.
+
+---
+
 ## 2026-11-12 — Resolution: beat vocabulary revised against RPG_STATS and OUTCOME_AUTHORITY (Draft v0)
 
 Cross-checking the beat vocabulary against the two contracts it serves turned up

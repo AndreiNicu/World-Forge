@@ -35,7 +35,7 @@ Delete all instructional text in brackets before submitting. Leave the section h
 
 **Genre & Tone:** [What genres are active? How does the tone shift across arcs? Name the emotional register for each phase of the story. Example: "Begins as grimdark political intrigue, transitions into reluctant romance, culminates in mythic tragedy with a bittersweet resolution."]
 
-[If the story contains sexual content: describe the tone and approach. Example: "Intimate scenes are sensory and character-driven, prioritizing psychological state over mechanics. Trauma flashbacks are rendered with unflinching realism — never titillating."]
+[If the story contains sexual content: describe the tone and approach. Example: "Intimate scenes are sensory and character-driven, prioritizing psychological state over mechanics. Trauma flashbacks are rendered with unflinching realism — never titillating." *How explicitly* intimate scenes are rendered is a separate declaration — the `Erotic Register` in Section 8a (`restrained` / `explicit` / `pornographic`). A world built for erotic payoff says so there, not here.]
 
 **Emotional Payoff:** [What should the player feel at the end? What is the story ultimately about? Example: "That loyalty can survive betrayal if the person doing the betraying is honest about the cost. That some debts cannot be paid but can be carried together."]
 
@@ -441,6 +441,10 @@ Trigger keywords: [sex, intimacy, touch, desire, arousal, etc.]
 
   Three rules. **Write it in the register you want the prose to inherit** — this text goes into the model's context and the model echoes it, so clinical vocabulary here produces anatomy-lecture prose in play. Not "reduced pelvic floor tone post-partum" but "she braces a hand flat against the headboard in positions that used to take no effort, and is entirely unbothered about it — it is simply what the position costs now." **And difference, not deficit** — name what got harder *and* what got easier, better, more certain, or no longer worth performing. Fill this in for every intimate character, including the ordinary twenty-two-year-olds; if only the older characters get it, the stock default quietly wins everywhere else. **And declare the valence** of any culturally loaded attribute — size, weight, scars, disability, age. Each of these has *two* competing trained defaults, not one (for size: overwhelming vs. inadequate; for age: idealised vs. diminished), and the model picks from ambient tone unless told. Say whether the attribute is a **neutral fact**, an **advantage**, or **charged** material the world is deliberately using. Charged is legitimate — it should just be your choice rather than a drift.]
 
+- **Intimate anatomy (required when Section 8a's Erotic Register is `explicit` or `pornographic`; skip otherwise):** [At those registers the prose stays on the bodies, so the embodied baseline has to reach where the prose now goes. For this character, state what is true of the body *in the act*: breasts (size, weight, shape, how they sit and move, how soft or firm — a forty-five-year-old's are not a twenty-five-year-old's, and the difference is specific); genitals (how they look, how they feel to a partner, how wet or how hard and how quickly, how tight or how yielding, what changes as arousal builds); what this body does at climax; anything else the world's acts will put on the page. Without this the model renders one stock set of genitals for the entire cast, exactly as it renders one stock body.
+
+  The three rules above apply in full, and one of them changes shape. **Register:** write this in the words from your Erotic Lexicon (Section 8a) — the model echoes the vocabulary it is given, so a baseline written in euphemism produces euphemism and one written as a chart produces a chart. Plain names are not the clinical failure; *explaining physiology* is. "Her cunt is slower to wet now than it was at thirty and stays wet far longer once it has; she tells him to wait, and means it" is the register. "Perimenopausal reduction in lubrication" is the chart. **Difference, not deficit** — the older body is not a worse copy of the younger one; say what it does better, more certainly, or more honestly. **Valence** — declare it for anything loaded.]
+
 - **Physical dyad (per recurring pairing — required where a real differential exists):** [Some intimate facts belong to a *pairing*, not a person: height difference is not a fact about her, it is a fact about her and whoever she is with. For each pairing you will actually play — `{{user}}` first — name the differential **and what it costs or changes**: height and reach (what positions stop working, who adjusts, what standing contact requires), build/strength (what can actually be lifted, held, or braced against), stamina and recovery asymmetry (the mismatch, and what the two of them do about it), age-gap embodiment (differing arousal timing, signals, certainty, willingness to say what they want), experience gap (who knows what they're doing and how the other handles that), and **anatomical fit — what each act actually costs this specific pair** (what needs preparation and what does not, what is comfortable, what takes work, what a partner has to accommodate; a smaller partner does not make a given act a lesser version of the stock scene, it makes it a materially different one, and the model will default to the stock version unless this line says otherwise).
 
   **Author the asymmetry in both directions.** A woman in her forties with a man in his early twenties is not a list of things she can no longer do: she arrives differently, knows exactly what she wants, and has stopped performing for anyone; he has stamina and recovery she doesn't, plus inexperience and over-eagerness she doesn't. Each has what the other lacks. One-directional entries produce one-directional prose. Leave blank only where no meaningful differential exists.]
@@ -449,7 +453,7 @@ Trigger keywords: [sex, intimacy, touch, desire, arousal, etc.]
 
 - **Vulnerability shape:** [When their shield drops in an intimate context, what does the unguarded version look like? Three to five specific shapes. The intimate analogue to the crack from their card. Not "she becomes vulnerable" — "tears she did not expect, going still and not breathing for a full second, asking a question she has been afraid to ask, looking directly at the partner instead of past them."]
 
-- **Voice in intimacy:** [How do they speak in intimate scenes? Sample lines. What they say easily. What they only say under specific conditions. What they never say. Vocabulary register — clinical, vulgar, tender, evasive, archaic, silent. What sounds escape them vs. what sounds they perform.]
+- **Voice in intimacy:** [How do they speak in intimate scenes? Sample lines. What they say easily. What they only say under specific conditions. What they never say. Vocabulary register — clinical, vulgar, tender, evasive, archaic, silent. What sounds escape them vs. what sounds they perform. **This field governs what the character *says*; the Erotic Lexicon in Section 8a governs what the *narration* says.** They are allowed to differ, and the gap is characterization: in a `pornographic` world the narration names everything plainly while a prim character still cannot bring herself to say the word aloud, and a crude one says little else.]
 
 - **Afterward:** [What does this character do in the ten minutes *after*? Erotic prose is trained to stop at climax, so unless the seed says otherwise the model simply stops writing — and the aftermath is where a lot of the characterization lives. Two registers: the **ordinary bodily business** (getting up to urinate, cleanup, the towel or the lack of one, needing water, being sticky and either minding or not, showering immediately or later or not at all) and **what they do with the other person** (stay or leave, hold on or turn away, talk and about what, go quiet, joke to defuse it, fall asleep, dress immediately, ask something they couldn't ask before). Then name the tell: the one aftermath behavior that means something has *changed* — the character who always leaves and this once doesn't.]
 
@@ -534,7 +538,7 @@ Trigger keywords: [name variants, role descriptors, ways they'd be referenced in
 - "[A line of dialogue that captures their voice precisely]" *([context — when would they say this?])*
 - "[Another sample line]" *([context])*
 
-**Intimacy (only if this NPC has sexual presence — feeds the Intimacy Architect):** [For a principal NPC, sketch the same substrate you would for a character: baseline sexuality, any trauma map, **embodied baseline** (age and what this body has lived through, build/scale, arousal and recovery mechanics — observable register, difference-not-deficit), body/sound signature, voice in intimacy, hard limits and hard yeses, what they do **afterward**. Add a **physical dyad** line for any pairing with a real height, age, build, stamina, or experience differential — `{{user}}` first. Leave blank if the NPC has no sexual presence.]
+**Intimacy (only if this NPC has sexual presence — feeds the Intimacy Architect):** [For a principal NPC, sketch the same substrate you would for a character: baseline sexuality, any trauma map, **embodied baseline** (age and what this body has lived through, build/scale, arousal and recovery mechanics — observable register, difference-not-deficit), body/sound signature, voice in intimacy, hard limits and hard yeses, what they do **afterward** — plus **intimate anatomy** when the Erotic Register is `explicit` or `pornographic`. State the NPC's **age**: every NPC with sexual presence is an adult (Section 8a). Add a **physical dyad** line for any pairing with a real height, age, build, stamina, or experience differential — `{{user}}` first. Leave blank if the NPC has no sexual presence.]
 
 **NPC: [Name]** — *Principal*
 [Same format — repeat for each principal NPC]
@@ -551,7 +555,7 @@ Trigger keywords: [name variants, role descriptors]
 - **Signature line:** "[one sample line only this NPC would say]"
 - **Stance toward {{user}}:** [deference / rivalry / desire / fear / transaction / curiosity — one line on how they treat {{user}}]
 - **Hook:** [what pulls them into a scene, or what they offer the sandbox — one line]
-- **Intimacy (only if this NPC has sexual presence):** [two or three lines of compact sexual context — how they are in sex + what they want; an **embodied baseline** (age and what this body has lived through, build/scale, and its stamina or arousal-timing particular — one line, observable register, not clinical); a distinct body/sound or voice-in-intimacy cue; one hard limit/yes; and one line on what they do **afterward** (stay / leave / clean up immediately / sleep / talk about something unrelated). This becomes the Intimacy Architect's §6.5 compact stat block. Keep it distinct from every other NPC — without the embodied line a whole roster defaults to interchangeable twenty-somethings. Leave blank if no sexual presence.]
+- **Intimacy (only if this NPC has sexual presence):** [two or three lines of compact sexual context — how they are in sex + what they want; an **embodied baseline** (age and what this body has lived through, build/scale, and its stamina or arousal-timing particular — one line, observable register, not clinical); a distinct body/sound or voice-in-intimacy cue; one hard limit/yes; and one line on what they do **afterward** (stay / leave / clean up immediately / sleep / talk about something unrelated). When the Erotic Register is `explicit` or `pornographic`, add one line of **intimate anatomy** — the one thing about this body in the act that no other NPC on the roster shares, in your Erotic Lexicon's words. State the NPC's **age**; every NPC with sexual presence is an adult (Section 8a). This becomes the Intimacy Architect's §6.5 compact stat block. Keep it distinct from every other NPC — without the embodied line a whole roster defaults to interchangeable twenty-somethings. Leave blank if no sexual presence.]
 
 **NPC: [Name]** — *Roster*
 [Same format — repeat for each roster NPC]
@@ -731,8 +735,36 @@ Trigger keywords: [name variants, role descriptors]
 - [ ] **Forbidden / surveilled** — intimacy is policed by the world's structures. Doing it costs something. Being caught costs more.
 - [ ] **Other:** [describe]
 
+**Adults only — confirm it:** [ ] *Every character with intimate presence in this world — card characters, principal NPCs, roster NPCs, and `{{user}}` — is an adult: 18 or older, with a stated age in Section 3 / Section 4, and adult in body and manner as well as in years.*
+
+*This is not a register setting and it has no opt-out. It applies at every Erotic Register, `restrained` included. A character with no stated age gets no intimate substrate, and neither does one written as an adult "in years" but a child in body or behavior — the pipeline halts on either and asks, rather than guessing.*
+
+**Erotic Register — how explicitly intimate scenes are rendered:** [`restrained` | `explicit` | `pornographic`]
+
+*This is a separate question from what intimacy is **for** (the thematic function, Section 8b). The two are independent: a corruption arc can be graphic and still be about the cost, and a tender world can stay restrained. Choose the rendering here; choose the function there.*
+
+- **`restrained`** — acts are implied, elided, or rendered through sensation and interior state. The camera may cut away. Figurative language is welcome.
+- **`explicit`** — the act stays on the page. Anatomy and acts are named plainly and the scene is not cut away from or summarised. The scene still serves its thematic function first.
+- **`pornographic`** — graphic and sustained. Bodies, genitals, and the mechanics of the act are rendered in close detail in this world's own vocabulary; the scene is given room rather than hurried to its end; and the reader's arousal is a legitimate purpose of the scene, not a failure of it. Pairs naturally with the **Indulgence** function (Section 8b) but does not require it.
+
+*⚠️ **Leaving this blank does not give you a neutral register — it gives you the model's trained one:** euphemism ("she took him into her core"), a drift into interior reflection at the moment of the act, and an early fade. That is how every world built before this field existed behaves, and nothing about those worlds changes. It is a legitimate result — but if you want it, write `restrained` and own it, because the trained default is inconsistent from scene to scene and a declared register is not.*
+
+*No register makes a world generic. `pornographic` is not permission to stop authoring people: the bodies are still the ones you described, the voices are still theirs, and limits, trauma, and the afterward all still hold. A graphic scene with an interchangeable woman in it is the same failure this pipeline exists to prevent, rendered in more detail.*
+
+**Erotic Lexicon** **[REQUIRED if the Erotic Register is `explicit` or `pornographic`; skip for `restrained`]**
+
+*Declaring the register is not enough. "Be explicit" loses to the trained reflex exactly as "describe her real body" loses to the stock body. What displaces a reflex is a sample of the real thing plus a prohibition on the substitute.*
+
+- **Sample lines (2–4, verbatim, at the register you want):** [Write narration the way you want it to read. These lines are carried word-for-word into the model's context — the wording *is* the calibration, and a paraphrase loses it. Example: "Her labia spread open for him as the tip of his cock entered her folds and slid across the velvet canal."]
+- **Named vocabulary:** [The words this world's narration uses for anatomy and acts. A blunt set (cock, pussy, cunt, clit, ass, tits; fuck, suck, come), a more anatomical one (penis, vagina, labia, clitoris, anus), a period- or setting-appropriate one — or a mix, with a note on which is used when. This is a style decision, and it should be yours.]
+- **Banned stand-ins:** [The evasions you never want to read. The usual ones: "her core," "her center," "her womanhood," "her heat," "her most intimate place," "his length," "his member," "his manhood," "their union," "became one." Add your own.]
+
+*The rule that separates the last two: **a vague word may never stand in place of the name, but texture is welcome on top of it.** In the sample line above, "folds" and "velvet" sit beside "labia" and "cock" — the anatomy is named and then described. "Her core" names nothing. The first is the register; the second is the evasion.*
+
+*The lexicon governs the **narration**. What each character says aloud is theirs — see `Voice in intimacy` in Section 4.*
+
 **World-level tonal hard rules for intimate content:** [What must the AI never do with intimate scenes in this world? List 3–6 non-negotiable rules. Be specific — not "no gratuitous content" but the actual lines you do not want crossed.]
-- [Rule 1 — example: "Never write intimate scenes as titillation primary. The character interior is always primary; physical detail serves the interior."]
+- [Rule 1 — example for a `restrained` or `explicit` world whose intimacy serves something else: "Never write intimate scenes as titillation primary. The character interior is always primary; physical detail serves the interior." *(This rule contradicts a `pornographic` register or an Indulgence function — do not carry it into a world that declares either.)*]
 - [Rule 2 — example: "Trauma responses during sex are rendered with clinical specificity. They are not glossed, romanticized, or eroticized into false-vulnerability."]
 - [Rule 3 — example: "Coercive structures are visible to the prose even when invisible to the participants. The reader is never confused about the power dynamic."]
 - [Rule N]
@@ -743,13 +775,24 @@ Trigger keywords: [name variants, role descriptors]
 - *"No character is rendered on a default body. Every body in an intimate scene is the one its embodied baseline describes — age, build, history, proportion — including `{{user}}`'s."*
 - *"Intimate scenes do not end at climax. The aftermath is rendered — the ordinary bodily business and what the characters do with each other — per each character's authored afterward."*
 
-**World-level prose register for intimacy:** [How does the prose feel during intimate scenes in this world? Examples: "Long sentences, dwelling on sensory detail, time slowing." "Clipped and clinical, the prose refusing to dissolve." "Unflinching realism, neither pornographic nor romantic — the tone of a witness."]
+**Recommended by default when the Erotic Register is `explicit` or `pornographic` — the evasion rules.** *The stock-register rules above stop the model writing the wrong body. These stop it declining to write the body at all. Explicit prose has its own trained reflexes, and they fire against a declared register exactly as scale language fires against stated anatomy — so, again, only a prohibition displaces them. Three apply at `explicit`; all five at `pornographic`:*
+- *"**No stand-ins.** Anatomy and acts are named in this world's lexicon. A vague word never replaces the name; sensory and figurative detail is added to a named thing, never substituted for it."*
+- *"**No cutaway.** Intimate scenes are not faded out of, cut away from, time-skipped, or summarised. What happens is rendered as it happens."*
+- *"**No hedging.** The narration does not moralise about the scene, apologise for it, or step outside it, and characters do not hesitate or check in unless their own authored substrate says they would."*
+- *(`pornographic` only)* *"**No compression.** The act is given room — rendered beat by beat, never hurried to climax. How long the scene runs is the player's to set."*
+- *(`pornographic` only)* *"**No interiority retreat.** The prose stays with the bodies. Interior state accompanies the physical rendering; it never replaces it at the moment of the act."*
+
+*And the two counter-rules. Keep them — they are not optional, and a world that ships the rules above without them trades one bug for a worse one:*
+- *"**Explicit is not generic.** The body named is this character's authored body, the voice is theirs, and their limits, trauma map, and afterward hold exactly as written. Every stock-register rule above still applies in full."*
+- *"**The register is rendering, not escalation.** It sets how what happens is written — never what happens. No act is added, escalated, or initiated on the register's authority; a character who would refuse still refuses; and scenes that are not intimate are not sexualised because the register is high."*
+
+**World-level prose register for intimacy:** [How does the prose feel during intimate scenes in this world? Examples: "Long sentences, dwelling on sensory detail, time slowing." "Clipped and clinical, the prose refusing to dissolve." "Unflinching realism, neither pornographic nor romantic — the tone of a witness." "Close, unhurried, physical — the prose stays on skin and never looks away." This is the *texture* of the prose; how explicit it is was settled by the Erotic Register above, and the two should agree.]
 
 ### 8b. Per-Arc Intimacy Specification
 
 *For each arc that contains intimate beats, specify what intimacy is for in that arc. Skip arcs that do not contain intimate scenes.*
 
-*__Sandbox mode:__ skip the per-arc breakdown — there are no arcs. Section 8a (world-level posture, hard rules, prose register) IS your standing intimacy spec; it feeds the single standing `INTIMACY_FUNCTION` register. Specify the world's standing intimate scene types and the sexual context of your NPC cast (in Section 4's NPC intimacy fields) instead of per-arc functions.*
+*__Sandbox mode:__ skip the per-arc breakdown — there are no arcs. Section 8a (world-level posture, Erotic Register and Lexicon, hard rules, prose register) IS your standing intimacy spec — name the standing thematic function(s) from the menu below alongside it (a sex-forward sandbox usually declares **Indulgence**); it feeds the single standing `INTIMACY_FUNCTION` register. Specify the world's standing intimate scene types and the sexual context of your NPC cast (in Section 4's NPC intimacy fields) instead of per-arc functions.*
 
 #### ARC [N] Intimacy
 
@@ -764,9 +807,12 @@ Trigger keywords: [name variants, role descriptors]
 - **Hunger** — intimacy as the discharge of accumulated tension between two people who have been deferring it. The point is the release.
 - **Grief** — intimacy as the body's response to loss. The point is what cannot be said in words.
 - **Ritual** — intimacy as sacred practice within the world's framework. The point is the structure being honored.
+- **Indulgence** — intimacy as pleasure pursued for its own sake. Nothing is being bought, proven, healed, or endured. The point is appetite and its satisfaction — the characters', and the reader's. *(This is the function a sex-forward sandbox or an erotica arc declares. It is not a licence for interchangeable partners: whose appetite, for what, and how each body answers it is still the whole of the scene.)*
 - **Other:** [describe]
 
 [Selected function(s) for Arc N: ___]
+
+**Erotic register this arc:** [`inherit` (the Section 8a world default) | `restrained` | `explicit` | `pornographic` — override only where this arc is rendered differently from the rest of the world, e.g. a slow-burn Arc 1 at `restrained` in a world that is `pornographic` from Arc 2 on. The Erotic Lexicon is world-level and does not change per arc.]
 
 **How this function manifests in prose this arc:** [What does the prose dwell on? What does it elide? What sentence shapes does it use? Example for Corruption: "Long dwelling sensory paragraphs that linger on the protagonist's resistance crumbling. The pleasure rendered carefully and without irony. The shame rendered just as carefully, side by side, neither winning over the other."]
 
@@ -915,6 +961,7 @@ Trigger keywords: [name variants, role descriptors]
 - [ ] LLM behavioral instructions written for each card (with arc-range qualifiers)
 - [ ] For characters with intimate scene presence: substrate (trauma map, **embodied baseline**, body reactions, vulnerability shape, voice in intimacy, hard limits, **afterward**) and arc-specific evolution filled out
 - [ ] Embodied baseline filled in for *every* intimate character — including the ordinary/default-bodied ones — written in observable register, running in both directions (what is harder *and* what is easier or more certain)
+- [ ] *(Erotic Register `explicit` or `pornographic`)* **Intimate anatomy** filled in for every intimate character, in the Erotic Lexicon's words, distinct from character to character
 - [ ] **Physical dyad** filled in for every pairing with a real height, age, build, stamina, experience, or world-specific differential (`{{user}}` pairings first), with the asymmetry authored in both directions
 
 **Section 5 — Arcs (arc mode) / Sandbox Charter (sandbox mode):**
@@ -932,7 +979,11 @@ Trigger keywords: [name variants, role descriptors]
 
 **Section 8 — Intimacy & Sexuality (skip entirely if not applicable):**
 - [ ] World-level posture defined with notes
-- [ ] World-level tonal hard rules listed
+- [ ] **Adults-only confirmation ticked; every character, NPC, and `{{user}}` with intimate presence has a stated adult age**
+- [ ] **Erotic Register declared (`restrained` / `explicit` / `pornographic`) — not left blank**
+- [ ] *(register `explicit` or `pornographic`)* Erotic Lexicon filled in: 2–4 verbatim sample lines, named vocabulary, banned stand-ins
+- [ ] *(register `explicit` or `pornographic`)* Evasion rules included with **both** counter-rules (explicit is not generic; the register is rendering, not escalation) — or explicitly declined
+- [ ] World-level tonal hard rules listed — none contradicting the declared register or an Indulgence function
 - [ ] World-level prose register described
 - [ ] Per-arc thematic function, prose manifestation, direction, and live scene types specified for every arc with intimate beats
 - [ ] Cross-arc intimacy trajectory described (recommended)

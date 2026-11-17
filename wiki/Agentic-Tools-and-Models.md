@@ -164,6 +164,15 @@ The pipeline's phases split cleanly into prose seats (where sampling variety is 
 
 If maintaining four temperature bands is more fiddling than you want, collapse to two: a **creative** profile (~0.8) for Phases 0, 2, 2.5 and the auditors, and a **precise** profile (~0.2) for Phases 1, 3, 4, 5 — the Compiler and Editor are the two seats where getting this wrong costs the most. Kilo Code users: `temperature` is a per-agent field in `kilo.jsonc`, and the shipped World-Forge config already carries these values — see [Kilo setup §5.4](./Kilo-Code-Setup.md#54-per-phase-temperature).
 
+### 3.6 Explicit-register worlds and model compliance
+
+A world may declare an **Erotic Register** of `explicit` or `pornographic` (World Seed §8a). The pipeline can specify that register precisely — a verbatim lexicon, evasion prohibitions, an audit that checks for euphemism — but it cannot make a model comply with it. Two seats matter, and they fail differently:
+
+- **Build-time seats** — the Intimacy Architect (Phase 2.5) must write the lexicon and intimate-anatomy substrate in the user's own vocabulary, and the Intimacy Auditor (Phase 3.7) must write its probe scenes at the declared register. A model that softens here produces euphemistic *substrate*, which the runtime model then echoes no matter what the hard rules say. The Editor's Step 4.9 catches banned stand-ins in the drafts; if it keeps firing round after round, the seat's model is the problem, not the spec.
+- **The runtime model** in SillyTavern — if it declines the register, the Intimacy Auditor's Step 3J will show the same evasion across the whole matrix despite a present lexicon and rules. That pattern is model-side. Changing the preset will not fix it; changing the model will.
+
+Pick models for these worlds on that basis and test with a short intimate scene before a full build. Every register, including these two, carries the pipeline's unconditional adults-only gate — that is a property of the pipeline, not of the model.
+
 ---
 
 ## 4. Why Claude Code is a poor fit (currently)

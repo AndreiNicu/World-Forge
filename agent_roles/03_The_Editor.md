@@ -28,7 +28,7 @@ If all ten pass, proceed to the full audit (Step 3 onward) for prose quality, lo
 
 **Load now:**
 - Every file in `Drafts/` — Step 1 is a completeness audit; you cannot validate what you have not opened
-- `Drafts/Master_Design.md` — the truth you validate against (Section 9 title for World Mode first)
+- `Drafts/Master_Design.md` — the truth you validate against (Section 9 title for World Mode first; Section 10's `Intimacy Rendering (Erotic Register)` record for Step 4.9 when intimacy drafts are present)
 - `agent_roles/SHARED_Style_Contract_Reference.md` — §1/§3 for style-override metadata checks
 
 **Load on demand (open at the step that needs it — do not preload):**
@@ -322,6 +322,7 @@ For every entry whose Position Rationale is marked "DEFAULT", verify the entry a
 | Tier 3 INTIMACY_FUNCTION_Arc[N] (arc) / INTIMACY_FUNCTION (sandbox standing) | `position: 1`, `constant: true`, `selective: true`, `ignoreBudget: true` |
 | Tier 3 [CHAR]_INTIMATE_REGISTER_Arc[N] / [CHAR]_or_NPC_INTIMATE_REGISTER (sandbox) | `position: 1`, `constant: true`, `selective: true`, `ignoreBudget: true` |
 | Tier 3 INTIMATE_SCENE_TYPES / INTIMATE_HARD_RULES | `position: 1`, `constant: false` |
+| Tier 3 EROTIC_LEXICON_Arc[N] (arc) / EROTIC_LEXICON (sandbox standing) | `position: 1`, `constant: false` *(`constant: true` + `selective: true` + `ignoreBudget: true` is a permitted non-default where the arc's / world's primary function is Indulgence — it needs a rationale saying so)* |
 | Tier 2 NPC roster intimacy (`NPC_INTIMACY` compact block, §6.5) | `position: 1`, `constant: false` |
 
 If an entry is marked "DEFAULT" but uses different position or flag values, this is a contradiction — either the rationale is wrong (entry is non-default and needs justification) or the position/flags are wrong (entry should be using the default). Hard reject with the directive: "Either change the rationale to a justified non-default explanation, or change the position/flags to match the documented default."
@@ -436,6 +437,49 @@ Applies **only if** the Architect authored a `### CARRIER: [[DICE_TABLES]]` bloc
   - **Serializing framing.** A procedure `framing` (or the payload-level one) that invites a sequence — "narrate the sequence of events", "in order", or wording that lists participants to be handled one at a time. Recount framing should fix the register and assert one continuous scene, and leave choreography to the model.
 
 Read-only: direct the Architect to fix the carrier; do not edit it.
+
+### Step 4.9 — Intimacy Age Gate & Erotic Register Validation (conditional — runs when intimacy drafts are present)
+
+Runs whenever `Drafts/` contains any Intimacy Profile, NPC intimacy roster, protagonist intimacy profile, or Intimacy Register. Skipped when `intimacy_in_scope: false`. Read Master Design Section 10's `Intimacy Rendering (Erotic Register)` record first. Read-only as always: route every failure to the Intimacy Architect (or, for a missing age upstream, to the user via the Refiner's record).
+
+#### 4.9a — Adults only (unconditional hard fail — every register)
+
+Every character, NPC, and protagonist with **any** intimate substrate in the drafts — a Tier 2 Intimacy Profile, a §6.5 `NPC_INTIMACY` block, a `[PROTAGONIST]_INTIMATE_EMBODIMENT` entry, or a named appearance in an `INTIMATE_SCENE_TYPES` / `INTIMATE_BEAT` entry — must have a **stated age of 18 or older** in the drafts (card, Tier 2 entries, or the embodied baseline itself) and must be written as an adult in body and manner. Hard fail, and the entry is to be removed rather than repaired, on any of:
+
+- no stated age anywhere in the drafts for a character with intimate substrate;
+- a stated age under 18;
+- a stated adult age contradicted by the description — a child's body, a child's behavior, or a framing device standing in for an age (a long-lived species, a magical or apparent age, "only looks young").
+
+This check has no register condition, no user-decline path, and no soft-flag tier. Also confirm the Master Design record says `Adults-only confirmation: confirmed`; if the record is absent on a world with intimacy drafts, fail and route to the Refiner.
+
+#### 4.9b — Register presence and placement (hard fail)
+
+Skip 4.9b–4.9d when the record's world default is `unstated` (legacy: no register material is expected — and finding any is itself a fail, since nothing declared it). Otherwise, per arc register file (or the single sandbox register), with the **effective register** = the arc's override if recorded, else the world default:
+
+- Every `INTIMACY_FUNCTION` entry opens its prose specification with a literal `**Erotic register:**` line whose value equals the effective register.
+- *Effective register `explicit` or `pornographic`:* an `EROTIC_LEXICON` entry exists; `INTIMATE_HARD_RULES` carries the evasion rules — no stand-ins, no cutaway, no hedging, and at `pornographic` also no compression and no interiority retreat — **and both counter-guardrails** (explicit is not generic; the register is rendering, not escalation). Evasion rules without both guardrails are a hard fail, not a soft flag. An explicit user decline recorded in the Master Design (`Evasion rules: declined by user`) is the only exemption, and it exempts the rules, never the lexicon.
+- *Effective register `restrained`:* **no** `EROTIC_LEXICON` and **no** evasion rules in that file. A `restrained` arc that carries either will be rendered graphically.
+- The declared thematic function and the register are stated independently. Hard fail an entry that derives one from the other ("because this arc is corruption, the register is restrained").
+
+#### 4.9c — Lexicon fidelity (hard fail)
+
+For every `EROTIC_LEXICON` entry:
+
+- The sample lines match the Master Design record **character for character**. A paraphrased, tidied, softened, or "improved" sample line is a hard fail — the wording is the calibration, the same rule as verbatim manipulation phrasings and sample dialogue. So is a sample line the record does not contain.
+- The named vocabulary and banned stand-ins are present as recorded, and the separating rule is stated (a vague word never stands in place of the name; texture is added to a named thing, never substituted for it).
+- The entry contains no character names, arc events, or scene content — it is a register sample. Character bodies belong in Tier 2.
+
+#### 4.9d — Substrate at register (hard fail + soft flag)
+
+Where any effective register in the world is `explicit` or `pornographic`:
+
+- **Hard fail** — any intimate character's Entry 3 Half A with no **intimate anatomy** bullet, or any roster `NPC_INTIMACY` block with no `Intimate anatomy` line.
+- **Hard fail** — a banned stand-in from the world's own lexicon used anywhere in an Intimacy Profile, roster block, protagonist embodiment entry, or register entry. The model echoes the vocabulary of its context; a euphemistic substrate under a graphic register is a self-inflicted evasion. Quote the phrase.
+- **Hard fail** — any `INTIMATE_HARD_RULES` rule, Tier 1 world rule, or `ARC_STATE` / `SANDBOX_STATE` Tonal Mandate bullet that contradicts the effective register or a declared Indulgence function (e.g. "never titillation primary", a "prose elides physical detail" bullet in a `pornographic` arc). Route to whichever Architect owns the contradicting entry.
+- **Soft flag** — chart register in an intimate-anatomy bullet (physiology *explained* rather than a body *named and observed*). Plain anatomical naming is not this flag.
+- **Soft flag** — two characters' intimate-anatomy bullets that could be swapped without changing a scene; a deficit-only intimate anatomy for an older or altered body; a `VOICE_IN_INTIMACY` entry that does not say which of the lexicon's words the character will and will not say aloud.
+
+Where every effective register is `restrained`: **soft flag** any intimate-anatomy bullet or graphic vocabulary in the substrate — it will pull the prose past the declared register.
 
 ### Step 5 — LLM Instruction Audit (Hybrid Validation Protocol)
 
@@ -875,6 +919,8 @@ Post-history: [checklist results + word count]
 - **All Style Override Metadata soft flags reviewed and resolved (or carried forward as user-acknowledged) ✓**
 - No structural failures ✓
 - Arc mode: all arc lorebooks ≥8 entries ✓ — OR — Sandbox mode: Sandbox Lorebook has SANDBOX_STATE + ≥1 WORLD_PULSE ✓
+
+- **Intimacy age gate & Erotic Register (Step 4.9; only when intimacy drafts are present): every character / NPC / protagonist with intimate substrate has a stated age of 18+ and is adult in body and manner (unconditional, every register); `Erotic register:` line present and correct in every `INTIMACY_FUNCTION`; at `explicit` / `pornographic` — `EROTIC_LEXICON` present with sample lines verbatim against the Master Design, evasion rules present with both counter-guardrails, intimate anatomy authored for every intimate character, no banned stand-in in any intimacy draft, no rule contradicting the register or an Indulgence function; at `restrained` — no lexicon and no evasion rules; `unstated` — no register material present**
 
 **Status: APPROVED — Proceed to Phase 4 (The Compiler)**
 ```
