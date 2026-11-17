@@ -1,6 +1,6 @@
 # RPG Stats Contract — `[[RPG_STATS]]`
 
-**Status:** Draft · **Version:** 0 · **Last updated:** 2026-11-13
+**Status:** Draft · **Version:** 0 · **Last updated:** 2026-11-18
 
 > **Shared contract — canonical source of truth:**
 > [`AndreiNicu/World-Forge`](https://github.com/AndreiNicu/World-Forge) → `contracts/RPG_STATS.md`.
@@ -311,6 +311,7 @@ and `carry` field is ignored.
 | `weight` | number | no | Per unit, in `system.carry.unit` (§3.13). Default `0`. A magazine's weight is the same full or empty; loaded rounds are not weighed separately. |
 | `ammo` | object | no | Makes the item a ranged weapon and says how it is fed (§3.8). |
 | `fireModes` | array | no | Firearm fire modes and the rounds each pull of the trigger spends (§3.8.2). |
+| `pullsPerAction` | int | no | Trigger pulls one attack action covers in a fight (`RESOLUTION.md` §3.2a). Default `3`. A bolt-action rifle is `1`. A burst or automatic pull counts as one. |
 | `magazine` | object | no | Makes the item a magazine: `{ "accepts": [itemId], "capacity": int }` (§3.8.1). |
 | `durability` | object | no | Wear: `{ "max": int, "perUse"?: int, "atZero": "broken" \| "destroyed" }` (§3.9). |
 | `recover` | number | no | `0–1`. Chance each spent unit is recovered after the encounter (arrows, bolts, throwing knives; §3.8.3). Default `0`. |
@@ -500,7 +501,8 @@ the default mode. A firearm without `fireModes` spends one round per shot.
 The current mode is per-copy state (`mode`, §3.11). Switching mode spends
 nothing and is not a commit inside an encounter (it lives in the working copy);
 outside one it commits with the next change. What a mode does to a hit is
-combat resolution, reserved for `combat` (§7). Here it only counts rounds.
+combat resolution, reserved for `combat` (§7). Here it only counts rounds. How
+many pulls fit in one attack action is `pullsPerAction` (§3.3).
 
 #### 3.8.3 Recovery
 
@@ -526,9 +528,9 @@ Two different actions, kept apart on purpose:
   narrates fumbled rounds while the threat closes in, as the world's answer
   (`OUTCOME_AUTHORITY.md` §3.3). Refilling with no loose rounds that fit fails.
 
-How long a refill takes in turns is deferred with initiative and turn order
-(§7). Until then, "it took too long" is something the model narrates from the
-check's outcome, not a number.
+In a fight, a refill costs the exchange's action (`RESOLUTION.md` §3.2a): one
+refill check per action, whatever it loads. "It took too long" is the enemies
+acting while it happened.
 
 ### 3.9 Durability
 
@@ -1020,6 +1022,7 @@ Absence never errors, matching every other seam:
       catalog item. Every magazine's `accepts` resolves to round items.
 - [ ] `fireModes` keys are unique per weapon; every `rounds` is ≥ 1 (a range's
       floor included). Starting `mode` values name a declared mode.
+      `pullsPerAction`, where set, is ≥ 1.
 - [ ] Starting `loaded` ≤ capacity and `durability` ≤ `max`. Any non-pristine
       starting copy is explained in the sheet's `buildNote` (§3.11).
 - [ ] If any `price` or `vendors` exists, `system.currency` names a catalog
@@ -1074,8 +1077,9 @@ the fork side. Any new authored data they need is added here.
 - **Regeneration and rest** — how `current` recovers between fights.
 - **Weapon combat numbers** — damage, range, accuracy, what a fire mode does to a
   hit, reach (knife vs. katana). All in the reserved `combat` field.
-- **Refill duration in turns** and the roll scheme behind `system.refill`
-  checks; both wait on initiative and turn order.
+- **The roll scheme behind `system.refill` checks**, which waits on the core
+  roll. Refill duration is settled: one action per refill check in a fight
+  (`RESOLUTION.md` §3.2a).
 - **Repair** — restoring durability (a repair kit item, a vendor service, a
   proficiency). Until then a `broken` copy stays broken.
 - **Ammunition realism** — a chambered round (+1), dropping magazines on a speed

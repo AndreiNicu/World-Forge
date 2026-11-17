@@ -1,6 +1,6 @@
 # Resolution Contract — how attempts become outcomes
 
-**Status:** Placeholder, with §2 (attempt interpretation) and §3 (combat: the enemy side) in Draft · **Version:** 0 · **Last updated:** 2026-11-13
+**Status:** Placeholder, with §2 (attempt interpretation) and §3 (combat: the exchange, its budget, and the enemy side) in Draft · **Version:** 0 · **Last updated:** 2026-11-18
 
 > **Shared contract — canonical source of truth:**
 > [`AndreiNicu/World-Forge`](https://github.com/AndreiNicu/World-Forge) → `contracts/RESOLUTION.md`.
@@ -13,8 +13,8 @@
 > belongs to the SillyTavern fork's side, which owns the runtime internals it
 > describes. World Forge only produces the data the engine consumes
 > (`RPG_STATS.md`, `DICE_ORACLE.md`); how that data is handled at runtime is the
-> fork's to define. §2 (attempt interpretation) and §3 (combat: how the enemy
-> side of a fight resolves) were drafted early so the rest of the engine has a
+> fork's to define. §2 (attempt interpretation) and §3 (combat: how an exchange
+> is budgeted and how the enemy side resolves) were drafted early so the rest of the engine has a
 > shape to build against. They are Drafts: nothing reads them, and the fork may
 > revise them here as it builds. The other sections have no content yet. No
 > agent spec references this document and nothing in this repo depends on it.
@@ -36,8 +36,8 @@ something" and "the fork commits a result."
   show why the odds are what they are. *Placeholder.*
 - **Time** — what a beat or round is in chat play; refill and reload duration;
   initiative and turn order. *Placeholder.*
-- **Combat** — the exchange, range bands, and how enemies act and are
-  narrated: **§3, Draft.** Attack math, damage, armor, and what a fire mode does
+- **Combat** — the exchange and its budget, range bands, overwatch, and how
+  enemies act and are narrated: **§3, Draft.** Attack math, damage, armor, and what a fire mode does
   to a hit (the reserved `combat` field in `RPG_STATS.md` §3.3) are still
   *placeholder*, with the core roll.
 - **Dice grammar** — dice notation and roll syntax, shared with the dice oracle
@@ -128,7 +128,8 @@ on who they are:
 - **Travel along the way** ("I took a turn on the road", "we pass the gas
   station") is `flavor`. A `move` is arriving at a place, leaving one, or
   setting out for one. The road between two places is one journey (§2.5), not a
-  new place at every bend.
+  new place at every bend. Changing distance to an enemy inside a fight ("I
+  back away", "I rush him") is a `position` beat (§2.3).
 - **Questions to the narrator** ("Is there anything useful in the room?") are
   perception: `flavor`. The answer comes from the state
   (`OUTCOME_AUTHORITY.md` §5): what's in plain sight, and for a place not yet
@@ -146,7 +147,7 @@ on who they are:
 
 ### 2.3 The vocabulary
 
-Eleven kinds, grouped by the route each one takes.
+Twelve kinds, grouped by the route each one takes.
 
 | Kind | What it is | Example | Rolls? | What the fork does |
 | --- | --- | --- | --- | --- |
@@ -157,6 +158,7 @@ Eleven kinds, grouped by the route each one takes.
 | **Checked, then committed** | | | | |
 | `stance` | A change to `{{user}}`'s own readiness or posture, on one of four axes (§2.7); and a conditional that describes readiness (§2.2). | "Raising my rifle", "I slip in quietly", "I get up", "If anything moves, I shoot it" | no | A free action (§2.7). Checks it's possible, then records the axis it names, leaves the others as they were, and shows it on the HUD. Readying a named weapon puts it in hand (`RPG_STATS.md` §3.11). |
 | `gear` | A deterministic action with an item or the party's own gear. The beat names the operation in `op` (below). | "I drink a dressing", "I swap magazines", "I take the shotgun it dropped", "I go through his pockets", "I hand Maya the dressing" | only `refill` in an encounter | Runs the legality check for that `op` (`OUTCOME_AUTHORITY.md` §4.1a), then makes the matching commit (`RPG_STATS.md` §4.4). A `refill` inside an encounter makes the check `RPG_STATS.md` §3.8.4 asks for. A `take` of a catalog item no roll placed commits nothing and brings up the place's search action (§2.4a). |
+| `position` | Inside an encounter, changing distance to an enemy without leaving the place: closing in, backing off, falling back across the room. | "I back away from it", "I rush him", "I fall back to the stairs" | only to disengage | Checks it's possible, then moves one range band toward the target or away, two with `dash` (§3.3). Backing away from an enemy engaged with you is disengaging, which is a check. Outside an encounter there are no bands, and the beat is `flavor`. |
 | **The world's roll** | | | | |
 | `move` | Entering or leaving a distinct place: a room, a building, a street, an area; or setting out for one it doesn't reach in the same beat, which starts a journey (§2.5). | "I entered apartment 202", "We drive back to camp" | **yes** | Commits the new location, makes the **arrival roll** (§2.5), and offers the place's HUD actions (search, trade). A journey makes the **journey roll** instead; arriving is its own `move`. |
 | `wait` | Time passing: resting, sleeping, waiting, holing up. | "We hole up for the night", "I wait an hour" | **yes**, once encounter data exists | Makes the **time roll** for something finding the party (§2.5), and advances time once time exists (§1). A cut point when the roll interrupts (§2.6). |
@@ -389,7 +391,8 @@ Beats resolve in the order the player wrote them, all before the main model
 generates.
 
 - Free beats (`flavor`, `intent`, `speech`, `stance`, `gear`, `claim`) resolve
-  immediately and in order.
+  immediately and in order. So does `position`, which rolls only to disengage
+  (§3.3).
 - **A rolled beat (`move`, `wait`, `check`) is a cut point.** If the roll
   leaves the rest of the message's premise intact — a `check` that succeeds,
   an arrival that turns up nothing, a night or a journey that passes quietly —
@@ -401,9 +404,11 @@ generates.
   doesn't stop `{{user}}` reloading. The beats resolve in order, and a beat that
   depended on the failed one is caught by the legality check instead: searching
   a Shambler that didn't go down fails because it isn't defeated. The fork then
-  resolves the enemy side (§3.2), and the model narrates both. How many actions
-  fit in one exchange is still open (§3.9). An arrival roll that starts an
-  encounter still cuts: the fight begins at that beat.
+  resolves the enemy side (§3.2), and the model narrates both. What does cut
+  inside an encounter is the **exchange budget** (§3.2a): the first beat that
+  doesn't fit ends the exchange, and it and everything after it are *Not
+  reached*. An arrival roll that starts an encounter still cuts: the fight
+  begins at that beat.
 - **A perceived presence that rolls** (§2.4a) is a cut point when it's here and
   finds something: the encounter starts at that beat. One about somewhere else
   never cuts, because what it found is waiting there.
@@ -435,10 +440,10 @@ then commits it. "I raise my rifle" with no rifle equipped is caught by the
 legality check like any other possession claim, and the model is given the fact
 to write around.
 
-Free applies **outside an encounter.** During one, how long an action takes and
-whether it can be interrupted is a question of time and combat (§1,
-placeholder), and the fork may put a check on a free action there, as it
-already does for a refill. The beat's kind doesn't change.
+Free applies **outside an encounter.** During one, every beat has a cost in the
+exchange budget (§3.2a): readying the weapon already in hand is still free,
+drawing a different one costs the move, and a refill costs the action and makes
+its check. The beat's kind doesn't change.
 
 **Stance** is short-lived state the fork tracks for `{{user}}`, on four
 independent axes. A beat sets the axis it names and leaves the others alone:
@@ -533,6 +538,7 @@ deterministically.
   | `intent` | None. |
   | `speech` | `to` if it addresses someone; `quoted: true` for quoted words; `instruction: true` for a direction to a party member, with `asks` (the kind it would be if they did it) and the fields that kind takes ("Maya, shoot the big one" carries `asks: check` and its `target`) (§2.2). |
   | `stance` | The axis it sets (`weapon`, `noise`, `cover`, `posture`) with its value, or `at_ease: true`; `object` if a weapon is named; `when` for a conditional (§2.7). |
+  | `position` | `toward` (the enemy it closes on) or `away: true`; `dash: true` when it moves fast or far ("I sprint at him", "I run for the back of the store") (§3.3). |
   | `gear` | `op` (§2.3); `item`; for `give`, `to`; for `mode`, `mode`; for `loot`, `target`. |
   | `move` | `to`; `journey: true` when it sets out for a place it doesn't reach in the same beat. |
   | `wait` | `duration` as written ("for the night", "an hour"). |
@@ -679,7 +685,9 @@ loose 9mm, and is fighting a Shambler.
 | 3 | "clicked" | `claim: state` | *Not confirmed*. It happens to match here; the fork's count is what's true either way. |
 | 4 | "quickly tried to reload" | `gear`, `op: reload` | The legality check fails: no magazine in inventory holds a round. Fact injected: no loaded magazine, 11 loose rounds. |
 
-A miss on beat 1 doesn't cut (§2.6, inside an encounter). The model narrates two
+The message fits the exchange budget (§3.2a): three pulls are one attack
+action, at the default cap, and the reload is the move. The failed reload still
+spends it. A miss on beat 1 doesn't cut (§2.6, inside an encounter). The model narrates two
 shots, the dry click, a hand finding only the empty spare, and the Shambler's
 response. Its narration of the shots isn't counted again (§2.9). Refilling the
 spare is its own action next turn, with its check (`RPG_STATS.md` §3.8.4). The
@@ -700,13 +708,16 @@ and the rest falls to `flavor`.
 | 4 | "I already found 50 bucks on him" | `claim: contents` | *Not confirmed*. The §8 Shambler's dollar line is a 30% chance of $2–18, so it could never have carried $50; and what it did carry was rolled at defeat, not declared. |
 | 5 | "He must've been someone before all of this" | `flavor` | None |
 
-- **The stab kills:** the body's rolled loot is taken: a field dressing on a 10%
-  line, a few dollars on a 30% line, both, or nothing. The model narrates what
-  was actually found, not $50, and the reflection reaches it in the player's
-  own voice.
-- **The stab fails:** no cut, because it's an encounter. The search fails the
-  legality check because the Shambler is still moving, the $50 stays *Not
-  confirmed*, and the reflection still applies; it never depended on the kill.
+- **The stab kills, and it was the only enemy:** the encounter ends at beat 1,
+  and the rest of the message resolves outside it, with no budget (§3.2a). The
+  body's rolled loot is taken: a field dressing on a 10% line, a few dollars
+  on a 30% line, both, or nothing. The model narrates what was actually found,
+  not $50, and the reflection reaches it in the player's own voice.
+- **The stab fails:** the stab spent the exchange's action, and searching a
+  body costs an action too, so beat 3 doesn't fit the budget. Beats 3–5 are
+  *Not reached*, the $50 and the reflection with them, and the Shambler acts.
+  Had the action been free, the search would still have failed the legality
+  check: the Shambler is still moving.
 
 Examples F–K use the §8 starting state: the Glock with 9 rounds, an empty spare
 magazine, 11 loose rounds, $35, no stim, no axe. Maya is in the party.
@@ -761,11 +772,13 @@ in a fight.
 | 1 | "*Ignoring the pain*" | `flavor` | The player's feeling. It changes nothing the body can do. |
 | 2 | "I get up" | `stance`, `posture: standing` | Fails: `downed` pins posture at `prone` (`OUTCOME_AUTHORITY.md` §6). Attempted, and it fails. |
 | 3 | "jab the military stim into my thigh" | `gear`, `op: consume` | `downed` allows `gear.consume`, so the status doesn't stop it. Fails possession: there is no stim in inventory. It would not help anyway, because the stim raises max HP and is not a revive. |
-| 4 | "grab my axe" | `gear`, `op: equip` | No axe is in a slot, so this is an `equip`, not a `stance` (§2.3). Fails twice: `downed` doesn't allow `gear.equip`, and `{{user}}` has no axe. The fire axe is Maya's. |
+| 4 | "grab my axe" | `gear`, `op: equip` | No axe is in a slot, so this is an `equip`, not a `stance` (§2.3). It doesn't fit the budget, so it is *Not reached* (below). Reached, it would fail twice: `downed` doesn't allow `gear.equip`, and `{{user}}` has no axe. The fire axe is Maya's. |
 
-Inside an encounter nothing cuts. The model narrates the try to rise and the
-body refusing, a hand finding no injector and no axe in reach. Any cost comes
-from the state, never from the number of failures.
+Inside an encounter a failed beat doesn't cut, but the budget does (§3.2a). The
+attempt to get up spends the move and the stim spends the action, even though
+both fail, so beat 4 doesn't fit: "grab my axe" is *Not reached*. The model
+narrates the try to rise and the body refusing, and a hand finding no
+injector. Any cost comes from the state, never from the number of failures.
 
 **J. A night, then something that can't exist.**
 
@@ -843,7 +856,8 @@ With the Shambler there:
 | 2 | "I pulled my gun" | `stance`, `weapon: ready`, `object: gun` | Matches the equipped Glock, which is now in hand. In an encounter the fork may put a check on it (§2.7). |
 | 3 | "fired blindly in the dark, at the source of the noise" | `check`, `target`: the Shambler | Uses the Glock in hand. The magazine is empty, so the pull clicks: nothing fires and nothing rolls (§2.9). Fact injected: empty magazine, loose rounds in the pocket. "Blindly" and "in the dark" are handicaps the player chose: `scenery` (§2.4a). |
 
-There's no cut, because it's an encounter. The model narrates the dry click and
+There's no cut, because it's an encounter, and the message fits the budget
+(§3.2a): drawing the gun is the move and firing is the action. The model narrates the dry click and
 the Shambler's response. Nothing warns the player beforehand or reloads for
 them. The HUD showed the count, and the click is what forgetting it costs (the
 no-rescue rule, producer `CLAUDE.md` principle #13).
@@ -895,9 +909,11 @@ Each is recorded once, in the file that will settle it.
   queue HUD actions or stay narrative only.
 - **Time in free beats.** Whether "I paused a bit" should advance time once
   time exists (§1). Longer spans ("I wait an hour") are a `wait` (§2.3).
-- **Conditionals that fire.** Whether "If anything moves, I shoot it" should
-  resolve automatically when the condition happens (overwatch), or stay a
-  stance until the player acts. A question for combat (§3.9).
+- ~~**Conditionals that fire.**~~ Resolved 2026-11-18 for fights: inside an
+  encounter, a readiness conditional holds the action and fires on a
+  mechanical trigger (overwatch, §3.4a). Outside one it stays a stance. Whether
+  one held outside a fight fires when an arrival roll starts an encounter is
+  initiative (§3.9).
 
 **Tracked in the owning contract:**
 
@@ -914,11 +930,12 @@ Each is recorded once, in the file that will settle it.
 
 ---
 
-## 3. Combat: the enemy side — Draft
+## 3. Combat — Draft
 
-Decided 2026-11-13. This section covers how an exchange is ordered, where
-enemies are, what they do, who they do it to, and how the result reaches the
-model. The numbers behind it — the attack roll, what defense is made of, damage,
+The enemy side was decided 2026-11-13; the exchange budget, movement within a
+fight, and overwatch on 2026-11-18. This section covers how an exchange is
+ordered and how much fits in it, where the party and the enemies are, what the
+enemies do, who they do it to, and how the result reaches the model. The numbers behind it — the attack roll, what defense is made of, damage,
 armor — belong to the core roll and math (§1) and are still placeholders here.
 
 ### 3.1 The problem
@@ -963,7 +980,47 @@ exchange.** Before generation, the fork resolves it in this order:
   arrival roll starts an encounter has no enemy actions: the turn ends at that
   beat (§2.6), and the first full exchange is the player's next message.
 - **How much fits in one exchange** — three shots, a reload, and a dive for
-  cover in one message — is the exchange budget, which is open (§3.9).
+  cover in one message — is the exchange budget (§3.2a).
+
+### 3.2a The exchange budget
+
+Decided 2026-11-18. Each exchange gives `{{user}}` one **action**, one
+**move**, and any number of **free** beats. The action can be spent as a second
+move. A party member acting on an instruction has her own action and move
+(§3.5).
+
+| Cost | Beats |
+| --- | --- |
+| **Free** | `flavor`, `intent`, `claim`; `speech`, orders to companions included; `stance` changes to `weapon` (readying or lowering the weapon already in hand), `noise`, or `posture` → `prone`; `gear` `mode` and `drop`; `wait`, which spends nothing and lets the enemies act |
+| **Move** | `position`, one band (§3.3); `stance` changes to `cover` (in or out) or `posture` → `standing`; `stance` readying a weapon that isn't in hand (drawing or switching, §2.7); `gear` `reload`, `take`, `give`, `equip` |
+| **Action** | `check`: an attack, an ability, forcing something, disengaging (§3.3); `position` with `dash`; `gear` `refill` (with its check, `RPG_STATS.md` §3.8.4), `consume`, `loot`; holding an attack (overwatch, §3.4a) |
+| **Not in a fight** | `search` and `trade`: their actions aren't offered during an encounter, so the beat commits nothing and the fact is injected. `move`: leaving the place (below). |
+
+- **Beats spend in order.** The first beat that costs more than what's left
+  ends the exchange: it and every beat after it, free ones included, are *Not
+  reached* (§2.6, §2.10), folded with **Use as my next message**. The fold's
+  line says where the exchange ran out.
+- **An attempt spends its cost whether or not it works.** A refill that loads
+  nothing, a reach for an axe that isn't there, and a stand that a status
+  refuses each use the moment they took (`OUTCOME_AUTHORITY.md` §3.3).
+- **Trigger pulls per action.** One attack action covers up to **3** trigger
+  pulls; a weapon's `pullsPerAction` overrides it (`RPG_STATS.md` §3.3). A
+  burst or automatic pull counts as one. A `count` above the cap fires only
+  the cap, the beat stays whole in the model's copy (§2.4), and a fact says how
+  many pulls fired.
+- **An implied close.** A melee attack on an enemy at `near` spends the move to
+  close first, when the move is still unspent (§3.3). Without it, the attack
+  fails for reach and the fact is injected.
+- **The fight can end mid-message.** When the party's beats leave no enemy able
+  to act (§3.7), the encounter ends at that beat, and the rest of the message
+  resolves as it would outside a fight, with no budget.
+- **Leaving the place** (a `move` during an encounter) costs the action. Until
+  leaving a fight is settled (§3.9), it succeeds only when no enemy instance is
+  `engaged` or `near`: nothing is close enough to stop the party. The
+  encounter then ends for the party, and the instances are discarded with no
+  loot. Otherwise it commits nothing and the fact is injected.
+- **The HUD shows the budget** beside the parse: action and move, spent or
+  open.
 
 ### 3.3 Range bands
 
@@ -984,11 +1041,28 @@ Each enemy instance is in one of three **range bands**, relative to the party:
   along with whether the enemy is alerted.
 - **Enemies change band** through their own actions: `close` moves `speed`
   bands toward the party, `withdraw` moves one band away (§3.4).
-- **The party changing band** ("I back away", "I rush him") has no beat kind
-  yet. It is open (§3.9).
+- **The party changes band** through `position` beats (§2.3), decided
+  2026-11-18:
+  - **`toward`** an enemy moves one band closer to it, costing the move;
+    reaching `engaged` engages it with whoever moved. A `dash` moves two bands
+    and costs the action instead (`far` to `engaged` in one exchange).
+  - **`away`** moves one band farther from every instance that isn't engaged
+    with the mover. Past `far` there is no band left: that is leaving the place
+    (§3.2a).
+  - **Disengaging.** A `position` away from an enemy engaged with the mover is
+    a check, and costs the action. On a success the mover gets clear and the
+    enemy drops to `near`. On a partial the mover gets clear, but the enemy
+    attacks first; that attack is its action this exchange. On a fail the
+    mover stays engaged. Without this, backing off one band each exchange would
+    keep a slow enemy closing forever and never attacking.
+  - **Only `{{user}}`'s `position` moves the party's bands.** A companion's
+    instructed `position` changes only her own engagement: toward a `near`
+    enemy engages her with it, and away disengages her, with her own check.
 - **Reach.** A `melee` attack reaches only the party member the instance is
   engaged with. A `ranged` attack reaches any band. What range does to the
-  odds is a modifier (§1, placeholder).
+  odds is a modifier (§1, placeholder). The same holds for the party: a melee
+  attack on an enemy at `near` makes an implied close first, if the move is
+  unspent (§3.2a), and one at `far` can't reach.
 - Each instance's band shows in the state block (`RPG_STATS.md` §4.5) and on
   the HUD.
 
@@ -1060,13 +1134,36 @@ character's own material (`RPG_STATS.md` §3.5), but the fork still picks its
 intent and resolves its results. Its `tactics` and `phases` are the authored
 frame the portrayal stands on, the same way a card is.
 
+### 3.4a Overwatch
+
+Decided 2026-11-18. Inside an encounter, a readiness conditional ("If anything
+comes through that door, I shoot it", §2.7) **holds the exchange's action**:
+weapon `ready`, plus a held attack.
+
+- **It fires in the enemy step,** the first time any enemy instance `close`s
+  into the held weapon's reach or `attack`s a party member. The held attack
+  resolves first, against that enemy, as an ordinary attack action (pull cap
+  included, §3.2a). If it defeats the enemy, the enemy's action doesn't happen.
+- **The trigger is mechanical, not the `when` text.** The fork doesn't judge
+  whether "comes through that door" matched. `when` stays in the model's copy
+  so the narration can honor it.
+- **Reach still applies.** A held melee attack fires only on an enemy that
+  closes to `engaged` with the holder or attacks them. A held ranged attack
+  fires on any band.
+- **Unfired, it lapses** at the end of the exchange. The weapon stays `ready`.
+- **A companion can be told to hold** ("Maya, cover the door"): an instruction
+  asking for a `stance` with `when` holds her action the same way (§3.5).
+- Outside an encounter the conditional stays a stance (§2.7). Whether one held
+  then fires when an arrival roll starts a fight is initiative (§3.9).
+
 ### 3.5 Party members in a fight
 
 - **`{{user}}`** acts through their beats (§2).
 - **A party member given an instruction** this exchange ("Maya, shoot the big
   one") acts on it in step 2 of the exchange (§3.2). The fork checks the asked
   kind against her own sheet (§2.2) and resolves it as it would `{{user}}`'s:
-  her proficiency, her weapon, her rounds. Until refusal is settled (§3.9), an
+  her proficiency, her weapon, her rounds, and her own action and move
+  (§3.2a). Until refusal is settled (§3.9), an
   instruction her state allows is carried out, and the model voices how she
   does it.
 - **A party member with no instruction** takes no mechanical action until
@@ -1115,9 +1212,9 @@ works as `RPG_STATS.md` §4.6 describes: a fall, a fire, a hazard.
 ### 3.7 Encounter end
 
 An encounter ends when no enemy instance is left able to act: each one
-defeated or fled. The working copy then commits (`RPG_STATS.md` §4.3). The party
-leaving a fight — fleeing, or simply walking away from enemies that can't
-follow — is open (§3.9).
+defeated or fled. The working copy then commits (`RPG_STATS.md` §4.3). So does leaving the
+place while nothing is close enough to stop the party (§3.2a). Fleeing from
+closer is open (§3.9).
 
 ### 3.8 Graceful degradation
 
@@ -1132,21 +1229,13 @@ follow — is open (§3.9).
 
 ### 3.9 Open questions
 
-- **The exchange budget.** How much the player can do in one exchange before
-  the enemy answers. The likely shape is a time budget with the beats past it
-  cut as *Not reached* (§2.6), but nothing is decided.
-- **Moving within a fight.** "I back away", "I rush him", "I fall back to the
-  stairs": no beat kind changes the party's band. `move` is entering or leaving
-  a place (§2.3), and travel along the way is `flavor`. Settled with the
-  exchange budget.
-- **Melee reach on the player's side.** "I stab the Shambler" while it's `near`:
-  a legality failure, or an implied close and then a stab.
 - **The core roll and defense** (§1). The attack roll, what defense is made of,
   what a partial does to an attack (either side), armor reduction, and armor
   wear.
 - **Initiative and surprise.** Whether an alerted enemy acts on the exchange an
-  encounter starts, whether a surprised one loses its first, and what `quiet`
-  stance does to it.
+  encounter starts, whether a surprised one loses its first, what `quiet`
+  stance does to it, and whether a readiness conditional held outside a fight
+  fires when one starts (§3.4a).
 - **Companions.** What a party member with no instruction does, and whether one
   may refuse an order mid-fight.
 - **Attacks on downed characters.** Whether an enemy can target a downed party
@@ -1158,8 +1247,9 @@ follow — is open (§3.9).
   statuses (`OUTCOME_AUTHORITY.md` §10.2).
 - **Morale** beyond `fleeAtHpPct`: fleeing when the others fall, or when the
   leader does.
-- **Overwatch** (§2.13).
-- **Leaving a fight** (§3.7).
+- **Leaving a fight** (§3.7). The interim rule in §3.2a lets the party leave
+  only when nothing is `engaged` or `near`; fleeing from closer, and enemies
+  that follow, are unsettled.
 - **A fleeing `unique` enemy.** Its HP doesn't persist yet (`RPG_STATS.md`
   §7), so it comes back whole.
 
@@ -1181,5 +1271,5 @@ uses it.
 | --- | --- |
 | What exists: stats, items, sheets, bestiary (including attacks, speed, tactics), economy | `RPG_STATS.md` (Draft) |
 | Who decides: attempts vs. results, pinned rolls, legality | `OUTCOME_AUTHORITY.md` (Draft) |
-| How an attempt resolves: beats, the enemy side of a fight, dice, math, modifiers, parsing | this document (§2 and §3 Draft, rest Placeholder) |
+| How an attempt resolves: beats, the exchange budget and the enemy side of a fight, dice, math, modifiers, parsing | this document (§2 and §3 Draft, rest Placeholder) |
 | Stateless narrative roll tables | `DICE_ORACLE.md` |

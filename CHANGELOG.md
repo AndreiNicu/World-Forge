@@ -21,8 +21,11 @@ observation. That made the model the jeopardy dial: the habit that yields to
 `{{user}}` would decide how often the enemy hits them (principle #13). The fork
 now resolves the enemy side too, before generation. Each enemy rolls its own
 attack, the fork picks the target, and the model writes how it happens but
-never whether, who, or how much. Attack math, defense, damage, and armor stay
-placeholders with the core roll. Still a Draft; nothing reads it.
+never whether, who, or how much. A follow-up in the same PR caps what one
+message can do before the enemy answers: an **exchange budget** of one action,
+one move, and free beats, with movement inside a fight as its own beat kind so
+backing off can't kite a slow enemy forever. Attack math, defense, damage, and
+armor stay placeholders with the core roll. Still a Draft; nothing reads it.
 
 ### Added
 
@@ -38,6 +41,22 @@ placeholders with the core roll. Still a Draft; nothing reads it.
   band; encounter end; degradation; and the open questions this surfaced
   (exchange budget, moving within a fight, melee reach, defense, initiative,
   companions without orders, attacks on the downed, talking an enemy down).
+- `contracts/RESOLUTION.md` §3.2a — **the exchange budget**: one action, one
+  move, any number of free beats, the action spendable as a second move; a
+  cost table covering every beat kind and `gear` op; the first beat that
+  doesn't fit and everything after it are *Not reached*; an attempt spends its
+  cost whether or not it works; up to 3 trigger pulls per attack action; a
+  fight that ends mid-message drops the budget; an interim rule for leaving
+  the place (only when nothing is `engaged` or `near`).
+- `contracts/RESOLUTION.md` §2.3, §2.9, §3.3 — **a 12th beat kind, `position`**
+  (`toward` / `away`, `dash`), for movement within a fight. Disengaging from an
+  engaged enemy is a check that costs the action; a melee attack on a `near`
+  enemy makes an implied close with the unspent move.
+- `contracts/RESOLUTION.md` §3.4a — **overwatch**: a readiness conditional in a
+  fight holds the action and fires when an enemy closes into reach or attacks.
+  The trigger is mechanical, never the fork's reading of the `when` text.
+- `contracts/RPG_STATS.md` §3.3 — `pullsPerAction` on weapons (default 3).
+- `contracts/OUTCOME_AUTHORITY.md` §10.1g — the budget decisions.
 - `contracts/RPG_STATS.md` §3.5 — bestiary fields `attacks[]`, `speed`,
   `tactics`, `fleeAtHpPct`, and `phases[].tactics`; matching producer rules in
   §6; the §8 worked example gains attacks, the Runner's speed, and tactics for
@@ -56,6 +75,15 @@ placeholders with the core roll. Still a Draft; nothing reads it.
   player's beats; §2.9 — an instruction carries its asked kind's fields
   (`target` for a `check`). The trailing sections renumber to §4–§5 (nothing
   referenced them by number).
+- `contracts/RESOLUTION.md` §2.6, §2.7, §2.11 — the budget is the one thing
+  that cuts inside an encounter; free actions point at the cost table; worked
+  examples D and M are shown to fit the budget, and E and I now end where the
+  budget runs out. §2.13's overwatch question is resolved for fights; §3.9
+  drops the questions this settles.
+- `contracts/RPG_STATS.md` §3.8.4, §7 — a refill in a fight costs the action;
+  refill duration is no longer deferred.
+- `contracts/OUTCOME_AUTHORITY.md` §6 — the `downed` sketch's `allows` gains
+  `position` (crawling away).
 - `contracts/README.md`, `CLAUDE.md` — RESOLUTION status: §2–§3 Draft.
 
 ### Fixed

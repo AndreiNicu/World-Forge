@@ -1,6 +1,6 @@
 # Outcome Authority Contract — who decides what happened
 
-**Status:** Draft · **Version:** 0 · **Last updated:** 2026-11-13
+**Status:** Draft · **Version:** 0 · **Last updated:** 2026-11-18
 
 > **Shared contract — canonical source of truth:**
 > [`AndreiNicu/World-Forge`](https://github.com/AndreiNicu/World-Forge) → `contracts/OUTCOME_AUTHORITY.md`.
@@ -356,8 +356,8 @@ Result declarations and other fuzzy claims stay with the main model and the
 engine block.
 
 **A second small-model job: the beat pass.** Splitting `{{user}}`'s message
-into beats and labeling each one (flavor, intent, speech, stance, gear, move,
-wait, check, search, trade, claim) is specified in `RESOLUTION.md` §2.9. It is a separate call
+into beats and labeling each one (flavor, intent, speech, stance, gear, position,
+move, wait, check, search, trade, claim) is specified in `RESOLUTION.md` §2.9. It is a separate call
 with the same discipline as this one: it labels, it never decides. The beat pass
 flags a clause that declares its own result (§3.4) but does not judge it.
 
@@ -541,7 +541,7 @@ recovery rule gets recovered by narration, which is the outcome-denial hole
   "persona": {
     "state": "downed",
     "posture": "prone",                    // pins the stance axis while the status holds
-    "allows": ["speech", "move", "gear.consume"],  // beat kinds still open: speaking, crawling, using a consumable
+    "allows": ["speech", "move", "position", "gear.consume"],  // beat kinds still open: speaking, crawling, using a consumable
     "recovery": [                           // the ONLY ways out of downed
       { "by": "ability", "tag": "revive" }, // an ability tagged revive (Maya's Triage)
       { "by": "item",    "tag": "revive" }, // an item tagged revive
@@ -559,7 +559,7 @@ recovery rule gets recovered by narration, which is the outcome-denial hole
   are never forbidden. Every other kind not listed fails: attempted, and it
   fails (§3.3).
 - **`posture`** pins that stance axis (`RESOLUTION.md` §2.7). A downed
-  character's `move` is a crawl because they're prone, and "I get up" is a
+  character's `move` or `position` is a crawl because they're prone, and "I get up" is a
   `stance` beat the status refuses.
 - **`recovery`** is closed: nothing outside the list ends the status. A revive
   ability is itself an attempt the fork resolves.
@@ -590,8 +590,8 @@ any ally stands" until the field is settled.
 - **Out-of-fiction cheating.** Editing JSON, editing or deleting messages,
   branching a chat. Not detected, not prevented. The player owns the chat.
 - **Ironman / rewind locks.** Not planned; same reason.
-- **Combat resolution.** Belongs to `RESOLUTION.md` (§3 drafts the enemy
-  side), with its data in `RPG_STATS.md`. This document only fixes the rule
+- **Combat resolution.** Belongs to `RESOLUTION.md` (§3 drafts the exchange,
+  its budget, and the enemy side), with its data in `RPG_STATS.md`. This document only fixes the rule
   that a resolution, once made, holds.
 - **Narrowing creativity.** Uncatalogued objects, clever plans, and legal
   actions the author didn't foresee are all fine. The rule is about results,
@@ -695,6 +695,23 @@ The enemy side of combat, drafted in `RESOLUTION.md` §3:
   weapon's numbers and its own proficiency, as `{{user}}` would.
 - **Both sides of an exchange are pinned** to the user's message (§4.2), and
   the enemy side isn't read back from the narration (§2.2 writer 3).
+
+### 10.1g Decided (2026-11-18)
+
+The exchange budget, drafted in `RESOLUTION.md` §3.2a–§3.4a:
+
+- **One action, one move, and free beats per exchange**, the action spendable
+  as a second move. A beat that doesn't fit, and everything after it, is *Not
+  reached*. An attempt spends its cost whether or not it works, which is the
+  budget's form of "attempted, and it fails" (§3.3).
+- **Up to three trigger pulls per attack action**, overridable per weapon.
+- **Movement within a fight is a `position` beat.** Disengaging from an engaged
+  enemy is a check, so backing off can't keep a slow enemy closing forever.
+- **A melee attack on a `near` enemy makes an implied close** with the unspent
+  move; without one it fails for reach.
+- **Overwatch holds the action** and fires on a mechanical trigger (an enemy
+  closing into reach or attacking), never on the fork's reading of the
+  condition's text.
 
 ### 10.2 Open
 
