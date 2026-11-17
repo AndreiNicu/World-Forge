@@ -13,7 +13,7 @@ numbers. Newest first.
 
 ---
 
-## 2026-11-16 — The Erotic Register: opt-in explicit and pornographic worlds, Indulgence, adults-only gate
+## 2026-11-16 — The Erotic Register: opt-in explicit and pornographic worlds, Indulgence, adults-only gate (#97)
 
 Until now the intimacy machinery treated erotic payoff itself as a failure: the
 Intimacy Architect did not write "spicy content for its own sake", the Auditor
