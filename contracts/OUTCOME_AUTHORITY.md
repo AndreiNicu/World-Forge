@@ -1,6 +1,6 @@
 # Outcome Authority Contract — who decides what happened
 
-**Status:** Draft · **Version:** 0 · **Last updated:** 2026-11-18
+**Status:** Draft · **Version:** 0 · **Last updated:** 2026-11-19
 
 > **Shared contract — canonical source of truth:**
 > [`AndreiNicu/World-Forge`](https://github.com/AndreiNicu/World-Forge) → `contracts/OUTCOME_AUTHORITY.md`.
@@ -489,6 +489,10 @@ posture blocks:
   note, no lecture.
 - **No narrated recovery.** Never write a downed or dead character, `{{user}}`
   or anyone else, back into action unless the state shows the recovery.
+- **Stress is the body, never the feeling.** When the state block shows a
+  stress level, render its `note`: the tremor, the breath, the narrowing
+  vision. Never write that `{{user}}` is afraid, panicking, or calm; what they
+  feel is the player's (`RESOLUTION.md` §4.4).
 - **The player's description of the world is a proposal, not the world.** When
   a message says what a place holds, who is there, or how something turned out,
   narrate from the injected state instead. Never confirm a find, an absence, or
@@ -713,6 +717,29 @@ The exchange budget, drafted in `RESOLUTION.md` §3.2a–§3.4a:
   closing into reach or attacking), never on the fork's reading of the
   condition's text.
 
+### 10.1h Decided (2026-11-19)
+
+The core roll, drafted in `RESOLUTION.md` §4:
+
+- **d100 against a chance**, clamped to 5–95, with 01–05 always succeeding and
+  96–00 always failing: nothing is certain and nothing is impossible. Up to 20
+  over the chance is a partial.
+- **Modifiers add; they never multiply.** Each is a named source the HUD shows:
+  proficiency, the weapon's accuracy at the target's range, weapon condition,
+  aim, readiness, the target's cover and posture, stress, encumbrance, and
+  authored difficulty. Damage is where multiplication belongs.
+- **One roll per action.** Success hits with every pull, a partial at half
+  damage, a fail with none. Armor subtracts per hit, less the weapon's pierce;
+  it never changes the chance.
+- **Difficulty is never judged from prose.** Standard unless authored, and the
+  proficiency a check reads is a label from the world's own list.
+- **A partial on a non-attack check has a fixed cost:** noise outside a fight,
+  exposure inside one. The model never picks it.
+- **Stress is physiology, not emotion.** The world owns `{{user}}`'s body and
+  the player owns what `{{user}}` feels (§2), so the gauge tracks shaking hands
+  and tunnel vision, rises on deterministic triggers, is resisted by nerve, and
+  is lowered only by attempts and events. "I'm calm" changes nothing.
+
 ### 10.2 Open
 
 - **Where premise refusal lives.** It applies to every world, with or without
@@ -732,7 +759,8 @@ The exchange budget, drafted in `RESOLUTION.md` §3.2a–§3.4a:
   stats. Outside the pipeline's scope; needs its own investigation.
 - ~~**The `allows` vocabulary.**~~ Resolved 2026-11-12: beat kinds (§6,
   §10.1e).
-- **Statuses beyond downed.** Broken limbs, bleeding, restrained, blinded, each
+- **Statuses beyond downed.** Stress, the first, is built as a gauge of its own
+  (§10.1h). Broken limbs, bleeding, restrained, blinded remain, each
   with its own `allows` and the cost of acting against it. The broken-leg case
   in §3.3 needs these, so `RPG_STATS.md`'s reserved `statuses` field is
   probably needed before combat resolution is. This document's §6 shape is meant
@@ -761,6 +789,6 @@ The exchange budget, drafted in `RESOLUTION.md` §3.2a–§3.4a:
 | Stat system, sheets, items, bestiary, campaign state | `RPG_STATS.md` |
 | Rolled facts injected as authoritative context | `DICE_ORACLE.md` |
 | Who decides outcomes, and what `{{user}}`'s message can and cannot change | this document |
-| How attempts and the enemy side of a fight resolve | `RESOLUTION.md` (§2–§3 Draft) |
+| How attempts, the core roll, and the enemy side of a fight resolve | `RESOLUTION.md` (§2–§4 Draft) |
 | The disposition (yield, auto-success, rescue) | producer `CLAUDE.md` principle #13, `protagonist_jeopardy` |
 | `{{user}}` as reference data, never impersonation | producer `CLAUDE.md` principle #14 |

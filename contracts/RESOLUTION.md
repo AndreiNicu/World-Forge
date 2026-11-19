@@ -1,6 +1,6 @@
 # Resolution Contract — how attempts become outcomes
 
-**Status:** Placeholder, with §2 (attempt interpretation) and §3 (combat: the exchange, its budget, and the enemy side) in Draft · **Version:** 0 · **Last updated:** 2026-11-18
+**Status:** Placeholder, with §2 (attempt interpretation), §3 (combat: the exchange, its budget, and the enemy side), and §4 (the core roll) in Draft · **Version:** 0 · **Last updated:** 2026-11-19
 
 > **Shared contract — canonical source of truth:**
 > [`AndreiNicu/World-Forge`](https://github.com/AndreiNicu/World-Forge) → `contracts/RESOLUTION.md`.
@@ -13,8 +13,8 @@
 > belongs to the SillyTavern fork's side, which owns the runtime internals it
 > describes. World Forge only produces the data the engine consumes
 > (`RPG_STATS.md`, `DICE_ORACLE.md`); how that data is handled at runtime is the
-> fork's to define. §2 (attempt interpretation) and §3 (combat: how an exchange
-> is budgeted and how the enemy side resolves) were drafted early so the rest of the engine has a
+> fork's to define. §2 (attempt interpretation), §3 (combat: how an exchange
+> is budgeted and how the enemy side resolves), and §4 (the core roll) were drafted early so the rest of the engine has a
 > shape to build against. They are Drafts: nothing reads them, and the fork may
 > revise them here as it builds. The other sections have no content yet. No
 > agent spec references this document and nothing in this repo depends on it.
@@ -28,18 +28,21 @@ something" and "the fork commits a result."
 
 - **The core roll** — the dice system, and how a roll maps onto the three
   outcome bands (success / partial / fail) that `RPG_STATS.md` and
-  `OUTCOME_AUTHORITY.md` already use. *Placeholder.*
-- **The math** — how proficiency ranks, attributes, and modifiers turn into
-  odds; difficulty and who sets it. *Placeholder.*
-- **The modifier stack** — named sources (rank, attribute, weapon condition,
-  encumbrance tier, statuses, stance, cover, range, fire mode), so the HUD can
-  show why the odds are what they are. *Placeholder.*
-- **Time** — what a beat or round is in chat play; refill and reload duration;
-  initiative and turn order. *Placeholder.*
+  `OUTCOME_AUTHORITY.md` already use: **§4, Draft.**
+- **The math** — how proficiency ranks and modifiers turn into odds;
+  difficulty and who sets it: **§4.2, Draft**, with every number still
+  illustrative.
+- **The modifier stack** — named sources (rank, weapon accuracy and condition,
+  aim, stance, cover, range, stress, encumbrance tier), so the HUD can show why
+  the odds are what they are: **§4.2, Draft.** Statuses beyond stress join it
+  later.
+- **Time** — what a beat or round is in chat play; initiative and turn order.
+  *Placeholder.* What fits in one exchange, reload and refill included, is the
+  budget (§3.2a).
 - **Combat** — the exchange and its budget, range bands, overwatch, and how
-  enemies act and are narrated: **§3, Draft.** Attack math, damage, armor, and what a fire mode does
-  to a hit (the reserved `combat` field in `RPG_STATS.md` §3.3) are still
-  *placeholder*, with the core roll.
+  enemies act and are narrated: **§3, Draft.** Attack math, damage, and armor
+  are in the core roll (§4.2–§4.3). What a fire mode does to a hit is still a
+  placeholder.
 - **Dice grammar** — dice notation and roll syntax, shared with the dice oracle
   where it can be. *Placeholder.*
 - **Attempt interpretation** — how `{{user}}`'s message is split into beats,
@@ -163,7 +166,7 @@ Twelve kinds, grouped by the route each one takes.
 | `move` | Entering or leaving a distinct place: a room, a building, a street, an area; or setting out for one it doesn't reach in the same beat, which starts a journey (§2.5). | "I entered apartment 202", "We drive back to camp" | **yes** | Commits the new location, makes the **arrival roll** (§2.5), and offers the place's HUD actions (search, trade). A journey makes the **journey roll** instead; arriving is its own `move`. |
 | `wait` | Time passing: resting, sleeping, waiting, holing up. | "We hole up for the night", "I wait an hour" | **yes**, once encounter data exists | Makes the **time roll** for something finding the party (§2.5), and advances time once time exists (§1). A cut point when the roll interrupts (§2.6). |
 | **The player's roll** | | | | |
-| `check` | An action whose outcome is uncertain and matters: against resistance, risk, or opposition. Includes firing a weapon, using an ability, and talking someone into something. | "I force the door", "I sneak past", "I fire three shots", "I use Triage on Maya", "I talk the guard into letting me through" | **yes** | Runs the legality check (a loaded weapon, an ability's `cost`), then rolls. `with` names the item or ability the action uses; without one, the weapon in hand (§2.7). How the check is chosen and resolved is the core roll and math (§1, placeholder). A repeated action carries a `count` (§2.9). |
+| `check` | An action whose outcome is uncertain and matters: against resistance, risk, or opposition. Includes firing a weapon, using an ability, and talking someone into something. | "I force the door", "I sneak past", "I fire three shots", "I use Triage on Maya", "I talk the guard into letting me through" | **yes** | Runs the legality check (a loaded weapon, an ability's `cost`), then rolls. `with` names the item or ability the action uses; without one, the weapon in hand (§2.7). How the check is chosen and resolved is the core roll (§4). A repeated action carries a `count` (§2.9). |
 | **An explicit action** | | | | |
 | `search` | A committed search of a **place**: search, rummage, go through, check. | "I search the kitchen", "I check the cruiser" | no, by itself | Brings up the matching search action (`RPG_STATS.md` §3.12) and ends the turn there (§2.6). The table rolls only when the player chooses it. Looking around is `flavor`; searching a body is a `gear` beat (`op: loot`). |
 | `trade` | An offer to buy, sell, or swap, and any argument about a price, spoken or narrated. | "I offer him my Glock and 200 bucks", "How about you drop the 50?" | no | Runs the legality check on what's offered, brings up the trade action with the offer filled in, and ends the turn there (§2.6). Nothing commits until the player confirms it (§2.8). The words stay in the model's copy as written. Haggling has no roll until it exists (`RPG_STATS.md` §7); the model is told the price stands (§2.8). |
@@ -452,7 +455,7 @@ independent axes. A beat sets the axis it names and leaves the others alone:
 
 | Axis | Values (default first) | Set by | Example |
 | --- | --- | --- | --- |
-| `weapon` | `lowered`, `ready` | Raising, drawing, or lowering a weapon; bracing for trouble. | "Raising my rifle", "I lower the rifle" |
+| `weapon` | `lowered`, `ready`, `aimed` | Raising, drawing, or lowering a weapon; bracing for trouble; taking aim. `aimed` lasts until the next attack or the end of the exchange, then returns to `ready`. | "Raising my rifle", "I lower the rifle", "I take careful aim" |
 | `noise` | `normal`, `quiet` | Moving carefully, keeping noise down. | "I slip in quietly" |
 | `cover` | `exposed`, `hidden` | Getting into or out of cover or concealment. | "I duck behind the counter" |
 | `posture` | `standing`, `prone` | Getting up, dropping down. | "I get up", "I drop flat" |
@@ -473,7 +476,7 @@ independent axes. A beat sets the axis it names and leaves the others alone:
   `ready` and keeps the condition in `when`. No shot is fired (§2.13).
 - Each non-default axis shows on the HUD as a badge. What it does to a roll —
   `ready` helping the first shot, `quiet` helping an arrival roll go unnoticed —
-  is a modifier (§1, placeholder). A stance word in a `move` beat ("I slip into
+  is a modifier (§4.2). A stance word in a `move` beat ("I slip into
   202 quietly") sets the stance first, then moves, so it applies to the arrival
   roll.
 
@@ -542,7 +545,7 @@ deterministically.
   | `gear` | `op` (§2.3); `item`; for `give`, `to`; for `mode`, `mode`; for `loot`, `target`. |
   | `move` | `to`; `journey: true` when it sets out for a place it doesn't reach in the same beat. |
   | `wait` | `duration` as written ("for the night", "an hour"). |
-  | `check` | `target` if there is one; `with` when the clause names the item or ability it uses; `count` when the clause repeats the action ("three shots" is three trigger pulls); `declaresResult: true` when the clause stated its own outcome (§2.4). |
+  | `check` | `target` if there is one; `with` when the clause names the item or ability it uses; `count` when the clause repeats the action ("three shots" is three trigger pulls); `declaresResult: true` when the clause stated its own outcome (§2.4); `skill`, a proficiency key from the world's declared list, when the check isn't an attack or an ability and one fits (§4.2); `steady: true` when the clause steadies `{{user}}`'s own nerves (§4.4). |
   | `search` | `place`. |
   | `trade` | `vendor` if named; `gives` and `wants` as written (items, amounts); `quoted: true` for a quoted offer. |
   | `claim` | `about` (§2.4a). For `outcome`, `own: true` when it's the result of `{{user}}`'s own `check`. For `state`, the quantity it contradicts where it can (`"rounds"`, `"hp"`). For `presence`, `perceived: true` when it's something `{{user}}` senses, `absent: true` when it says nothing is there, and `place` when it names somewhere other than here. |
@@ -687,7 +690,10 @@ loose 9mm, and is fighting a Shambler.
 
 The message fits the exchange budget (§3.2a): three pulls are one attack
 action, at the default cap, and the reload is the move. The failed reload still
-spends it. A miss on beat 1 doesn't cut (§2.6, inside an encounter). The model narrates two
+spends it. The two shots that fire are one roll (§4.3): with the Shambler at
+`near` and `{{user}}` `steady`, the chance is 30 base + 40 handguns + 0 for a
+pistol at near = 70% (illustrative numbers, §4.7), and a partial lands both
+rounds at half damage. A miss on beat 1 doesn't cut (§2.6, inside an encounter). The model narrates two
 shots, the dry click, a hand finding only the empty spare, and the Shambler's
 response. Its narration of the shots isn't counted again (§2.9). Refilling the
 spare is its own action next turn, with its check (`RPG_STATS.md` §3.8.4). The
@@ -936,7 +942,7 @@ The enemy side was decided 2026-11-13; the exchange budget, movement within a
 fight, and overwatch on 2026-11-18. This section covers how an exchange is
 ordered and how much fits in it, where the party and the enemies are, what the
 enemies do, who they do it to, and how the result reaches the model. The numbers behind it — the attack roll, what defense is made of, damage,
-armor — belong to the core roll and math (§1) and are still placeholders here.
+armor — are the core roll (§4).
 
 ### 3.1 The problem
 
@@ -992,7 +998,7 @@ move. A party member acting on an instruction has her own action and move
 | Cost | Beats |
 | --- | --- |
 | **Free** | `flavor`, `intent`, `claim`; `speech`, orders to companions included; `stance` changes to `weapon` (readying or lowering the weapon already in hand), `noise`, or `posture` → `prone`; `gear` `mode` and `drop`; `wait`, which spends nothing and lets the enemies act |
-| **Move** | `position`, one band (§3.3); `stance` changes to `cover` (in or out) or `posture` → `standing`; `stance` readying a weapon that isn't in hand (drawing or switching, §2.7); `gear` `reload`, `take`, `give`, `equip` |
+| **Move** | `position`, one band (§3.3); `stance` changes to `cover` (in or out) or `posture` → `standing`; `stance` readying a weapon that isn't in hand (drawing or switching, §2.7); `stance` taking aim (`weapon: aimed`, §4.2); `gear` `reload`, `take`, `give`, `equip`; steadying (a `check` with `steady: true`, §4.4) |
 | **Action** | `check`: an attack, an ability, forcing something, disengaging (§3.3); `position` with `dash`; `gear` `refill` (with its check, `RPG_STATS.md` §3.8.4), `consume`, `loot`; holding an attack (overwatch, §3.4a) |
 | **Not in a fight** | `search` and `trade`: their actions aren't offered during an encounter, so the beat commits nothing and the fact is injected. `move`: leaving the place (below). |
 
@@ -1060,7 +1066,7 @@ Each enemy instance is in one of three **range bands**, relative to the party:
     enemy engages her with it, and away disengages her, with her own check.
 - **Reach.** A `melee` attack reaches only the party member the instance is
   engaged with. A `ranged` attack reaches any band. What range does to the
-  odds is a modifier (§1, placeholder). The same holds for the party: a melee
+  odds is the weapon's accuracy for that band (§4.2). The same holds for the party: a melee
   attack on an enemy at `near` makes an implied close first, if the move is
   unspent (§3.2a), and one at `far` can't reach.
 - Each instance's band shows in the state block (`RPG_STATS.md` §4.5) and on
@@ -1077,7 +1083,7 @@ steps: **intent, target, roll, damage.** None of them is the model's.
 | --- | --- | --- |
 | `attack` | One of its attacks reaches a party member (§3.3) | The attack resolves (below). |
 | `close` | It isn't engaged and no attack reaches | It moves `speed` bands toward the party. Reaching `engaged`, it engages its target. |
-| `cover` | It isn't in cover | It is in cover until it moves. What cover does to the odds is a modifier (§1, placeholder). |
+| `cover` | It isn't in cover | It is in cover until it moves, and attacks against it take the cover modifier (§4.2). |
 | `withdraw` | It's engaged and has a `ranged` attack | It moves to `near`. |
 | `flee` | Its HP is at or below its `fleeAtHpPct` | It leaves the encounter. It isn't defeated, so it drops no loot. |
 
@@ -1113,14 +1119,14 @@ a downed character would need to be authored the same way.
 **Which attack.** When several of an instance's attacks reach, the fork picks
 one at random, weighted by each attack's `weight` (default `1`).
 
-**Roll.** The attack rolls against the target's **defense** and lands in one of
-the three bands: success, partial, fail. How the roll works, what defense is
-made of (stance `cover` and `posture`, armor, perhaps an attribute), and what a
-partial does to an enemy attack belong to the core roll (§1, placeholder).
+**Roll.** The attack is a core roll (§4.1): its chance is the instance's rank
+and its weapon's accuracy, adjusted by the target's cover, posture, and band
+(§4.2), and it lands in one of the three bands.
 
 **Damage.** A hit rolls the attack's `damage` (a number or a range,
-`RPG_STATS.md` §3.6), reduced by the target's armor (placeholder), and commits
-to the target's working copy. `atZero` applies as usual.
+`RPG_STATS.md` §3.6), halved on a partial, reduced by the target's armor less
+the attack's pierce (§4.3), and commits to the target's working copy. `atZero`
+applies as usual.
 
 **One attack formula for both sides.** An enemy with `equipment` attacks with
 its equipped weapon exactly as `{{user}}` would: the weapon's `combat` numbers
@@ -1229,9 +1235,7 @@ closer is open (§3.9).
 
 ### 3.9 Open questions
 
-- **The core roll and defense** (§1). The attack roll, what defense is made of,
-  what a partial does to an attack (either side), armor reduction, and armor
-  wear.
+- **Calibration** of the core roll's numbers against the bestiary (§4.7).
 - **Initiative and surprise.** Whether an alerted enemy acts on the exchange an
   encounter starts, whether a surprised one loses its first, what `quiet`
   stance does to it, and whether a readiness conditional held outside a fight
@@ -1255,7 +1259,215 @@ closer is open (§3.9).
 
 ---
 
-## 4. Boundary with the producer
+## 4. The core roll — Draft
+
+Decided 2026-11-19. One roll serves every `check`, both sides of a fight, and
+every authored check object (`RPG_STATS.md` §3.2). The **shape** is decided:
+the dice, the bands, how modifiers combine, what a band does. The **numbers**
+in this section are illustrative and uncalibrated (§4.7). They show the scale,
+not the balance.
+
+### 4.1 The roll
+
+**d100 against a chance.** The fork computes a **chance** from a base and
+named modifiers (§4.2), clamps it to **5–95**, and rolls d100:
+
+| Roll | Band |
+| --- | --- |
+| 01–05 | **Success**, always |
+| at or under the chance | **Success** |
+| up to 20 over the chance, and at most 95 | **Partial** |
+| anything higher, and 96–00 always | **Fail** |
+
+At chance 70: 01–70 success, 71–90 partial, 91–00 fail. At chance 5: 01–05
+success, 06–25 partial, the rest fail.
+
+- **Nothing is certain and nothing is impossible.** The clamp and the fixed
+  ends keep at least a 5% chance of failing and at least a 5% chance of
+  succeeding. That is the dice-side form of two `protagonist_jeopardy` rules:
+  no auto-success, no no-win scene.
+- **Additive, never multiplied.** Every modifier is a number of points added
+  to or taken from the chance. Multipliers compound across sources: three
+  favourable ones make any roll succeed, and one bad one halves everything,
+  which can't be calibrated or shown. Damage is where multiplication belongs
+  (§4.3).
+- **The roll is pinned** to the user message that made the attempt
+  (`OUTCOME_AUTHORITY.md` §4.2), like every other roll.
+- **Why d100.** Many small factors each move the odds a little. A percentile
+  scale has room for all of them without saturating, and the HUD can show the
+  chance as a number the player reads at a glance.
+
+### 4.2 The chance
+
+**Chance = base + every modifier that applies**, then clamped. Each modifier is
+a named source, so the HUD can show exactly why the odds are what they are.
+
+| Source | Applies when | Illustrative value |
+| --- | --- | --- |
+| **Base** | always | 30 |
+| **Proficiency** | the check reads a proficiency (below) | +10 per rank, scaled to five ranks when the world's `maxRank` differs |
+| **Untrained** | a fitting proficiency exists and the actor has none | −10 |
+| **Weapon at range** | an attack with a weapon | the weapon's `combat.accuracy` for the target's band (`RPG_STATS.md` §3.3) |
+| **Weapon condition** | the copy is below half its durability `max` | −10. A `broken` copy can't be used at all. |
+| **Aimed** | weapon `aimed` (§2.7), on an attack of one trigger pull | +15. Volume fire and overwatch shots get none. |
+| **Ready** | weapon `ready`, the first attack the actor makes in an encounter | +10 |
+| **Target in cover** | the target's `cover` is `hidden` | −15 |
+| **Target prone** | the target's `posture` is `prone` | −10 against ranged, +10 against melee |
+| **Exposed** | the target took a partial on a non-attack check this exchange (§4.3) | +10 to the next attack against them |
+| **Stress** | the actor isn't `steady` (§4.4) | the level's `mod` |
+| **Encumbrance** | a carry tier is in force | the tier's `mod` (`RPG_STATS.md` §3.13) |
+| **Authored difficulty** | a check object carries `mod` (`RPG_STATS.md` §3.2) | as authored |
+
+**Which proficiency a check reads.** An attack reads its weapon's
+`requires.proficiency`. An ability reads its `uses`. Any other `check` reads
+the proficiency the beat pass tags in `skill`, chosen from the world's declared
+keys (§2.9): a label, the same kind of classification as an object's type.
+With no tag, no proficiency fits: rank counts as 0 and **untrained** doesn't
+apply. A bare climb in a world with no climbing skill is a +0 check, not a
+penalty.
+
+**Difficulty is never judged from prose.** A check with no authored `mod` is at
+standard difficulty. Neither the fork nor the beat pass decides that "this door
+looks hard." Where a world wants a harder search or a harder refill, it authors
+the `mod` on that check object.
+
+**Defense is the modifiers.** There is no defense stat and no attribute in the
+formula. A target is harder to hit because it is in cover, prone, or far away;
+it is harder to **hurt** because of armor, which is damage, not chance (§4.3).
+
+**Enemies roll the same way.** An instance's proficiency comes from its
+bestiary values (`RPG_STATS.md` §3.5). A natural attack reads its own `rank`,
+which defaults by tier: common 1, elite 2, boss 3. Its weapon, if it has one,
+brings its `combat.accuracy`. Stress doesn't apply to enemies (§4.7).
+
+### 4.3 What a band does
+
+**One roll per action.** An attack action rolls once, however many trigger
+pulls it covers (§3.2a). The band decides what the whole action did:
+
+| Band | An attack | A check that isn't an attack |
+| --- | --- | --- |
+| **Success** | Every pull that fired hits, at full damage. | It works. |
+| **Partial** | Every pull that fired hits, at half damage (rounded down, minimum 1). | It works, with a cost (below). |
+| **Fail** | Nothing hits. The rounds are still spent. | It doesn't work. The cost of trying is still spent (§3.2a). |
+
+**Damage, per hit:** roll the weapon's `combat.damage` (or the natural attack's
+`damage`), halve it on a partial, then subtract the target's **armor** reduced
+by the weapon's **pierce**, to a minimum of 0. Each hit the armor takes costs
+it one use of durability (`RPG_STATS.md` §3.9); a `broken` or `destroyed` piece
+absorbs nothing. This is where "the rifle goes through the vest and the Glock
+doesn't" lives.
+
+**The cost of a partial, on a check that isn't an attack,** is fixed, so the
+model never picks it:
+
+- **Outside a fight: noise.** It works, but loudly. The fork makes a short time
+  roll here, the same one a perceived presence asks for (§2.4a). Without
+  encounter data, the cost falls away and it is a plain success.
+- **Inside a fight: exposure.** It works, and the next attack against the
+  actor this exchange gets +10 (§4.2).
+
+**Authored outcomes win.** A check with its own outcomes uses them instead of
+this table: a refill under fire loads `full` / `half` / `none`
+(`RPG_STATS.md` §3.8.4), a scavenge check halves the table's chances, and
+disengaging has its own three results (§3.3).
+
+### 4.4 Stress
+
+Stress is the body's response to danger, tracked per party sheet: hands that
+shake, breathing that won't slow, vision narrowing to the threat. It is opt-in
+per world (`system.stress`, `RPG_STATS.md` §3.2) and is the first tracked
+status after `downed`.
+
+**Three levels.** `steady` (no modifier), `shaken`, `overwhelmed`, each with
+an authored `mod` (illustratively −10 and −25) and a `note` in observable
+register.
+
+**It is the body, never the feeling.** The player owns what `{{user}}` feels;
+the world owns `{{user}}`'s body (`OUTCOME_AUTHORITY.md` §2). The state block
+shows the level and its `note` ("shaken: hands unsteady, breathing fast"), and
+the model renders exactly that: the tremor, the breath, the tunnel vision. It
+never writes that `{{user}}` is afraid, panicking, or calm. A player who writes
+`{{user}}` as cold and composed while their hands shake is characterizing, not
+contradicting the state.
+
+**What raises it.** The fork checks these deterministically, from the state:
+
+- **Outnumbered.** When able enemies outnumber standing party members by the
+  authored ratios (illustratively 3:1 for `shaken`, 6:1 for `overwhelmed`),
+  each party member is raised to at least that level. Fifteen Shamblers
+  against two people is 7.5:1.
+- **Badly hurt.** A hit that leaves the character at `badly hurt` severity or
+  worse (§3.6) raises them one level.
+- **An ally goes down.** Every standing party member rises one level.
+- **Surprised.** An encounter that starts with an alerted enemy raises the
+  party one level.
+
+**Nerve resists it.** When a trigger fires on a character with a rank in the
+world's nerve proficiency (`system.stress.check`), the fork rolls nerve for
+them: a success resists that trigger, anything else takes it. A character with
+no rank simply takes it. This is the world's response, so it rolls
+automatically, like an arrival roll. The rank is part of the authored build and
+explained in `buildNote`: an ex-soldier is steadier than a nurse.
+
+**What lowers it.**
+
+- **Steadying** ("I take a breath and steady myself") is a `check` with
+  `steady: true` that reads nerve and **costs the move** (§3.2a). A success
+  lowers the level by one. A partial lowers it by one and exposes the actor.
+  A fail changes nothing.
+- **The odds improving.** When the enemy-to-party ratio drops below the
+  threshold that raised a character, the level drops by one.
+- **The encounter ending** resets every party member to `steady`.
+
+**It can't be declared away.** "I'm calm" and "I'm not scared" are feelings:
+`flavor`, and they change nothing. "My hands are steady" is a `claim` about
+tracked state (`about: state`) and is marked *Not confirmed*. Only steadying,
+which is an attempt, moves the gauge.
+
+Party members other than `{{user}}` have their own stress, from their own
+sheets. Enemies have none; human enemies breaking is morale, which is open
+(§3.9).
+
+### 4.5 What the HUD shows
+
+For every roll: the chance with each source and its points ("Glock at near:
+30 base, +40 handguns, +0 range, −10 shaken = 60%"), the d100 result, and the
+band. For an attack, the damage per hit and what armor took off. For stress,
+each party member's level and what raised it. The exact layout is the fork's.
+
+### 4.6 Graceful degradation
+
+- **No `combat` numbers on a weapon:** it has no accuracy modifier and no
+  damage; an attack with it can't hurt anything, and the fallback in §3.8
+  applies.
+- **No `system.stress`:** no stress, no nerve rolls, no steadying. A
+  `steady: true` check becomes an ordinary check with no effect on the state.
+- **No carry tier `mod`:** encumbrance adds no modifier, as before.
+- **An unknown `skill` tag** counts as no tag: rank 0, no untrained penalty.
+
+### 4.7 Open questions
+
+- **Calibration.** Every number in §4.2–§4.4 is illustrative: the base, points
+  per rank, weapon accuracy and damage tables, armor and pierce, stress
+  modifiers and thresholds. They need a calibration pass against the bestiary's
+  HP before anything is built on them.
+- **Vision.** Darkness and visibility should come from the world, not the
+  player: the Scene Tracker's time of day, or a place's lighting. No signal is
+  chosen.
+- **Social checks.** Persuading, lying, and intimidating need something on the
+  NPC side to roll against, and the posture contract governs what a success
+  may mean. A round of its own, together with talking an enemy down (§3.9).
+- **Critical results.** None in v0.
+- **What a fire mode does to a hit.** Burst and automatic fire still count only
+  as pulls and rounds.
+- **Attributes.** Not part of the formula in v0 (`RPG_STATS.md` §10).
+- **Morale** for enemies, as stress's counterpart (§3.9).
+- **Dice grammar** shared with the dice oracle (§1).
+
+---
+
+## 5. Boundary with the producer
 
 World Forge authors **starting values and world data** (stats, items, sheets,
 bestiary, vendors, scavenge tables). It never authors resolution rules, never
@@ -1265,11 +1477,11 @@ range, an encounter chance per kind of place), that field is added to
 `RPG_STATS.md` and produced there; this document defines only how the engine
 uses it.
 
-## 5. Relationship to the other contracts
+## 6. Relationship to the other contracts
 
 | Concern | Governed by |
 | --- | --- |
 | What exists: stats, items, sheets, bestiary (including attacks, speed, tactics), economy | `RPG_STATS.md` (Draft) |
 | Who decides: attempts vs. results, pinned rolls, legality | `OUTCOME_AUTHORITY.md` (Draft) |
-| How an attempt resolves: beats, the exchange budget and the enemy side of a fight, dice, math, modifiers, parsing | this document (§2 and §3 Draft, rest Placeholder) |
+| How an attempt resolves: beats, the exchange budget and the enemy side of a fight, the core roll, modifiers, stress, parsing | this document (§2–§4 Draft, rest Placeholder) |
 | Stateless narrative roll tables | `DICE_ORACLE.md` |

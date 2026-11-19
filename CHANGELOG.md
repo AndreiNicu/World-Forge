@@ -13,7 +13,7 @@ numbers. Newest first.
 
 ---
 
-## 2026-11-18 — Resolution: combat, the enemy side and the exchange budget (Draft v0) (#96)
+## 2026-11-19 — Resolution: combat — the enemy side, the exchange budget, and the core roll (Draft v0) (#96)
 
 The beat vocabulary resolved the player's side of a fight before generation,
 but left the enemy's response to the narration, with damage read back as an
@@ -24,11 +24,37 @@ attack, the fork picks the target, and the model writes how it happens but
 never whether, who, or how much. A follow-up in the same PR caps what one
 message can do before the enemy answers: an **exchange budget** of one action,
 one move, and free beats, with movement inside a fight as its own beat kind so
-backing off can't kite a slow enemy forever. Attack math, defense, damage, and
-armor stay placeholders with the core roll. Still a Draft; nothing reads it.
+backing off can't kite a slow enemy forever. A third pass adds the **core
+roll**: d100 against a chance built from additive, named modifiers (weapon at
+range, aim, stress, cover, and the rest), one roll per action, armor and
+pierce in the damage, and **stress** as the body's response to danger rather
+than an emotion the world imposes on `{{user}}`. The numbers are illustrative
+until a calibration pass. Still a Draft; nothing reads it.
 
 ### Added
 
+- `contracts/RESOLUTION.md` §4 — **the core roll.** d100 against a chance
+  clamped to 5–95 (01–05 always succeed, 96–00 always fail), up to 20 over is
+  a partial; the chance is a base plus named, additive modifiers (never
+  multipliers), listed in one table; which proficiency a check reads, and that
+  difficulty is never judged from prose; defense as modifiers only; enemies
+  rolling the same way, with natural-attack `rank` defaulting by tier; one roll
+  per action, half damage on a partial, armor less pierce per hit; fixed
+  partial costs for non-attack checks (noise outside a fight, exposure inside);
+  **stress** (`steady` / `shaken` / `overwhelmed`) as physiology the model
+  renders as the body, never the feeling, raised by deterministic triggers,
+  resisted by nerve, lowered by steadying; the HUD, degradation, and open
+  questions (calibration, vision, social checks, criticals). Every number is
+  illustrative.
+- `contracts/RPG_STATS.md` — the `combat` field becomes a drafted shape
+  (`accuracy` per band, `damage`, `pierce`; `armor` on armor); `system.stress`
+  (nerve proficiency, level mods and notes, outnumbered ratios, triggers);
+  `mod` on check objects and carry tiers; `rank` and `pierce` on natural
+  attacks; conformance rules for both. The §8 worked example gains combat
+  numbers on every weapon and the stab vest, stress settings, and nerve ranks
+  for `{{user}}` and Maya.
+- `contracts/OUTCOME_AUTHORITY.md` §10.1h, and a §5 engine-block bullet:
+  stress is rendered as the body, never the feeling.
 - `contracts/RESOLUTION.md` §3 — **combat: the enemy side.** The exchange (one
   user message and its reply; party first, then each enemy that can act, both
   sides pinned to the message); three **range bands** per enemy instance
@@ -66,6 +92,14 @@ armor stay placeholders with the core roll. Still a Draft; nothing reads it.
 
 ### Changed
 
+- `contracts/RESOLUTION.md` §1, §2.3, §2.7, §2.9, §3 — the core-roll,
+  math, and modifier-stack placeholders point at §4; the `weapon` stance axis
+  gains `aimed` (costs the move); `check` beats gain `skill` and `steady`; the
+  enemy attack's roll and damage are the core roll's; worked example D shows
+  its odds. The trailing sections renumber to §5–§6.
+- `contracts/RPG_STATS.md` §1.3, §3.13, §4.5, §5, §7, §10 — encumbrance tiers
+  modify rolls; the state block shows stress; weapon numbers and the refill
+  roll scheme are no longer deferred; attributes stay out of the formula.
 - `contracts/RPG_STATS.md` §4.3 — **swipes replay the exchange** instead of
   discarding working-copy changes, applying the pending `OUTCOME_AUTHORITY.md`
   §9 row; the working copy tracks band, engagement, cover, and fired phases.

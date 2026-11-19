@@ -1,6 +1,6 @@
 # RPG Stats Contract — `[[RPG_STATS]]`
 
-**Status:** Draft · **Version:** 0 · **Last updated:** 2026-11-18
+**Status:** Draft · **Version:** 0 · **Last updated:** 2026-11-19
 
 > **Shared contract — canonical source of truth:**
 > [`AndreiNicu/World-Forge`](https://github.com/AndreiNicu/World-Forge) → `contracts/RPG_STATS.md`.
@@ -95,9 +95,9 @@ campaign.
   bookkeeping of what they carry: rounds loaded, magazines full or empty, a
   blade's wear, money in the pocket (§3.8–§3.11). It also carries the data the
   enemy side of a fight runs on: a bestiary entry's attacks, speed, and tactics
-  (§3.5). How that data resolves lives in `RESOLUTION.md` §3, and hit chance,
-  damage math, and initiative are still absent (§7). Weapon logistics work
-  without combat resolution; weapon numbers do not.
+  (§3.5), the weapon and armor numbers the core roll reads (`combat`, §3.3),
+  and a world's stress settings (§3.2). How that data resolves lives in
+  `RESOLUTION.md` §3–§4. Initiative is still absent (§7).
 
 ### 1.4 Arc and sandbox
 
@@ -275,24 +275,47 @@ from loose rounds (§3.8.4):
 | `outOfCombat` | `"free"` \| check object | Default `"free"`: a refill outside an encounter is a plain commit. |
 | `inCombat` | `"free"` \| check object | Default: a check reading the `requires.proficiency` of the weapon being loaded (for a magazine: the equipped weapon that takes it), untrained if it has none, with outcomes `full` / `half` / `none`. |
 
-A **check object** is `{ "check"?: key, "outcomes": { "success", "partial", "fail" } }`.
+A **check object** is `{ "check"?: key, "mod"?: int, "outcomes": { "success", "partial", "fail" } }`.
 `check` names a proficiency or attribute key the roll reads (a world that wants
 refilling to test Dexterity or Nerve rather than weapon training names it here);
 absent ⇒ the loaded weapon's `requires.proficiency`, as above. Each outcome is
 `"full"` (every magazine being refilled is filled), `"half"` (half the rounds that
 would have gone in, rounded down), or `"none"` (no rounds loaded; the time is
-still spent). How the roll turns a rank into success / partial / fail belongs to
-combat resolution and is deferred (§7); until it exists the consumer may use any
-documented scheme.
+still spent). `mod` is an authored difficulty added to the chance (default `0`).
+How the roll turns a rank into success / partial / fail is the core roll
+(`RESOLUTION.md` §4).
 
 **`pricing`** — optional. `{ "condition": { "floor": 0–1, "broken": 0–1 } }`.
 How wear changes what an item is worth (§3.10.1). Absent ⇒ condition doesn't
 affect price.
 
 **`carry`** — optional. Enables the weight limit (§3.13): `{ "unit": string,
-"tiers": [ { "atPct": 1–99, "state": string, "note": string } ] }`. `unit` is a
-display label (`"kg"`, `"lb"`). Absent ⇒ no weight tracking, and every `weight`
-and `carry` field is ignored.
+"tiers": [ { "atPct": 1–99, "state": string, "note": string, "mod"?: int } ] }`.
+`unit` is a display label (`"kg"`, `"lb"`). A tier's `mod` (≤ 0, default `0`)
+is added to every roll its bearer makes while it's in force
+(`RESOLUTION.md` §4.2). Absent ⇒ no weight tracking, and every `weight` and
+`carry` field is ignored.
+
+**`stress`** — optional. Enables stress, the body's response to danger
+(`RESOLUTION.md` §4.4), on party sheets:
+
+```jsonc
+"stress": {
+  "check": "nerve",                       // the proficiency nerve rolls read; absent ⇒ no one resists
+  "levels": {                              // `steady` is implicit, with no modifier
+    "shaken":      { "mod": -10, "note": "Hands unsteady, breathing fast." },
+    "overwhelmed": { "mod": -25, "note": "Tunnel vision; fine control going." }
+  },
+  "outnumbered": [3, 6],                   // enemy:party ratios that raise to shaken / overwhelmed
+  "triggers": ["outnumbered", "badlyHurt", "allyDown", "surprised"]   // default: all four
+}
+```
+
+The two level keys are fixed; the world authors their `mod` (≤ 0) and `note`.
+A `note` describes the body in observable register, never a feeling: it is what
+the state block shows and the model renders. `check` names an ordinary
+proficiency; a sheet's rank in it is its nerve, part of the authored build and
+explained in `buildNote`. Absent ⇒ no stress anywhere.
 
 ### 3.3 `items[]` — the catalog
 
@@ -316,7 +339,7 @@ and `carry` field is ignored.
 | `durability` | object | no | Wear: `{ "max": int, "perUse"?: int, "atZero": "broken" \| "destroyed" }` (§3.9). |
 | `recover` | number | no | `0–1`. Chance each spent unit is recovered after the encounter (arrows, bolts, throwing knives; §3.8.3). Default `0`. |
 | `tags` | string[] | no | Free world vocabulary (`"medical"`, `"quest"`, `"rare"`). |
-| `combat` | object | — | **Reserved** for weapon and armor numbers (damage, range, accuracy, armor value, what a fire mode does to a hit). Not defined in v0; consumers ignore it. A weapon's damage is expected to take the same number-or-range shape as a bestiary attack's `damage` (§3.5), because enemies with weapons attack with these numbers (`RESOLUTION.md` §3.4). |
+| `combat` | object | no | The numbers the core roll reads (`RESOLUTION.md` §4.2–§4.3). On a weapon: `{ "accuracy"?: { "engaged"?, "near"?, "far"? }, "damage": number \| range, "pierce"?: int }`. `accuracy` is points added to the chance in each range band (a missing band is `0`); `damage` follows §3.6 and is rolled per hit; `pierce` (default `0`) is how much armor the hit ignores. On armor: `{ "armor": int }`, subtracted from each hit. **Shape drafted, numbers uncalibrated.** What a fire mode does to a hit is still reserved. Enemies with weapons attack with these numbers (`RESOLUTION.md` §3.4). |
 
 The catalog exists because inventory, equipment, and loot all point at the same
 things. Without one list, the same carbine is described three slightly different
@@ -389,8 +412,11 @@ discarded when the encounter ends (§4.3).
 how they resolve is `RESOLUTION.md` §3.
 
 - **`attacks[]`** — each is `{ "key": string, "label"?: string, "damage":
-  number | range, "reach": "melee" | "ranged", "weight"?: number }`. `key` is
-  unique per entry. `damage` follows §3.6 and is rolled per hit. A `melee`
+  number | range, "reach": "melee" | "ranged", "weight"?: number, "rank"?:
+  int, "pierce"?: int }`. `key` is unique per entry. `damage` follows §3.6 and
+  is rolled per hit. `rank` is the skill the attack rolls with
+  (`RESOLUTION.md` §4.2), defaulting by `tier`: common 1, elite 2, boss 3.
+  `pierce` works as on a weapon. A `melee`
   attack reaches only the party member the instance is engaged with; a
   `ranged` attack reaches any band. When several reach, `weight` (default `1`)
   sets the odds of each. An entry that fights with weapons needs no `attacks`;
@@ -781,10 +807,9 @@ every party sheet has a `carry.max`.
 - **Encumbrance tiers.** `system.carry.tiers` are ordered by `atPct`. The
   highest tier whose `atPct` the load has reached applies, and its `state` and
   `note` go into the state block (§4.5). An operator at 44 of 50 kg is
-  `burdened` and the model writes them slower and tiring faster. What a tier
-  does mechanically (movement, initiative, stamina drain, a failed escape) is
-  deferred with combat resolution (§7). In v0 a tier is authoritative fact the
-  model narrates from.
+  `burdened` and the model writes them slower and tiring faster. A tier's
+  `mod` is added to their rolls (§3.2). What else a tier does mechanically
+  (movement, initiative, stamina drain, a failed escape) is deferred (§7).
 - **The limit is part of the build.** `carry.max` is authored with the rest of
   the sheet and explained in `buildNote` when it's unusual. A trained operator
   who carries 50 kg; a nurse who manages 30. A starting load above the limit is
@@ -889,8 +914,9 @@ their limit and the encumbrance tier in force, with its `note`. While the party
 is trading: the vendor's funds and stock with current values. After a search:
 what it turned up. During combat it adds the encounter: each instance's name,
 rough condition, range band (and who it's engaged with), and `note`, plus any
-boss `phases` note that has fired. Each exchange's resolved results arrive
-beside it as their own block (`RESOLUTION.md` §3.6). Exact
+boss `phases` note that has fired, and each party member's stress level with
+its `note` (§3.2). Each exchange's resolved results arrive beside it as their
+own block (`RESOLUTION.md` §3.6). Exact
 numbers versus descriptive condition ("badly hurt") is a consumer presentation
 choice. The block is authoritative fact, the same standing as the dice oracle's
 injected facts (`DICE_ORACLE.md` §1).
@@ -968,8 +994,12 @@ Absence never errors, matching every other seam:
   nothing more can be picked up until it's under.
 - No Scene Tracker location ⇒ depletion is skipped, and trade with fixed vendors
   goes through an explicit trade action (§3.10.3, §3.12).
-- Unknown fields are ignored. Reserved fields (`combat`, `statuses`) are ignored
-  until defined.
+- A weapon with no `combat` block has no accuracy modifier and does no damage
+  (`RESOLUTION.md` §4.6). An unknown band key in `accuracy` is ignored.
+- `system.stress` with a `check` that names no declared proficiency ⇒ no one
+  resists triggers; warning. A level `mod` above `0` is clamped to `0`.
+- Unknown fields are ignored. The reserved `statuses` field is ignored until
+  defined.
 
 ---
 
@@ -1023,6 +1053,15 @@ Absence never errors, matching every other seam:
 - [ ] `fireModes` keys are unique per weapon; every `rounds` is ≥ 1 (a range's
       floor included). Starting `mode` values name a declared mode.
       `pullsPerAction`, where set, is ≥ 1.
+- [ ] Every weapon that can attack has a `combat` block with `damage`;
+      `accuracy` keys are only `engaged`, `near`, `far`; `pierce` ≥ 0. Armor
+      carries `combat.armor` ≥ 0. A natural attack's `rank` is within
+      `[0, maxRank]`.
+- [ ] With `system.stress`: `check` names a declared proficiency, both level
+      `mod`s are ≤ 0 with `overwhelmed` at or below `shaken`, `outnumbered`
+      is two ascending ratios, and each level `note` describes the body in
+      observable register, never a feeling. Every party sheet's nerve rank is
+      explained in its `buildNote` when it's unusual.
 - [ ] Starting `loaded` ≤ capacity and `durability` ≤ `max`. Any non-pristine
       starting copy is explained in the sheet's `buildNote` (§3.11).
 - [ ] If any `price` or `vendors` exists, `system.currency` names a catalog
@@ -1066,27 +1105,26 @@ mechanics among them (combat, refill time, encumbrance effects, repair checks,
 restocking) are specified in [`RESOLUTION.md`](./RESOLUTION.md), written from
 the fork side. Any new authored data they need is added here.
 
-- **Combat resolution** — hit chance, damage math, armor, initiative, and the
-  exchange budget. The enemy side's structure (exchange order, range bands,
-  intents, targeting) is drafted in `RESOLUTION.md` §3, with its data in §3.5
-  here. The numbers need the reserved item `combat` field and, per
-  `DICE_ORACLE.md` §7.3, likely server-authoritative rolls.
-- **Statuses** — bleeding, infected, stunned. The `statuses` field is reserved.
+- **Combat resolution** — initiative, and the calibration of every number.
+  The structure is drafted in `RESOLUTION.md` §3 (exchange, budget, enemy
+  side) and §4 (the core roll), with its data in §3.2, §3.3, and §3.5 here.
+  Per `DICE_ORACLE.md` §7.3, rolls are likely server-authoritative.
+- **Statuses** — bleeding, infected, stunned. Stress (§3.2) is the first one
+  built, as a gauge of its own; the `statuses` field stays reserved for the
+  rest.
 - **Levels, XP, and growth** — how `max` and ranks rise. v0 already allows `max`
   to change through `target: "max"` effects; systematic growth is later.
 - **Regeneration and rest** — how `current` recovers between fights.
-- **Weapon combat numbers** — damage, range, accuracy, what a fire mode does to a
-  hit, reach (knife vs. katana). All in the reserved `combat` field.
-- **The roll scheme behind `system.refill` checks**, which waits on the core
-  roll. Refill duration is settled: one action per refill check in a fight
-  (`RESOLUTION.md` §3.2a).
+- **Weapon combat numbers** — the `combat` shape is drafted (§3.3); the
+  numbers are uncalibrated. Still reserved: what a fire mode does to a hit,
+  and reach (knife vs. katana).
 - **Repair** — restoring durability (a repair kit item, a vendor service, a
   proficiency). Until then a `broken` copy stays broken.
 - **Ammunition realism** — a chambered round (+1), dropping magazines on a speed
   reload, mixed round types in one magazine, ammunition variants with different
   effects.
 - **Encumbrance mechanics** — what a carry tier does to movement, initiative,
-  stamina, or an escape. v0 tiers are narrated fact only.
+  stamina, or an escape. A tier's `mod` on rolls is defined (§3.2).
 - **Carry bonuses** — a bigger backpack or a cart raising `carry.max` (an item
   field plus a slot for it).
 - **Two-handed and dual-wield rules.**
@@ -1133,10 +1171,16 @@ reloads' worth of ammunition, and the second one has to be refilled first.
 The bestiary shows the fight data (`RESOLUTION.md` §3). The zombies have
 natural `attacks` and the default tactics: hit what's in reach, otherwise come
 closer. The Runner's `speed: 2` is its note made mechanical. The Rogue Operator
-and Colonel Hale fight with their equipped weapons, so they have no `attacks`
-and can't attack until weapon `combat` numbers exist; their `tactics` are there
-already. The operator takes cover first and breaks off at a quarter of its HP,
+and Colonel Hale fight with their equipped weapons, so they have no `attacks`:
+they roll with the C8's and the Glock's `combat` numbers and their own rifle
+ranks, and their stab vests take 4 off each hit. The operator takes cover first and breaks off at a quarter of its HP,
 and Hale stays back until his phase at 50% switches him to closing in.
+
+The weapons carry illustrative `combat` numbers (`RESOLUTION.md` §4.7): the
+Glock is good at arm's reach and poor across a street, the carbine the
+opposite; the carbine goes clean through a vest, and the Glock loses 3 points
+of every hit to one. Stress is
+on: `{{user}}`'s nerve 4 resists most triggers, and Maya's 2 resists few.
 
 ```json
 {
@@ -1154,7 +1198,8 @@ and Hale stays back until his phase at 50% switches him to closing in.
       { "key": "archery", "label": "Archery", "maxRank": 5 },
       { "key": "melee", "label": "Melee weapons", "maxRank": 5 },
       { "key": "hand_to_hand", "label": "Hand-to-hand", "maxRank": 5 },
-      { "key": "first_aid", "label": "First aid", "maxRank": 5 }
+      { "key": "first_aid", "label": "First aid", "maxRank": 5 },
+      { "key": "nerve", "label": "Nerve", "maxRank": 5 }
     ],
     "equipmentSlots": [
       { "key": "main", "label": "Main weapon" },
@@ -1171,9 +1216,17 @@ and Hale stays back until his phase at 50% switches him to closing in.
     "carry": {
       "unit": "kg",
       "tiers": [
-        { "atPct": 60, "state": "burdened", "note": "Slower on foot; tires faster; climbing is hard work." },
-        { "atPct": 90, "state": "overloaded", "note": "Can't run. Every stair and fence is a struggle." }
+        { "atPct": 60, "state": "burdened", "note": "Slower on foot; tires faster; climbing is hard work.", "mod": -5 },
+        { "atPct": 90, "state": "overloaded", "note": "Can't run. Every stair and fence is a struggle.", "mod": -15 }
       ]
+    },
+    "stress": {
+      "check": "nerve",
+      "levels": {
+        "shaken": { "mod": -10, "note": "Hands unsteady, breathing fast and shallow." },
+        "overwhelmed": { "mod": -25, "note": "Tunnel vision, hands shaking hard, fine control going." }
+      },
+      "outnumbered": [3, 6]
     }
   },
   "items": [
@@ -1183,13 +1236,17 @@ and Hale stays back until his phase at 50% switches him to closing in.
       "fireModes": [ { "key": "single", "label": "Semi", "rounds": 1 },
                      { "key": "burst", "label": "Burst", "rounds": 3 },
                      { "key": "auto", "label": "Auto", "rounds": { "base": 8, "spread": 3 } } ],
+      "combat": { "accuracy": { "engaged": -10, "near": 10, "far": 10 },
+                  "damage": { "base": 24, "spread": 5 }, "pierce": 6 },
       "durability": { "max": 300, "atZero": "broken" } },
     { "id": "stanag_30", "name": "STANAG Magazine", "type": "ammo.magazine", "weight": 0.5, "price": 30,
       "magazine": { "accepts": ["round_556"], "capacity": 30 } },
     { "id": "round_556", "name": "5.56mm Round", "type": "ammo.round", "weight": 0.012, "price": 2 },
     { "id": "glock_17", "name": "Glock 17", "type": "firearm.handgun", "weight": 0.7, "slot": "secondary",
       "requires": { "proficiency": "handguns", "rank": 1 }, "price": 350,
-      "ammo": { "feed": "magazine", "magazines": ["glock_mag_17"] } },
+      "ammo": { "feed": "magazine", "magazines": ["glock_mag_17"] },
+      "combat": { "accuracy": { "engaged": 10, "near": 0, "far": -20 },
+                  "damage": { "base": 14, "spread": 3 }, "pierce": 1 } },
     { "id": "glock_mag_17", "name": "Glock Magazine", "type": "ammo.magazine", "weight": 0.1, "price": 20,
       "magazine": { "accepts": ["round_9mm"], "capacity": 17 } },
     { "id": "round_9mm", "name": "9mm Round", "type": "ammo.round", "weight": 0.008, "price": 1 },
@@ -1197,24 +1254,33 @@ and Hale stays back until his phase at 50% switches him to closing in.
       "requires": { "proficiency": "handguns", "rank": 1 }, "price": 500,
       "description": "Military-issue 9mm. Clean ones haven't been seen since the first month.",
       "ammo": { "feed": "magazine", "magazines": ["beretta_mag_15"] },
+      "combat": { "accuracy": { "engaged": 10, "near": 0, "far": -15 },
+                  "damage": { "base": 14, "spread": 3 }, "pierce": 1 },
       "durability": { "max": 250, "atZero": "broken" } },
     { "id": "beretta_mag_15", "name": "Beretta Magazine", "type": "ammo.magazine", "weight": 0.1, "price": 20,
       "magazine": { "accepts": ["round_9mm"], "capacity": 15 } },
     { "id": "remington_870", "name": "Remington 870", "type": "firearm.shotgun", "weight": 3.6, "slot": "main",
       "requires": { "proficiency": "shotguns", "rank": 1 }, "price": 450,
-      "ammo": { "feed": "internal", "accepts": ["shell_12g"], "capacity": 6 } },
+      "ammo": { "feed": "internal", "accepts": ["shell_12g"], "capacity": 6 },
+      "combat": { "accuracy": { "engaged": 10, "near": 10, "far": -25 },
+                  "damage": { "base": 30, "spread": 8 } } },
     { "id": "shell_12g", "name": "12-Gauge Shell", "type": "ammo.shell", "weight": 0.04, "price": 3 },
     { "id": "recurve_bow", "name": "Recurve Bow", "type": "ranged.bow", "weight": 1.2, "slot": "ranged",
       "requires": { "proficiency": "archery", "rank": 1 }, "price": 250,
       "description": "Quiet. The only thing that doesn't bring more of them.",
-      "ammo": { "feed": "direct", "accepts": ["arrow"] } },
+      "ammo": { "feed": "direct", "accepts": ["arrow"] },
+      "combat": { "accuracy": { "engaged": -20, "near": 5, "far": 0 },
+                  "damage": { "base": 18, "spread": 4 }, "pierce": 3 } },
     { "id": "arrow", "name": "Arrow", "type": "ammo.arrow", "weight": 0.03, "price": 4, "recover": 0.5 },
     { "id": "fire_axe", "name": "Fire Axe", "type": "melee.blade", "weight": 2.7, "slot": "main", "price": 60,
+      "combat": { "damage": { "base": 20, "spread": 6 }, "pierce": 2 },
       "durability": { "max": 120, "atZero": "broken" } },
     { "id": "combat_knife", "name": "Combat Knife", "type": "melee.blade", "weight": 0.3, "slot": "secondary",
-      "price": 40, "durability": { "max": 150, "atZero": "broken" } },
+      "price": 40, "combat": { "accuracy": { "engaged": 10 }, "damage": { "base": 10, "spread": 3 }, "pierce": 1 },
+      "durability": { "max": 150, "atZero": "broken" } },
     { "id": "stab_vest", "name": "Police Stab Vest", "type": "armor.light", "weight": 2.5, "slot": "armor",
-      "price": 200, "durability": { "max": 80, "atZero": "destroyed" } },
+      "price": 200, "combat": { "armor": 4 },
+      "durability": { "max": 80, "atZero": "destroyed" } },
     { "id": "field_dressing", "name": "Field Dressing", "type": "consumable.medical", "weight": 0.1,
       "consumable": true, "price": 35,
       "description": "Gauze, tape, a sachet of clotting powder.",
@@ -1231,7 +1297,7 @@ and Hale stays back until his phase at 50% switches him to closing in.
       "id": "user", "kind": "persona", "party": true,
       "resources": { "hp": { "current": 100, "max": 150 },
                      "stamina": { "current": 60, "max": 120 } },
-      "proficiencies": { "rifles": 4, "handguns": 4, "hand_to_hand": 4, "melee": 2, "first_aid": 3 },
+      "proficiencies": { "rifles": 4, "handguns": 4, "hand_to_hand": 4, "melee": 2, "first_aid": 3, "nerve": 4 },
       "abilities": [
         { "id": "self_treat", "name": "Self-Treatment", "type": "skill", "uses": "first_aid",
           "description": "Can dress their own wounds under pressure." }
@@ -1249,13 +1315,13 @@ and Hale stays back until his phase at 50% switches him to closing in.
         "ranged": null,
         "armor": null
       },
-      "buildNote": "Ex-SAS operator, home on leave when the coma took them; woke weeks later into the outbreak. Training and reflexes intact, body not: HP and stamina well below max until they recover. Took a Glock off a dead officer in the hospital stairwell: the magazine in it is half spent, the spare is empty, and the rest is a pocketful of loose rounds. Used to carrying a full combat load, about 50 kg, and feels every kilo of it now."
+      "buildNote": "Ex-SAS operator, home on leave when the coma took them; woke weeks later into the outbreak. Training and reflexes intact, body not: HP and stamina well below max until they recover. Took a Glock off a dead officer in the hospital stairwell: the magazine in it is half spent, the spare is empty, and the rest is a pocketful of loose rounds. Used to carrying a full combat load, about 50 kg, and feels every kilo of it now. Years under fire left them hard to rattle; the body is what lets them down."
     },
     {
       "id": "maya_okafor", "kind": "npc", "party": true,
       "resources": { "hp": { "current": 80, "max": 80 },
                      "stamina": { "current": 90, "max": 90 } },
-      "proficiencies": { "first_aid": 5, "melee": 1 },
+      "proficiencies": { "first_aid": 5, "melee": 1, "nerve": 2 },
       "abilities": [
         { "id": "triage", "name": "Triage", "type": "skill", "uses": "first_aid",
           "description": "Stabilises a downed ally." }
@@ -1263,7 +1329,7 @@ and Hale stays back until his phase at 50% switches him to closing in.
       "inventory": [ { "item": "field_dressing", "qty": 4 }, { "item": "dollar", "qty": 120 } ],
       "equipment": { "main": { "item": "fire_axe", "durability": 70 } },
       "carry": { "max": 30 },
-      "buildNote": "ICU nurse who kept the ward running through the first week. Expert medic, untrained fighter: she swings the axe because she has to. It came off the corridor wall and has already been through a door and two of them; the edge is chipped."
+      "buildNote": "ICU nurse who kept the ward running through the first week. Expert medic, untrained fighter: she swings the axe because she has to. It came off the corridor wall and has already been through a door and two of them; the edge is chipped. Steady over a crashing patient, never trained for being hunted."
     }
   ],
   "bestiary": [
@@ -1407,7 +1473,8 @@ not trip `BODY_CYCLES.md` §7.1's generic-carrier trigger (§1.3).
   whether that is a world choice (a carrier field) or a user setting. The
   combat exchange block gives both: the number and a severity band
   (`RESOLUTION.md` §3.6). The bands themselves are not yet fixed.
-- **Whether `attributes` earn their place in v1** or wait until combat needs them.
+- **Whether `attributes` earn their place in v1.** The core roll doesn't read
+  them (`RESOLUTION.md` §4.2), so nothing in combat needs them yet.
 - **Carrier size.** A large bestiary plus catalog in one entry is fine for the
   consumer but heavy to hand-edit, and weapons, magazines, rounds, and vendors
   make the catalog grow fastest. Splitting into several carriers is possible
