@@ -150,7 +150,10 @@ the worked example in §8):
                 "inCombat": { "outcomes": { "success": "full", "partial": "half", "fail": "none" } } },
     "pricing": { "condition": { "floor": 0.2, "broken": 0.05 } },   // value follows wear (§3.10.1)
     "carry": { "unit": "kg",                                  // weight limit and encumbrance (§3.13)
-               "tiers": [ { "atPct": 60, "state": "burdened", "note": "Slower on foot; tires faster." } ] }
+               "tiers": [ { "atPct": 60, "state": "burdened", "note": "Slower on foot; tires faster." } ] },
+    "stealth": { "check": "stealth" },                        // what stealth and evasion roll (RESOLUTION §3.3a)
+    "exertion": { "resource": "stamina",                      // what running costs (RESOLUTION §3.7d)
+                  "costs": { "dash": 10, "disengage": 5 }, "recoverPerExchange": 3 }
   },
   "items": [                           // the item catalog (§3.3)
     { "id": "c8_carbine", "name": "C8 Carbine", "type": "firearm.rifle", "slot": "main",
@@ -290,10 +293,11 @@ How wear changes what an item is worth (§3.10.1). Absent ⇒ condition doesn't
 affect price.
 
 **`carry`** — optional. Enables the weight limit (§3.13): `{ "unit": string,
-"tiers": [ { "atPct": 1–99, "state": string, "note": string, "mod"?: int } ] }`.
+"tiers": [ { "atPct": 1–99, "state": string, "note": string, "mod"?: int, "dash"?: bool } ] }`.
 `unit` is a display label (`"kg"`, `"lb"`). A tier's `mod` (≤ 0, default `0`)
 is added to every roll its bearer makes while it's in force
-(`RESOLUTION.md` §4.2). Absent ⇒ no weight tracking, and every `weight` and
+(`RESOLUTION.md` §4.2). A tier with `dash: false` forbids its bearer to dash,
+which holds the whole party to a walk (`RESOLUTION.md` §3.7d). Absent ⇒ no weight tracking, and every `weight` and
 `carry` field is ignored.
 
 **`stress`** — optional. Enables stress, the body's response to danger
@@ -317,6 +321,27 @@ the state block shows and the model renders. `check` names an ordinary
 proficiency; a sheet's rank in it is its nerve, part of the authored build and
 explained in `buildNote`. Absent ⇒ no stress anywhere.
 
+**`stealth`** — optional. `{ "check": key }`: the proficiency that stealth and
+evasion checks read (`RESOLUTION.md` §3.3a, §3.7b). The party rolls at the
+lowest rank among its standing members, so the least quiet member decides
+it. Absent ⇒ those checks read no proficiency (rank 0).
+
+**`exertion`** — optional. Enables stamina, what movement costs in a fight
+(`RESOLUTION.md` §3.7d):
+
+```jsonc
+"exertion": {
+  "resource": "stamina",                  // a declared resource
+  "costs": { "dash": 10, "disengage": 5 }, // spent by each party member who does it; a chase exchange is a dash
+  "recoverPerExchange": 3                  // regained each exchange a character doesn't dash
+}
+```
+
+At zero a character can't dash or disengage. Outside an encounter, a `wait` of
+an hour or more brings stamina back to where it stood before the fighting
+started; recovering past that is regeneration and rest (§7). Absent ⇒ dashing
+and disengaging cost only the action.
+
 ### 3.3 `items[]` — the catalog
 
 | Field | Type | Required | Meaning |
@@ -338,7 +363,8 @@ explained in `buildNote`. Absent ⇒ no stress anywhere.
 | `magazine` | object | no | Makes the item a magazine: `{ "accepts": [itemId], "capacity": int }` (§3.8.1). |
 | `durability` | object | no | Wear: `{ "max": int, "perUse"?: int, "atZero": "broken" \| "destroyed" }` (§3.9). |
 | `recover` | number | no | `0–1`. Chance each spent unit is recovered after the encounter (arrows, bolts, throwing knives; §3.8.3). Default `0`. |
-| `tags` | string[] | no | Free world vocabulary (`"medical"`, `"quest"`, `"rare"`). |
+| `tags` | string[] | no | Free world vocabulary (`"medical"`, `"quest"`, `"rare"`). A consumable tagged `"revive"` gets a downed character up (§3.7); one tagged `"medical"` clears `hobbled` (`RESOLUTION.md` §3.4c). |
+| `noise` | string | no | `"loud"` or `"quiet"`: whether an attack with it alerts everything nearby and makes a noise roll (`RESOLUTION.md` §3.3a). Default by type: `firearm.*` loud, everything else quiet. A suppressed pistol is a `firearm` authored `"quiet"`. |
 | `combat` | object | no | The numbers the core roll reads (`RESOLUTION.md` §4.2–§4.3). On a weapon: `{ "accuracy"?: { "engaged"?, "near"?, "far"? }, "damage": number \| range, "pierce"?: int }`. `accuracy` is points added to the chance in each range band (a missing band is `0`); `damage` follows §3.6 and is rolled per hit; `pierce` (default `0`) is how much armor the hit ignores. On armor: `{ "armor": int }`, subtracted from each hit. Authoring targets: `RESOLUTION.md` §4.6. How many of a burst's rounds can hit is the core roll's (`RESOLUTION.md` §4.3); what automatic fire's extra rounds do is still reserved. Enemies with weapons attack with these numbers (`RESOLUTION.md` §3.4). |
 
 The catalog exists because inventory, equipment, and loot all point at the same
@@ -363,12 +389,12 @@ A sheet is an individual whose state carries across the whole campaign:
 | `resources` | object | yes | `resourceKey → { "current": int, "max": int }`. Every declared resource should appear; a missing one seeds as `current = max = min`. |
 | `attributes` | object | no | `attributeKey → int`. |
 | `proficiencies` | object | no | `proficiencyKey → rank`. |
-| `abilities` | array | no | `{ "id", "name", "type", "description"?, "uses"?, "cost"? }`. `type` is free world vocabulary (`"skill"`, `"spell"`, `"passive"`). `uses` names the proficiency it draws on. `cost` is `resourceKey → int` (a spell's MP). |
+| `abilities` | array | no | `{ "id", "name", "type", "description"?, "uses"?, "cost"?, "tags"? }`. `type` is free world vocabulary (`"skill"`, `"spell"`, `"passive"`). `uses` names the proficiency it draws on. `cost` is `resourceKey → int` (a spell's MP). `tags` as on items: `"revive"` makes it a way out of `downed` (§3.7). |
 | `inventory` | array | no | `{ "item": itemId, "qty": int }`, plus optional per-copy state for stateful items (`loaded`, `durability`; §3.11). |
 | `equipment` | object | no | `slotKey → itemId \| copy object \| null`. A plain id is a pristine copy; a copy object carries state (`mode`, `loaded`, `magazine`, `durability`; §3.11). An equipped item need not also appear in `inventory`. |
 | `carry` | object | no | `{ "max": number }`: the most this character can carry, inventory and equipment together, in `system.carry.unit` (§3.13). Required on party sheets when `system.carry` is declared. Part of the authored build. |
 | `buildNote` | string | yes | Why the build looks the way it does, in one or two sentences, observable register. See below. |
-| `statuses` | array | — | **Reserved** for conditions (bleeding, infected). Not defined in v0. |
+| `statuses` | array | — | **Reserved** for authored starting conditions (bleeding, infected). Not defined in v0. Conditions that arise in play (`hobbled`, `downed`, `dead`, stress) are fork state, not authored here. |
 
 **The build is authored, not picked.** There is no class menu in the fork. The
 build is worked out at build time from the character's description. The player
@@ -402,6 +428,9 @@ discarded when the encounter ends (§4.3).
 | `speed` | int | no | Range bands the instance moves per `close` (`RESOLUTION.md` §3.3). Default `1`. |
 | `tactics` | string[] | no | Ordered intents; the first that applies is taken each exchange (below). Default `["attack", "close"]`. |
 | `fleeAtHpPct` | int | no | `1–99`. HP percentage at or below which `flee` applies, where `tactics` lists it. Absent ⇒ never flees. |
+| `pursues` | bool | no | Keeps after a party that runs: it doesn't drop out past `far`, and a party that dashes away from it ends up in a chase (`RESOLUTION.md` §3.7a–§3.7b). Default `false`. Runners; armed people hunting someone. |
+| `fearless` | bool | no | Can't be pinned by suppression (`RESOLUTION.md` §3.4b), and is what makes a non-fearless pursuer break off a chase when it turns up (§3.7b). Default `false`. The dead. |
+| `feeds` | bool | no | Goes for downed and left-behind bodies first, kills where the victim's death path lists `fedOn`, and stays with the body (`RESOLUTION.md` §3.7e). Default `false`. |
 | `loot` | array | no | `{ "item": itemId, "chance": 0–1, "qty"?: number \| range, "loaded"?: number \| range, "durability"?: number \| range }`. Each line rolls independently when an instance is defeated. `qty` defaults to `1`. `loaded` and `durability` set the state of a dropped stateful item (a magazine with `{ "base": 12, "spread": 10 }` rounds left, a carbine at half wear); absent ⇒ pristine. Currency drops are ordinary loot lines on the currency item. |
 | `note` | string | no | One or two lines on how it fights, in observable register (slow but grabs; travels in packs). Not the lore. |
 | `unique` | bool | no | At most one instance per encounter, and its defeat is committed to campaign state (§4.4). Default `false`; `true` is expected for bosses. |
@@ -422,9 +451,12 @@ how they resolve is `RESOLUTION.md` §3.
   sets the odds of each. An entry that fights with weapons needs no `attacks`;
   one with neither has nothing to attack with.
 - **`tactics`** — an ordered list from the closed intent set `attack`,
-  `close`, `cover`, `withdraw`, `flee` (`RESOLUTION.md` §3.4). Each intent
-  applies under a fixed condition the consumer checks; the author sets only the
-  priority. Unknown intents are ignored.
+  `close`, `cover`, `withdraw`, `flee`, `suppress`, `flank`
+  (`RESOLUTION.md` §3.4). Each intent applies under a fixed condition the
+  consumer checks; the author sets only the priority. `suppress` and `flank`
+  are the coordinated pair: each goes to one instance per target per exchange.
+  `feed` is never listed: the consumer puts it first for any entry with
+  `feeds`. Unknown intents are ignored.
 
 **Named versus nameless.** Interchangeable enemies (a Shambler, a nameless rogue
 operator) are bestiary entries and nothing else. A named villain with a
@@ -462,18 +494,54 @@ give or take 10") reads directly. Dice notation is a candidate later addition
 | --- | --- |
 | `"none"` | Nothing happens beyond the floor (MP at 0 just means no spells). Default. |
 | `"downed"` | Out of the fight, alive, recoverable. |
-| `"dead"` | Dead. For a sheet, this is permanent campaign state. |
+| `"dead"` | Dead. For a sheet, this is permanent campaign state, shown in the state block with its cause (§4.5). |
 
 `atZero` is either one string for every kind, or an object keyed by `persona`,
 `npc`, `common`, `elite`, `boss`, with a `default`. A key that isn't listed
 falls back to `default`, and a missing `default` falls back to `"none"`.
+
+**`downed` in full.** A key's value may be an object instead of the string
+`"downed"`, saying what the status allows, what ends it, and what kills
+(the rationale is `OUTCOME_AUTHORITY.md` §6; the death path is
+`RESOLUTION.md` §3.7e):
+
+```jsonc
+"persona": {
+  "state": "downed",
+  "posture": "prone",                                     // pins the stance axis while it holds
+  "allows": ["speech", "move", "position", "gear.consume"], // beat kinds still open: speaking, crawling, a consumable
+  "recovery": [                                           // the ONLY ways out of downed
+    { "by": "ability", "tag": "revive" },                 // an ability tagged revive
+    { "by": "item", "tag": "revive" },                    // a consumable tagged revive
+    { "by": "encounterEnd", "requires": "allyStanding", "restoreTo": 1 }
+  ],
+  "diesWhen": ["bleedOut", "harmWhileDowned", "fedOn"],   // the death path; empty or absent ⇒ downed never becomes dead
+  "bleedOut": 3,                                          // exchanges, when bleedOut is listed
+  "allDown": "dead"                                       // nobody left standing: "captured", "left for dead", …, or "dead"
+}
+```
+
+| Field | Meaning |
+| --- | --- |
+| `allows` | Beat kinds (`RESOLUTION.md` §2.3), optionally narrowed to one operation (`"gear.consume"`), that stay open while downed. Every other kind is attempted and fails. Default: `speech`, `move`, `position`, `gear.consume`. |
+| `recovery` | The closed list of ways out. A revive restores to `restoreTo` HP (default `1`). Default: the encounter-end line alone. |
+| `diesWhen` | Any of `bleedOut`, `harmWhileDowned`, `fedOn` (`RESOLUTION.md` §3.7e). Default empty. |
+| `bleedOut` | Exchanges before a `bleedOut` death. Default `3`. |
+| `allDown` | What happens when nobody in the party is standing at the end of the extra exchange (`RESOLUTION.md` §3.7e). Authored from the world's permitted lost-scene shapes. `"dead"` only where death is ruled in. Default `"captured"`. |
+
+A plain string `"downed"` means the object with every default: it never kills,
+and it recovers at encounter end if an ally is standing.
 
 **This is where stats meet the posture contract** (producer `CLAUDE.md`
 principle #13). The world's declared boundary decides `persona` and `npc` at-zero
 values. A world that rules `{{user}}`'s death out makes `persona` `"downed"`. A
 souls-like world that rules it **in** says `"dead"` explicitly, because the
 model's trained floor will otherwise refuse to let the fight be lost. The value
-is authored from Master Design Section 6, never defaulted (§6).
+is authored from Master Design Section 6, never defaulted (§6). So is the
+death path: a world can make `{{user}}` go down first and die only by bleeding
+out, a finishing hit, or being eaten, with `diesWhen` and `allDown: "dead"`.
+A world that rules `{{user}}`'s death out leaves `diesWhen` empty and names a
+lost scene in `allDown`. Companions (`npc`) are authored separately.
 
 ### 3.8 Weapons and ammunition
 
@@ -739,6 +807,18 @@ to invent one.
 | `check` | check object | no | As in `system.refill` (§3.2): `full` rolls the table as authored, `half` halves every line's `chance`, `none` finds nothing and still spends the time. Absent ⇒ no check; the table rolls as authored. |
 | `fallback` | bool | no | At most one table. Backs the "Other" entry of the search action's manual choice (below). |
 | `note` | string | no | One line, observable register (already picked over; the back room is locked). |
+| `terrain` | object | no | What the place is like to fight in or run from (below). |
+
+**`terrain`** — `{ "exits"?: [ { "label": string, "door"?: bool } ], "chokepoint"?: "narrow" | "tight", "cover"?: bool }`.
+`exits` lists the ways out (default: two, unnamed); `door: true` marks one that
+can be shut behind the party. `chokepoint` caps how many enemies can be engaged
+with each party member at once (`"narrow"` 1, `"tight"` 2; absent: no cap).
+`cover: false` means there is nothing to get behind (default `true`). The
+consumer records a place's terrain when the party enters it, by the same
+matching as the search offer, and puts its exits in the state block; an exit
+the record doesn't have isn't there. A place with one exit is a dead end once
+enemies come through it. How the engine uses all of it is `RESOLUTION.md`
+§3.7c. Terrain is data so that the model can't invent a locked door mid-chase.
 
 **A search is a HUD action.** A scavenge table rolls only when the player
 triggers it explicitly, through a search action in the consumer's HUD. Free prose
@@ -808,8 +888,10 @@ every party sheet has a `carry.max`.
   highest tier whose `atPct` the load has reached applies, and its `state` and
   `note` go into the state block (§4.5). An operator at 44 of 50 kg is
   `burdened` and the model writes them slower and tiring faster. A tier's
-  `mod` is added to their rolls (§3.2). What else a tier does mechanically
-  (movement, initiative, stamina drain, a failed escape) is deferred (§7).
+  `mod` is added to their rolls (§3.2), and a tier with `dash: false` stops
+  them dashing, which holds the whole party to a walk (`RESOLUTION.md`
+  §3.7d). What else a tier does mechanically (initiative, stamina drain) is
+  deferred (§7).
 - **The limit is part of the build.** `carry.max` is authored with the rest of
   the sheet and explained in `buildNote` when it's unusual. A trained operator
   who carries 50 kg; a nurse who manages 30. A starting load above the limit is
@@ -846,14 +928,23 @@ difference and *offer* an update (§7). It never applies one silently.
   lives in chat metadata, SillyTavern's branch copy gives this for free.
 - Nothing is shared across chats. A campaign that spans several chat files is
   deferred (§7).
+- **A chat whose `{{user}}` died is ended** (`RESOLUTION.md` §3.7f). The reply
+  that narrates the death is the last one: the consumer replaces the input with
+  **Start a new chat**. Swipes of that reply stay possible and replay the same
+  death. Editing, deleting, and branching are not policed
+  (`OUTCOME_AUTHORITY.md` §8).
 
 ### 4.3 Encounters and the working copy
 
 When combat starts, the consumer creates a **working copy**. It holds the
 participating sheets, plus one instance per spawned enemy, each with its
-range-rolled numbers, its range band and the party member it's engaged with,
-whether it's in cover, and which boss phases have fired (`RESOLUTION.md` §3.3–
-§3.4). All combat changes go to the working copy, and none of them touch
+range-rolled numbers, its distance and the party member it's engaged with,
+whether it's in cover, unaware, pinned, flanking, hobbled, or feeding, and which
+boss phases have fired (`RESOLUTION.md` §3.3–§3.4c). It also holds whether
+the encounter is a chase, each downed character's bleed-out clock, who is being
+carried, each party member's suppression, the current place's terrain record,
+and each sheet's stamina before the fighting started (`RESOLUTION.md`
+§3.7a–§3.7e). All combat changes go to the working copy, and none of them touch
 campaign state until the encounter ends.
 
 **Swipes and regenerations replay the exchange.** Every roll in an exchange,
@@ -891,9 +982,11 @@ Campaign state changes only at **commits**:
 - an item moves between party sheets (§3.13);
 - equipment changes;
 - a permanent effect applies (a `target: "max"` item effect);
-- a sheet reaches an `atZero` of `"dead"`, or a `unique` bestiary entry is
-  defeated;
-- party membership changes.
+- a sheet reaches an `atZero` of `"dead"` or dies by its death path, or a
+  `unique` bestiary entry is defeated;
+- party membership changes, a party member left behind included
+  (`RESOLUTION.md` §3.7e);
+- a companion's standing order changes (`RESOLUTION.md` §3.5).
 
 Each commit records **the message id it happened at** plus its diff. Deleting or
 rewinding to before that message reverts the commit. That covers the one rewind
@@ -912,10 +1005,15 @@ rounds" are exactly the facts the model must not drift from. Money is shown with
 the currency `symbol`. With `system.carry`: each party member's load against
 their limit and the encumbrance tier in force, with its `note`. While the party
 is trading: the vendor's funds and stock with current values. After a search:
-what it turned up. During combat it adds the encounter: each instance's name,
-rough condition, range band (and who it's engaged with), and `note`, plus any
-boss `phases` note that has fired, and each party member's stress level with
-its `note` (§3.2). Each exchange's resolved results arrive beside it as their
+what it turned up. With `system.exertion`: each party member's stamina beside
+HP. Each companion's standing order, one line each (`Maya — order: covering
+the door`). The current place's exits (§3.12). During combat it adds the
+encounter: each instance's name, rough condition, range band (and who it's
+engaged with), awareness, and `note`, plus any boss `phases` note that has
+fired, each party member's stress level with its `note` (§3.2), whether the
+party is in a chase, and each downed character's bleed-out clock. A dead
+character is shown as dead with the cause (`Maya — dead (eaten, exchange 14)`)
+every turn from then on. Each exchange's resolved results arrive beside it as their
 own block (`RESOLUTION.md` §3.6). Exact
 numbers versus descriptive condition ("badly hurt") is a consumer presentation
 choice. The block is authoritative fact, the same standing as the dice oracle's
@@ -998,6 +1096,13 @@ Absence never errors, matching every other seam:
   (`RESOLUTION.md` §4.7). An unknown band key in `accuracy` is ignored.
 - `system.stress` with a `check` that names no declared proficiency ⇒ no one
   resists triggers; warning. A level `mod` above `0` is clamped to `0`.
+- `system.exertion` naming an undeclared resource ⇒ no stamina; warning.
+  `system.stealth` naming an undeclared proficiency ⇒ rank 0; warning.
+- An unknown `diesWhen` entry is ignored; warning. An `allDown` value the
+  consumer doesn't recognise is treated as `"captured"`; warning.
+- A `terrain` with an empty `exits` list is treated as no `exits` (two,
+  unnamed); warning. An unknown `chokepoint` value is ignored.
+- An unknown `noise` value falls back to the type default.
 - Unknown fields are ignored. The reserved `statuses` field is ignored until
   defined.
 
@@ -1089,7 +1194,19 @@ Absence never errors, matching every other seam:
       describe.
 - [ ] `atZero` for `persona` and `npc` matches the boundary in Master Design
       Section 6 (principle #13). If `{{user}}`'s death is off the table, it is
-      never `"dead"`. If it is ruled in, it says so explicitly.
+      never `"dead"`, its `diesWhen` is empty, and its `allDown` is a lost
+      scene the boundary permits, never `"dead"`. If death is ruled in, it says
+      so explicitly: `"dead"`, or `downed` with a `diesWhen` and
+      `allDown: "dead"`. Companions are checked against the boundary the same
+      way, separately.
+- [ ] With `system.exertion`: `resource` names a declared resource, every cost
+      is ≥ 0, `recoverPerExchange` ≥ 0. With `system.stealth`: `check` names a
+      declared proficiency. Party sheets' stamina and stealth ranks are
+      explained in `buildNote` when unusual.
+- [ ] Every `terrain` exit has a `label`; `chokepoint` is `narrow` or `tight`.
+      A place described as having one way out authors one exit.
+- [ ] `pursues`, `fearless`, and `feeds` agree with the `note`: an enemy that
+      runs people down pursues, the mindless dead are fearless.
 - [ ] Every bestiary entry that names a cast member carries `npc`. A bestiary
       `note` doesn't restate its Tier 1 lore entry.
 - [ ] Every bestiary entry that fights has a source of attacks: `attacks`, or
@@ -1097,8 +1214,8 @@ Absence never errors, matching every other seam:
       `RESOLUTION.md` §3.4). Attack `key`s are unique per
       entry, every `reach` is `melee` or `ranged`, and `damage` ranges stay
       ≥ 0. `speed` is ≥ 1. `tactics` (on the entry and on each phase) uses
-      only `attack`, `close`, `cover`, `withdraw`, `flee`, and `flee` appears
-      only where `fleeAtHpPct` is set. `tactics` and `phases` agree with the
+      only `attack`, `close`, `cover`, `withdraw`, `flee`, `suppress`, `flank`,
+      and `flee` appears only where `fleeAtHpPct` is set. `tactics` and `phases` agree with the
       `note`: an enemy described as fighting from cover lists `cover`.
 - [ ] No starting values appear in prose lorebook entries or cards. The carrier
       is the single source, and a number in prose becomes a second, stale copy.
@@ -1112,27 +1229,30 @@ mechanics among them (combat, refill time, encumbrance effects, repair checks,
 restocking) are specified in [`RESOLUTION.md`](./RESOLUTION.md), written from
 the fork side. Any new authored data they need is added here.
 
-- **Combat resolution** — initiative, escape and avoidance, and play-testing
-  the calibration.
+- **Combat resolution** — the encounter data that sets awareness and ambush,
+  fights between enemy groups, and play-testing the calibration.
   The structure is drafted in `RESOLUTION.md` §3 (exchange, budget, enemy
-  side) and §4 (the core roll), with its data in §3.2, §3.3, and §3.5 here.
+  side, escape, death) and §4 (the core roll), with its data in §3.2, §3.3,
+  §3.5, §3.7, and §3.12 here.
   Per `DICE_ORACLE.md` §7.3, rolls are likely server-authoritative.
 - **Statuses** — bleeding, infected, stunned. Stress (§3.2) is the first one
-  built, as a gauge of its own; the `statuses` field stays reserved for the
-  rest.
+  built, as a gauge of its own, and `hobbled` (`RESOLUTION.md` §3.4c) the
+  first an attack inflicts; the `statuses` field stays reserved for the rest.
 - **Levels, XP, and growth** — how `max` and ranks rise. v0 already allows `max`
   to change through `target: "max"` effects; systematic growth is later.
-- **Regeneration and rest** — how `current` recovers between fights.
+- **Regeneration and rest** — how `current` recovers between fights. Stamina
+  has an interim rule (§3.2 `exertion`): a long wait restores what the fighting
+  spent, never more.
 - **Weapon combat numbers** — the `combat` shape is drafted (§3.3) and the
   §8 numbers are calibrated against `RESOLUTION.md` §4.6. Still reserved:
-  suppression from automatic fire, and reach (knife vs. katana).
+  reach (knife vs. katana). Suppression is defined (`RESOLUTION.md` §3.4b).
 - **Repair** — restoring durability (a repair kit item, a vendor service, a
   proficiency). Until then a `broken` copy stays broken.
 - **Ammunition realism** — a chambered round (+1), dropping magazines on a speed
   reload, mixed round types in one magazine, ammunition variants with different
   effects.
-- **Encumbrance mechanics** — what a carry tier does to movement, initiative,
-  stamina, or an escape. A tier's `mod` on rolls is defined (§3.2).
+- **Encumbrance mechanics** — what a carry tier does to initiative or
+  stamina. A tier's `mod` on rolls and `dash: false` are defined (§3.2).
 - **Carry bonuses** — a bigger backpack or a cart raising `carry.max` (an item
   field plus a slot for it).
 - **Two-handed and dual-wield rules.**
@@ -1192,13 +1312,37 @@ opposite; the carbine goes clean through a vest, and the Glock loses 3 points
 of every hit to one. Stress is
 on: `{{user}}`'s nerve 4 resists most triggers, and Maya's 2 resists few.
 
+Getting away is built in too (`RESOLUTION.md` §3.3a–§3.7f). A dash costs 10
+stamina, and the post-coma `{{user}}` has 60: six dashes, then trouble. The
+zombies are `fearless` and `feed`; Runners and Rogue Operators `pursue`, and
+the operators break off when the dead turn up. Operators pin and flank in
+pairs. Running with Maya means rolling evasion at her stealth 1, not
+`{{user}}`'s 3. A basement has one way out and narrow stairs: a dead end, and
+the place for a last stand. `{{user}}` and Maya go down at 0 HP, and die if
+they bleed out, are hit again, or are eaten, and nobody left standing means
+death. Only Maya's Triage gets someone up mid-fight.
+
 ```json
 {
   "schema": 0,
   "system": {
     "resources": [
       { "key": "hp", "label": "HP", "min": 0, "cap": 999,
-        "atZero": { "default": "dead", "persona": "downed", "npc": "downed" } },
+        "atZero": { "default": "dead",
+          "persona": { "state": "downed", "posture": "prone",
+                    "allows": ["speech", "move", "position", "gear.consume"],
+                    "recovery": [ { "by": "ability", "tag": "revive" },
+                                  { "by": "item", "tag": "revive" },
+                                  { "by": "encounterEnd", "requires": "allyStanding", "restoreTo": 1 } ],
+                    "diesWhen": ["bleedOut", "harmWhileDowned", "fedOn"], "bleedOut": 3,
+                    "allDown": "dead" },
+          "npc": { "state": "downed", "posture": "prone",
+                    "allows": ["speech", "move", "position", "gear.consume"],
+                    "recovery": [ { "by": "ability", "tag": "revive" },
+                                  { "by": "item", "tag": "revive" },
+                                  { "by": "encounterEnd", "requires": "allyStanding", "restoreTo": 1 } ],
+                    "diesWhen": ["bleedOut", "harmWhileDowned", "fedOn"], "bleedOut": 3,
+                    "allDown": "dead" } } },
       { "key": "stamina", "label": "Stamina", "min": 0, "cap": 200, "atZero": "none" }
     ],
     "proficiencies": [
@@ -1209,7 +1353,8 @@ on: `{{user}}`'s nerve 4 resists most triggers, and Maya's 2 resists few.
       { "key": "melee", "label": "Melee weapons", "maxRank": 5 },
       { "key": "hand_to_hand", "label": "Hand-to-hand", "maxRank": 5 },
       { "key": "first_aid", "label": "First aid", "maxRank": 5 },
-      { "key": "nerve", "label": "Nerve", "maxRank": 5 }
+      { "key": "nerve", "label": "Nerve", "maxRank": 5 },
+      { "key": "stealth", "label": "Stealth", "maxRank": 5 }
     ],
     "equipmentSlots": [
       { "key": "main", "label": "Main weapon" },
@@ -1227,7 +1372,7 @@ on: `{{user}}`'s nerve 4 resists most triggers, and Maya's 2 resists few.
       "unit": "kg",
       "tiers": [
         { "atPct": 60, "state": "burdened", "note": "Slower on foot; tires faster; climbing is hard work.", "mod": -5 },
-        { "atPct": 90, "state": "overloaded", "note": "Can't run. Every stair and fence is a struggle.", "mod": -15 }
+        { "atPct": 90, "state": "overloaded", "note": "Can't run. Every stair and fence is a struggle.", "mod": -15, "dash": false }
       ]
     },
     "stress": {
@@ -1237,7 +1382,9 @@ on: `{{user}}`'s nerve 4 resists most triggers, and Maya's 2 resists few.
         "overwhelmed": { "mod": -25, "note": "Tunnel vision, hands shaking hard, fine control going." }
       },
       "outnumbered": [3, 6]
-    }
+    },
+    "stealth": { "check": "stealth" },
+    "exertion": { "resource": "stamina", "costs": { "dash": 10, "disengage": 5 }, "recoverPerExchange": 3 }
   },
   "items": [
     { "id": "c8_carbine", "name": "C8 Carbine", "type": "firearm.rifle", "weight": 3.4, "slot": "main",
@@ -1307,7 +1454,7 @@ on: `{{user}}`'s nerve 4 resists most triggers, and Maya's 2 resists few.
       "id": "user", "kind": "persona", "party": true,
       "resources": { "hp": { "current": 100, "max": 150 },
                      "stamina": { "current": 60, "max": 120 } },
-      "proficiencies": { "rifles": 4, "handguns": 4, "hand_to_hand": 4, "melee": 2, "first_aid": 3, "nerve": 4 },
+      "proficiencies": { "rifles": 4, "handguns": 4, "hand_to_hand": 4, "melee": 2, "first_aid": 3, "nerve": 4, "stealth": 3 },
       "abilities": [
         { "id": "self_treat", "name": "Self-Treatment", "type": "skill", "uses": "first_aid",
           "description": "Can dress their own wounds under pressure." }
@@ -1331,10 +1478,10 @@ on: `{{user}}`'s nerve 4 resists most triggers, and Maya's 2 resists few.
       "id": "maya_okafor", "kind": "npc", "party": true,
       "resources": { "hp": { "current": 80, "max": 80 },
                      "stamina": { "current": 90, "max": 90 } },
-      "proficiencies": { "first_aid": 5, "melee": 1, "nerve": 2 },
+      "proficiencies": { "first_aid": 5, "melee": 1, "nerve": 2, "stealth": 1 },
       "abilities": [
         { "id": "triage", "name": "Triage", "type": "skill", "uses": "first_aid",
-          "description": "Stabilises a downed ally." }
+          "description": "Gets a downed ally back on their feet.", "tags": ["revive"] }
       ],
       "inventory": [ { "item": "field_dressing", "qty": 4 }, { "item": "dollar", "qty": 120 } ],
       "equipment": { "main": { "item": "fire_axe", "durability": 70 } },
@@ -1347,24 +1494,27 @@ on: `{{user}}`'s nerve 4 resists most triggers, and Maya's 2 resists few.
       "resources": { "hp": { "base": 40, "spread": 10 } },
       "attacks": [ { "key": "claw", "label": "Grab and claw", "damage": { "base": 8, "spread": 3 }, "reach": "melee", "weight": 3 },
                    { "key": "bite", "label": "Bite", "damage": { "base": 14, "spread": 4 }, "reach": "melee" } ],
+      "fearless": true, "feeds": true,
       "note": "Slow, relentless, dangerous when it gets hands on you. Comes in numbers.",
       "loot": [ { "item": "field_dressing", "chance": 0.1 },
                 { "item": "dollar", "chance": 0.3, "qty": { "base": 10, "spread": 8 } } ] },
     { "id": "runner", "name": "Runner", "tier": "common",
       "resources": { "hp": { "base": 30, "spread": 8 } },
       "attacks": [ { "key": "claw", "label": "Claw", "damage": { "base": 7, "spread": 3 }, "reach": "melee" } ],
-      "speed": 2,
-      "note": "Recently turned. Fast, closes distance before you can aim." },
+      "speed": 2, "pursues": true, "fearless": true, "feeds": true,
+      "note": "Recently turned. Fast, closes distance before you can aim, and doesn't give up." },
     { "id": "bloated", "name": "Bloated", "tier": "elite",
       "resources": { "hp": { "base": 110, "spread": 20 } },
       "attacks": [ { "key": "slam", "label": "Slam", "damage": { "base": 16, "spread": 5 }, "reach": "melee" } ],
+      "fearless": true, "feeds": true,
       "note": "Swollen and slow. Bursts when it drops, and anyone close gets sprayed." },
     { "id": "rogue_operator", "name": "Rogue Operator", "tier": "elite",
       "resources": { "hp": { "base": 80, "spread": 10 } },
       "proficiencies": { "rifles": { "base": 2, "spread": 1 }, "hand_to_hand": 3 },
       "equipment": { "main": "c8_carbine", "secondary": "glock_17", "armor": "stab_vest" },
-      "tactics": ["flee", "cover", "attack", "close"], "fleeAtHpPct": 25,
-      "note": "Trained, works in pairs, uses cover and flanks. Breaks off when badly hurt.",
+      "tactics": ["flee", "cover", "suppress", "flank", "attack", "close"], "fleeAtHpPct": 25,
+      "pursues": true,
+      "note": "Trained, works in pairs: one pins you down while the other flanks. Hunts people who run, but not into the dead. Breaks off when badly hurt.",
       "loot": [ { "item": "c8_carbine", "chance": 0.4, "durability": { "base": 180, "spread": 80 } },
                 { "item": "stanag_30", "chance": 0.7, "qty": { "base": 2, "spread": 1 },
                   "loaded": { "base": 15, "spread": 15 } },
@@ -1432,6 +1582,7 @@ on: `{{user}}`'s nerve 4 resists most triggers, and Maya's 2 resists few.
       "loot": [ { "item": "field_dressing", "chance": 0.6, "qty": { "base": 2, "spread": 2 } },
                 { "item": "military_stim", "chance": 0.02 },
                 { "item": "dollar", "chance": 0.4, "qty": { "base": 30, "spread": 25 } } ],
+      "terrain": { "exits": [ { "label": "shopfront", "door": true }, { "label": "back door to the alley", "door": true } ] },
       "note": "Usually hit early. Look behind the counter and in the back room." },
     { "id": "police_cruiser", "name": "Police cruiser", "aliases": ["cop car", "patrol car"],
       "loot": [ { "item": "glock_17", "chance": 0.3 },
@@ -1445,7 +1596,13 @@ on: `{{user}}`'s nerve 4 resists most triggers, and Maya's 2 resists few.
                 { "item": "round_9mm", "chance": 0.15, "qty": { "base": 8, "spread": 6 } },
                 { "item": "fire_axe", "chance": 0.05, "durability": { "base": 80, "spread": 30 } },
                 { "vendor": "squatter_trader", "chance": 0.08 } ],
+      "terrain": { "exits": [ { "label": "main stairwell" }, { "label": "fire escape" } ], "chokepoint": "tight" },
       "note": "Most doors are open. The ones that aren't, someone is behind." },
+    { "id": "basement", "name": "Basement", "aliases": ["cellar", "boiler room"],
+      "loot": [ { "item": "round_9mm", "chance": 0.1, "qty": { "base": 6, "spread": 4 } },
+                { "item": "fire_axe", "chance": 0.05, "durability": { "base": 70, "spread": 30 } } ],
+      "terrain": { "exits": [ { "label": "stairs up", "door": true } ], "chokepoint": "narrow" },
+      "note": "One way in, one way out. Dark." },
     { "id": "anywhere_else", "name": "Anywhere else", "fallback": true, "depletes": false,
       "loot": [ { "item": "dollar", "chance": 0.15, "qty": { "base": 5, "spread": 4 } } ] }
   ]
@@ -1464,7 +1621,7 @@ on: `{{user}}`'s nerve 4 resists most triggers, and Maya's 2 resists few.
 | `[[BODY_CYCLES]]` carrier, cycle seed payload | `BODY_CYCLES.md` |
 | `[[RPG_STATS]]` carrier, stat system, item catalog (weapons, magazines, ammunition), starting sheets, bestiary, currency and vendors | this document |
 | Item `type` / `nature` vocabulary, possession and legality checks on weapons and money | `OUTCOME_AUTHORITY.md` (Draft) |
-| Dice, math, modifiers, time, combat, attempt parsing — how the engine uses this payload | `RESOLUTION.md` (§2 attempt interpretation Draft, rest Placeholder; fork-owned) |
+| Dice, math, modifiers, time, combat, attempt parsing — how the engine uses this payload | `RESOLUTION.md` (§2–§4 Draft, rest Placeholder; fork-owned) |
 | Who decides outcomes; what `{{user}}`'s message can change | `OUTCOME_AUTHORITY.md` (Draft) |
 
 All are independently versioned. `[[RPG_STATS]]` reuses existing conventions on
@@ -1507,7 +1664,9 @@ not trip `BODY_CYCLES.md` §7.1's generic-carrier trigger (§1.3).
   without any name matching. **Places inside places** sharpen it: upstairs in a
   house, the back room of a store. Is each its own location with its own
   encounter chance and depletion, or does it share its parent's?
-  (`RESOLUTION.md` §2.11 example C rolls arrival for both in one turn.)
+  (`RESOLUTION.md` §2.11 example C rolls arrival for both in one turn.) Terrain
+  (§3.12) leans on the same matching: the basement under an apartment block
+  needs its own record to be a dead end.
 - ~~**Matching a search to a table.**~~ Resolved 2026-11-11: a search is an
   explicit HUD action (§3.12). Free prose only suggests the matching action and
   never rolls a table; the manual "Search as…" choice covers places whose names
@@ -1519,12 +1678,14 @@ not trip `BODY_CYCLES.md` §7.1's generic-carrier trigger (§1.3).
   route). All three need an authored encounter chance, per kind of place and
   per span of time or route, referencing bestiary entries. Not yet a field here. Likely candidates: encounter lines on
   the scavenge tables (§3.12), or a separate table keyed the same way. Its own
-  PR.
+  PR. The same data should set each encounter's starting band, awareness, and
+  whether it ambushes (`RESOLUTION.md` §3.3a); until it exists, every enemy
+  starts alerted at `near`.
 - **Re-entry.** Going back into a place already visited: does arrival roll
   again (the world moved on) or not (it was cleared)? Possibly a per-table
   setting, like `depletes`.
-- **World-authored stances.** `RESOLUTION.md` §2.7 defines four v0 stance axes
-  (`weapon`, `noise`, `cover`, `posture`). Whether `system` may add a world's
+- **World-authored stances.** `RESOLUTION.md` §2.7 defines five v0 stance axes
+  (`weapon`, `noise`, `cover`, `posture`, `carrying`). Whether `system` may add a world's
   own axes or values (`warded`, `in formation`), and how a stance's modifier
   would be declared.
 - **Split parties.** Party location is one value in fork state, so "We split up"

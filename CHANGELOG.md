@@ -13,7 +13,7 @@ numbers. Newest first.
 
 ---
 
-## 2026-11-19 — Resolution: combat — the enemy side, the exchange budget, and the core roll (Draft v0) (#96)
+## 2026-11-19 — Resolution: combat — the enemy side, the exchange budget, the core roll, escape, and death (Draft v0) (#96)
 
 The beat vocabulary resolved the player's side of a fight before generation,
 but left the enemy's response to the narration, with damage read back as an
@@ -31,9 +31,62 @@ pierce in the damage, and **stress** as the body's response to danger rather
 than an emotion the world imposes on `{{user}}`. A last pass **calibrates the
 numbers by simulation** against stated danger curves: one zombie is trivial
 and five mean run; one trained human is a costly fight, two or three are very
-bad odds, four in the open are game over. Still a Draft; nothing reads it.
+bad odds, four in the open are game over. The final pass gives those lethal
+numbers their **way out, and their ending**: unaware enemies can be slipped
+past or ambushed; a party breaks contact by distance, paying stamina; some
+enemies chase, and a chase is an evasion roll against a stamina clock;
+suppression pins people but not the dead; companions follow with standing
+orders; terrain (exits, chokepoints, cover) is data, so a dead end is a
+consequence and a last stand is winnable; and a downed character can die,
+`{{user}}` included where the world rules it in, after which the chat ends.
+Still a Draft; nothing reads it.
 
 ### Added
+
+- `contracts/RESOLUTION.md` §3.3a — **awareness, stealth, and ambush**:
+  `unaware` / `alerted` instances; a quiet arrival rolls stealth at the
+  party's lowest rank; leaving unaware enemies quietly is free; the first
+  attack on an unaware instance gets +20, and a loud one costs every enemy
+  that exchange while a quiet kill leaves the rest unaware; being ambushed;
+  gunfire makes a noise roll.
+- `contracts/RESOLUTION.md` §3.4, §3.4b, §3.4c — enemy intents `feed`,
+  `suppress`, and `flank` (one coordinated instance per target per exchange);
+  **suppressive fire** (3+ rounds, no damage, pins up to 3 instances or the
+  whole band on automatic, `fearless` immune); **called shots to the legs**,
+  inflicting `hobbled`, the first status an attack inflicts, and the rule
+  that shooting a party member is a legal attempt whose fallout the posture
+  contract governs.
+- `contracts/RESOLUTION.md` §3.7a–§3.7f — **breaking contact** (distance as a
+  count past `far`, fire on the move, pursuers stay at `far`); **chases**
+  (dash plus evasion each exchange, results by pursuer speed, the stamina
+  clock, non-`fearless` pursuers breaking off for the dead, feeders stopping
+  at a body); **places, exits, and terrain** (the encounter moves with the
+  party, exits from data only, dead ends, chokepoints, no-cover places, doors);
+  **stamina**; **downed, dead, and left behind** (the `bleedOut` /
+  `harmWhileDowned` / `fedOn` death path, the extra exchange when nobody
+  stands, carrying, leaving someone behind explicitly, dead as permanent state
+  with a cause); **when `{{user}}` dies** (the fork decides, the reply narrates
+  it in full without the player's thoughts or last words, the chat ends with
+  Start a new chat, no anti-cheat).
+- `contracts/RESOLUTION.md` §3.5 — **standing orders** (`follow` default,
+  `attack`, `hold`, `suppress`, `cover`), one line each in the state block; the
+  party moves at its slowest member.
+- `contracts/RESOLUTION.md` §4.6 — an escape table measured by simulation
+  (Shamblers, operators with and without covering fire, Runner and operator
+  chases), and the constants for unaware, suppressed, pins, and bleed-out.
+- `contracts/RPG_STATS.md` — `system.stealth`, `system.exertion`, carry tier
+  `dash`, item `noise`, ability `tags` (`revive`), bestiary `pursues` /
+  `fearless` / `feeds`, intents `suppress` / `flank`, scavenge-table `terrain`,
+  and the full `downed` object in §3.7 (`allows`, `recovery`, `diesWhen`,
+  `bleedOut`, `allDown`), with degradation and conformance rules. The §8
+  example gains stealth ranks, stamina costs, an overloaded tier that can't
+  run, zombies that are fearless and feed, Runners and operators that pursue,
+  operators that pin and flank, Maya's Triage as the revive, a death path for
+  `{{user}}` and Maya, terrain on three places, and a basement dead end.
+- `contracts/OUTCOME_AUTHORITY.md` §10.1j, and §5 engine-block bullets: a
+  death the state shows is final and narrated in full; the ways out are the
+  ones the state lists; the `protagonist_jeopardy` guardrail must exempt a
+  fork-resolved death.
 
 - `contracts/RESOLUTION.md` §4.6 — **calibration.** The engine constants
   (base 35, +10 per rank, aim +15 with ×1.5 damage on a success, recoil −10
@@ -102,6 +155,26 @@ bad odds, four in the open are game over. Still a Draft; nothing reads it.
 
 ### Changed
 
+- `contracts/RESOLUTION.md` §2.7, §2.9, §3.2, §3.2a, §3.3, §3.6–§3.9, §4.2,
+  §4.3 — a fifth stance axis, `carrying`; beat fields `standing` / `order`,
+  `leaves`, `suppress`, `called`; the arriving exchange's enemy step follows
+  awareness; leaving the place is a dash through an exit and the interim leave
+  rule is gone; `away` and `dash` work on distance; disengaging costs stamina;
+  the downed are targeted by feeders, or when nobody standing is in reach;
+  the exchange block reports pins, chases, bleed-out, and deaths; encounter
+  end covers escape and nobody standing; new degradation rules; resolved and
+  new open questions; modifiers for unaware targets, suppressed actors, and
+  flanked cover; automatic fire's extra rounds go to suppression.
+- `contracts/RPG_STATS.md` §3.4, §3.12, §3.13, §4.2–§4.5, §7, §10 — runtime
+  conditions are fork state, not `statuses`; terrain on scavenge tables; a
+  carry tier can forbid dashing; a chat whose `{{user}}` died is ended; the
+  working copy, commits, and state block carry the new state (stamina, orders,
+  exits, awareness, chases, bleed-out, dead with its cause); deferred items and
+  open questions updated.
+- `contracts/OUTCOME_AUTHORITY.md` §6, §8, §9, §10.2 — downed, recovery, and
+  death applied to `RPG_STATS.md` §3.7 with the death path; ending the chat on
+  death is not an ironman lock; the §9 rows are marked applied.
+- `contracts/README.md`, `CLAUDE.md` — status lines name escape and death.
 - `contracts/RESOLUTION.md` §1, §2.3, §2.7, §2.9, §3 — the core-roll,
   math, and modifier-stack placeholders point at §4; the `weapon` stance axis
   gains `aimed` (costs the move); `check` beats gain `skill` and `steady`; the

@@ -1,6 +1,6 @@
 # Resolution Contract — how attempts become outcomes
 
-**Status:** Placeholder, with §2 (attempt interpretation), §3 (combat: the exchange, its budget, and the enemy side), and §4 (the core roll) in Draft · **Version:** 0 · **Last updated:** 2026-11-19
+**Status:** Placeholder, with §2 (attempt interpretation), §3 (combat: the exchange, its budget, the enemy side, escape, and death), and §4 (the core roll) in Draft · **Version:** 0 · **Last updated:** 2026-11-19
 
 > **Shared contract — canonical source of truth:**
 > [`AndreiNicu/World-Forge`](https://github.com/AndreiNicu/World-Forge) → `contracts/RESOLUTION.md`.
@@ -14,7 +14,7 @@
 > describes. World Forge only produces the data the engine consumes
 > (`RPG_STATS.md`, `DICE_ORACLE.md`); how that data is handled at runtime is the
 > fork's to define. §2 (attempt interpretation), §3 (combat: how an exchange
-> is budgeted and how the enemy side resolves), and §4 (the core roll) were drafted early so the rest of the engine has a
+> is budgeted, how the enemy side resolves, how a party gets away, and how characters die), and §4 (the core roll) were drafted early so the rest of the engine has a
 > shape to build against. They are Drafts: nothing reads them, and the fork may
 > revise them here as it builds. The other sections have no content yet. No
 > agent spec references this document and nothing in this repo depends on it.
@@ -37,9 +37,11 @@ something" and "the fork commits a result."
   later.
 - **Time** — what a beat or round is in chat play; initiative and turn order.
   *Placeholder.* What fits in one exchange, reload and refill included, is the
-  budget (§3.2a).
+  budget (§3.2a); ambush and unaware enemies are awareness (§3.3a).
 - **Combat** — the exchange and its budget, range bands, overwatch, and how
-  enemies act and are narrated: **§3, Draft.** Attack math, damage, and armor
+  enemies act and are narrated; awareness and ambush, suppression, standing
+  orders, breaking contact, chases, terrain, stamina, and death: **§3,
+  Draft.** Attack math, damage, and armor
   are in the core roll (§4.2–§4.3). What a fire mode does to a hit is still a
   placeholder.
 - **Dice grammar** — dice notation and roll syntax, shared with the dice oracle
@@ -158,7 +160,7 @@ Twelve kinds, grouped by the route each one takes.
 | `intent` | A plan or decision about later: *will*, *going to*, *decide to*, *want to*; and conditionals that aren't about readiness (§2.2). | "I decided that I will search them", "If he agrees, I'll buy two" | no | Nothing in v0. A plan is not an action. |
 | `speech` | Words `{{user}}` says, quoted or reported, and gestures to someone; instructions to party members, spoken or narrated (§2.2). | "Anyone in here?", "Maya, cover the stairs", "I wave her over" | no | Nothing by default; quoted words are never checked for claims. An instruction carries `asks`, and the fork checks it against the ally's own state (§2.2). A line meant to make someone do something they otherwise wouldn't (persuade, lie, intimidate) is labeled `check`, not `speech`; a line about buying, selling, or a price is labeled `trade`. |
 | **Checked, then committed** | | | | |
-| `stance` | A change to `{{user}}`'s own readiness or posture, on one of four axes (§2.7); and a conditional that describes readiness (§2.2). | "Raising my rifle", "I slip in quietly", "I get up", "If anything moves, I shoot it" | no | A free action (§2.7). Checks it's possible, then records the axis it names, leaves the others as they were, and shows it on the HUD. Readying a named weapon puts it in hand (`RPG_STATS.md` §3.11). |
+| `stance` | A change to `{{user}}`'s own readiness or posture, on one of five axes (§2.7); and a conditional that describes readiness (§2.2). | "Raising my rifle", "I slip in quietly", "I get up", "If anything moves, I shoot it" | no | A free action (§2.7). Checks it's possible, then records the axis it names, leaves the others as they were, and shows it on the HUD. Readying a named weapon puts it in hand (`RPG_STATS.md` §3.11). |
 | `gear` | A deterministic action with an item or the party's own gear. The beat names the operation in `op` (below). | "I drink a dressing", "I swap magazines", "I take the shotgun it dropped", "I go through his pockets", "I hand Maya the dressing" | only `refill` in an encounter | Runs the legality check for that `op` (`OUTCOME_AUTHORITY.md` §4.1a), then makes the matching commit (`RPG_STATS.md` §4.4). A `refill` inside an encounter makes the check `RPG_STATS.md` §3.8.4 asks for. A `take` of a catalog item no roll placed commits nothing and brings up the place's search action (§2.4a). |
 | `position` | Inside an encounter, changing distance to an enemy without leaving the place: closing in, backing off, falling back across the room. | "I back away from it", "I rush him", "I fall back to the stairs" | only to disengage | Checks it's possible, then moves one range band toward the target or away, two with `dash` (§3.3). Backing away from an enemy engaged with you is disengaging, which is a check. Outside an encounter there are no bands, and the beat is `flavor`. |
 | **The world's roll** | | | | |
@@ -447,7 +449,7 @@ exchange budget (§3.2a): readying the weapon already in hand is still free,
 drawing a different one costs the move, and a refill costs the action and makes
 its check. The beat's kind doesn't change.
 
-**Stance** is short-lived state the fork tracks for `{{user}}`, on four
+**Stance** is short-lived state the fork tracks for `{{user}}`, on five
 independent axes. A beat sets the axis it names and leaves the others alone:
 "Raising my rifle, I slip quietly into 202" is weapon `ready` *and* noise
 `quiet`.
@@ -458,11 +460,14 @@ independent axes. A beat sets the axis it names and leaves the others alone:
 | `noise` | `normal`, `quiet` | Moving carefully, keeping noise down. | "I slip in quietly" |
 | `cover` | `exposed`, `hidden` | Getting into or out of cover or concealment. | "I duck behind the counter" |
 | `posture` | `standing`, `prone` | Getting up, dropping down. | "I get up", "I drop flat" |
+| `carrying` | `nobody`, a party member | Lifting a downed party member to carry them; putting them down (§3.7e). | "I haul Maya over my shoulder", "I set her down" |
 
 - **`at_ease`** on the beat resets `weapon`, `noise`, and `cover` to their
   defaults ("I relax", "I let my guard down"). It doesn't change `posture`.
 - **`weapon`, `noise`, and `cover` last** until they're changed, the location
-  changes, or an encounter ends. **`posture` lasts** until it's changed. A
+  changes, or an encounter ends. **`posture` lasts** until it's changed.
+  **`carrying` lasts** until the carried character is put down, gets up, or
+  dies. A
   status can pin it: `downed` holds `posture` at `prone`
   (`OUTCOME_AUTHORITY.md` §6), so "I get up" while downed is a `stance` beat
   that fails the legality check. It is attempted, and it fails.
@@ -538,13 +543,13 @@ deterministically.
   | --- | --- |
   | `flavor` | `question: true` for a question to the narrator. |
   | `intent` | None. |
-  | `speech` | `to` if it addresses someone; `quoted: true` for quoted words; `instruction: true` for a direction to a party member, with `asks` (the kind it would be if they did it) and the fields that kind takes ("Maya, shoot the big one" carries `asks: check` and its `target`) (§2.2). |
-  | `stance` | The axis it sets (`weapon`, `noise`, `cover`, `posture`) with its value, or `at_ease: true`; `object` if a weapon is named; `when` for a conditional (§2.7). |
-  | `position` | `toward` (the enemy it closes on) or `away: true`; `dash: true` when it moves fast or far ("I sprint at him", "I run for the back of the store") (§3.3). |
+  | `speech` | `to` if it addresses someone; `quoted: true` for quoted words; `instruction: true` for a direction to a party member, with `asks` (the kind it would be if they did it) and the fields that kind takes ("Maya, shoot the big one" carries `asks: check` and its `target`) (§2.2). An instruction meant to last ("keep their heads down", "stay close") adds `standing: true` and an `order` (`follow`, `attack`, `hold`, `suppress`, `cover`) (§3.5). |
+  | `stance` | The axis it sets (`weapon`, `noise`, `cover`, `posture`, `carrying`) with its value, or `at_ease: true`; `object` if a weapon is named; `when` for a conditional (§2.7). |
+  | `position` | `toward` (the enemy it closes on) or `away: true`; `dash: true` when it moves fast or far ("I sprint at him", "I run for the back of the store") (§3.3); `leaves`, the party members the movement deliberately leaves behind ("I run, leaving Maya") (§3.7e). |
   | `gear` | `op` (§2.3); `item`; for `give`, `to`; for `mode`, `mode`; for `loot`, `target`. |
-  | `move` | `to`; `journey: true` when it sets out for a place it doesn't reach in the same beat. |
+  | `move` | `to`; `journey: true` when it sets out for a place it doesn't reach in the same beat; `leaves`, as for `position`. |
   | `wait` | `duration` as written ("for the night", "an hour"). |
-  | `check` | `target` if there is one; `with` when the clause names the item or ability it uses; `count` when the clause repeats the action ("three shots" is three trigger pulls); `declaresResult: true` when the clause stated its own outcome (§2.4); `skill`, a proficiency key from the world's declared list, when the check isn't an attack or an ability and one fits (§4.2); `steady: true` when the clause steadies `{{user}}`'s own nerves (§4.4). |
+  | `check` | `target` if there is one; `with` when the clause names the item or ability it uses; `count` when the clause repeats the action ("three shots" is three trigger pulls); `declaresResult: true` when the clause stated its own outcome (§2.4); `skill`, a proficiency key from the world's declared list, when the check isn't an attack or an ability and one fits (§4.2); `steady: true` when the clause steadies `{{user}}`'s own nerves (§4.4); `suppress: true` for fire meant to pin rather than hit ("I keep their heads down") (§3.4b); `called: legs` for a shot at the legs (§3.4c). |
   | `search` | `place`. |
   | `trade` | `vendor` if named; `gives` and `wants` as written (items, amounts); `quoted: true` for a quoted offer. |
   | `claim` | `about` (§2.4a). For `outcome`, `own: true` when it's the result of `{{user}}`'s own `check`. For `state`, the quantity it contradicts where it can (`"rounds"`, `"hp"`). For `presence`, `perceived: true` when it's something `{{user}}` senses, `absent: true` when it says nothing is there, and `place` when it names somewhere other than here. |
@@ -916,9 +921,8 @@ Each is recorded once, in the file that will settle it.
   time exists (§1). Longer spans ("I wait an hour") are a `wait` (§2.3).
 - ~~**Conditionals that fire.**~~ Resolved 2026-11-18 for fights: inside an
   encounter, a readiness conditional holds the action and fires on a
-  mechanical trigger (overwatch, §3.4a). Outside one it stays a stance. Whether
-  one held outside a fight fires when an arrival roll starts an encounter is
-  initiative (§3.9).
+  mechanical trigger (overwatch, §3.4a). Outside one it stays a stance; one
+  held when the party is ambushed fires in the ambush's enemy step (§3.3a).
 
 **Tracked in the owning contract:**
 
@@ -938,9 +942,11 @@ Each is recorded once, in the file that will settle it.
 ## 3. Combat — Draft
 
 The enemy side was decided 2026-11-13; the exchange budget, movement within a
-fight, and overwatch on 2026-11-18. This section covers how an exchange is
-ordered and how much fits in it, where the party and the enemies are, what the
-enemies do, who they do it to, and how the result reaches the model. The numbers behind it — the attack roll, what defense is made of, damage,
+fight, and overwatch on 2026-11-18; escape and avoidance, awareness, terrain,
+stamina, standing orders, and death on 2026-11-19. This section covers how an
+exchange is ordered and how much fits in it, where the party and the enemies
+are, what the enemies do, who they do it to, how the result reaches the model,
+how a party gets away, and how characters die. The numbers behind it — the attack roll, what defense is made of, damage,
 armor — are the core roll (§4).
 
 ### 3.1 The problem
@@ -980,10 +986,11 @@ exchange.** Before generation, the fork resolves it in this order:
   reloads, or hesitates still gives every enemy its action. Spending an
   exchange on something else is a choice, and the enemy answers it.
 - **The party acts first.** The player's message is the party's move and the
-  world answers it. Surprise, ambush, and an alerted enemy acting first are
-  initiative, which is open (§3.9). Until it's settled, the exchange whose
-  arrival roll starts an encounter has no enemy actions: the turn ends at that
-  beat (§2.6), and the first full exchange is the player's next message.
+  world answers it. The exchange whose arrival roll starts an encounter has no
+  enemy actions: the turn ends at that beat (§2.6), and the first full exchange
+  is the player's next message. Awareness makes the two exceptions (§3.3a):
+  enemies that ambush the party act in that arriving exchange, and `unaware`
+  enemies don't act at all until something alerts them.
 - **How much fits in one exchange** — three shots, a reload, and a dive for
   cover in one message — is the exchange budget (§3.2a).
 
@@ -998,8 +1005,8 @@ move. A party member acting on an instruction has her own action and move
 | --- | --- |
 | **Free** | `flavor`, `intent`, `claim`; `speech`, orders to companions included; `stance` changes to `weapon` (readying or lowering the weapon already in hand), `noise`, or `posture` → `prone`; `gear` `mode` and `drop`; `wait`, which spends nothing and lets the enemies act |
 | **Move** | `position`, one band (§3.3); `stance` changes to `cover` (in or out) or `posture` → `standing`; `stance` readying a weapon that isn't in hand (drawing or switching, §2.7); `stance` taking aim (`weapon: aimed`, §4.2); `gear` `reload`, `take`, `give`, `equip`; steadying (a `check` with `steady: true`, §4.4) |
-| **Action** | `check`: an attack, an ability, forcing something, disengaging (§3.3); `position` with `dash`; `gear` `refill` (with its check, `RPG_STATS.md` §3.8.4), `consume`, `loot`; holding an attack (overwatch, §3.4a) |
-| **Not in a fight** | `search` and `trade`: their actions aren't offered during an encounter, so the beat commits nothing and the fact is injected. `move`: leaving the place (below). |
+| **Action** | `check`: an attack (suppressive fire included, §3.4b), an ability, forcing something, disengaging (§3.3); `position` with `dash`; `move` through an exit, which is a dash (§3.7c); `gear` `refill` (with its check, `RPG_STATS.md` §3.8.4), `consume`, `loot`; holding an attack (overwatch, §3.4a); `stance` lifting a party member to carry, and every exchange of carrying after it (§3.7e); shutting a door behind the party (§3.7c) |
+| **Not in a fight** | `search` and `trade`: their actions aren't offered during an encounter, so the beat commits nothing and the fact is injected. |
 
 - **Beats spend in order.** The first beat that costs more than what's left
   ends the exchange: it and every beat after it, free ones included, are *Not
@@ -1019,11 +1026,12 @@ move. A party member acting on an instruction has her own action and move
 - **The fight can end mid-message.** When the party's beats leave no enemy able
   to act (§3.7), the encounter ends at that beat, and the rest of the message
   resolves as it would outside a fight, with no budget.
-- **Leaving the place** (a `move` during an encounter) costs the action. Until
-  leaving a fight is settled (§3.9), it succeeds only when no enemy instance is
-  `engaged` or `near`: nothing is close enough to stop the party. The
-  encounter then ends for the party, and the instances are discarded with no
-  loot. Otherwise it commits nothing and the fact is injected.
+- **Leaving the place** (a `move` during an encounter) is a dash through one
+  of the place's exits (§3.7c). It costs the action, and the encounter comes
+  along: distances carry through the doorway. A fight ends by breaking contact
+  (§3.7a), never by walking into the next room.
+- **Stamina.** With `system.exertion` (`RPG_STATS.md` §3.2), a dash and a
+  disengage also cost stamina, and at zero neither is possible (§3.7d).
 - **The HUD shows the budget** beside the parse: action and move, spent or
   open.
 
@@ -1037,32 +1045,39 @@ Each enemy instance is in one of three **range bands**, relative to the party:
 | `near` | Across a room or a yard: a few seconds' rush. |
 | `far` | Across a street or a field: ranged weapons only. |
 
+- **Distance past `far`.** The fork counts distance as a number: `engaged` 0,
+  `near` 1, `far` 2. Three or more is out of reach and out of sight, which is
+  how a party breaks contact (§3.7a). The state block shows only the band.
 - **The party shares one position.** Bands are per enemy instance, not per
   party member, except that an `engaged` instance names the member it's
   engaged with. Distances per party member wait on split parties
   (`RPG_STATS.md` §10).
 - **Starting band.** Instances start at `near` until encounter data sets the
   band (`RPG_STATS.md` §10). The arrival roll is the expected place to set it,
-  along with whether the enemy is alerted.
-- **Enemies change band** through their own actions: `close` moves `speed`
-  bands toward the party, `withdraw` moves one band away (§3.4).
+  along with whether the enemy is alerted (§3.3a).
+- **Enemies change band** through their own actions: `close` takes `speed`
+  off the distance, `withdraw` moves one band away (§3.4).
 - **The party changes band** through `position` beats (§2.3), decided
   2026-11-18:
   - **`toward`** an enemy moves one band closer to it, costing the move;
     reaching `engaged` engages it with whoever moved. A `dash` moves two bands
     and costs the action instead (`far` to `engaged` in one exchange).
   - **`away`** moves one band farther from every instance that isn't engaged
-    with the mover. Past `far` there is no band left: that is leaving the place
-    (§3.2a).
+    with the mover; a `dash` away moves two. Past `far` an instance is out of
+    reach (§3.7a).
   - **Disengaging.** A `position` away from an enemy engaged with the mover is
     a check, and costs the action. On a success the mover gets clear and the
     enemy drops to `near`. On a partial the mover gets clear, but the enemy
     attacks first; that attack is its action this exchange. On a fail the
     mover stays engaged. Without this, backing off one band each exchange would
-    keep a slow enemy closing forever and never attacking.
+    keep a slow enemy closing forever and never attacking. With
+    `system.exertion` it costs stamina too (§3.7d).
   - **Only `{{user}}`'s `position` moves the party's bands.** A companion's
     instructed `position` changes only her own engagement: toward a `near`
     enemy engages her with it, and away disengages her, with her own check.
+- **Fire on the move.** A ranged attack on a party member who moved this
+  exchange uses the weapon's accuracy for the band they **started** the
+  exchange in. Getting away from guns takes an exchange under fire.
 - **Reach.** A `melee` attack reaches only the party member the instance is
   engaged with. A `ranged` attack reaches any band. What range does to the
   odds is the weapon's accuracy for that band (§4.2). The same holds for the party: a melee
@@ -1070,6 +1085,39 @@ Each enemy instance is in one of three **range bands**, relative to the party:
   unspent (§3.2a), and one at `far` can't reach.
 - Each instance's band shows in the state block (`RPG_STATS.md` §4.5) and on
   the HUD.
+
+### 3.3a Awareness, stealth, and ambush
+
+Decided 2026-11-19. Each enemy instance is **`unaware`** or **`alerted`**.
+
+- **Arriving.** The arrival roll that spawns enemies decides it (§2.5). If the
+  party arrived in `quiet` stance (§2.7), the fork rolls the world's stealth
+  check (`system.stealth`, `RPG_STATS.md` §3.2) for the party, at the lowest
+  rank among its standing members: on a success the instances start
+  `unaware`. Otherwise, and whenever the party wasn't quiet, they start
+  `alerted`. Encounter data may set awareness instead (`RPG_STATS.md` §10).
+  With no encounter data, every instance starts `alerted`.
+- **Unaware enemies take no action.** They stay where they are and roll no
+  intent.
+- **Leaving unaware enemies** in `quiet` stance is free: a `position` away or
+  a `move` out commits with no check. Moving at `normal` noise within `near` of
+  one makes a stealth check, and a fail alerts every instance. A `dash` is
+  always loud and alerts them.
+- **Ambush.** The first attack on an `unaware` instance gets **+20** (§4.2).
+  Then:
+  - a `loud` attack (`RPG_STATS.md` §3.3 `noise`; firearms by default) alerts
+    every instance, and they **lose that exchange**: no enemy acts in it;
+  - a `quiet` attack (bows, blades, fists by default) alerts only its target,
+    and only if it survives. A quiet kill leaves the rest unaware.
+- **Being ambushed.** Enemies that ambush the party (encounter data) take an
+  enemy step in the arriving exchange, and the `surprised` stress trigger fires
+  (§4.4). A readiness conditional held as the party arrived (§3.4a) fires in
+  that step.
+- **Gunfire is noise.** An exchange with any loud attack in it makes one short
+  time roll at its end (§2.5), the same roll a partial's noise asks for
+  (§4.3). It can start a second encounter in the same place: the rest of the
+  street heard the shots. Without encounter data, nothing comes.
+- Each instance's awareness shows in the state block and on the HUD.
 
 ### 3.4 An enemy's action
 
@@ -1085,6 +1133,9 @@ steps: **intent, target, roll, damage.** None of them is the model's.
 | `cover` | It isn't in cover | It is in cover until it moves, and attacks against it take the cover modifier (§4.2). |
 | `withdraw` | It's engaged and has a `ranged` attack | It moves to `near`. |
 | `flee` | Its HP is at or below its `fleeAtHpPct` | It leaves the encounter. It isn't defeated, so it drops no loot. |
+| `feed` | It `feeds` and is engaged with a downed or left-behind party member | It feeds. If `fedOn` is in that character's death path, they die (§3.7e). It stays with the body and drops out of the encounter and any chase. |
+| `suppress` | It has a ranged attack, its target is in cover, another able instance can attack that target, and no other instance is suppressing it this exchange | No damage. The target is **suppressed** until the end of their next exchange: −20 to their attacks (§4.2), and leaving cover while suppressed exposes them (+10 to the next attack against them). |
+| `flank` | Its target is in cover and the cover still counts against it, it isn't engaged, and no other instance is flanking that target this exchange | It moves for an angle. From then on the target's cover doesn't count against **this** instance's attacks, until the target changes position or cover. |
 
 The bestiary entry's **`tactics`** is an ordered list of these intents, and
 **the first one that applies is taken** (`RPG_STATS.md` §3.5). Authors set the
@@ -1097,6 +1148,14 @@ model-chosen and no condition language is authored.
   first, then shoots from it.
 - `flee` applies only to an entry with `fleeAtHpPct`, and only where it is
   listed in `tactics`.
+- **`feed` comes first** for an entry with `feeds` (`RPG_STATS.md` §3.5): the
+  fork puts it at the front of the list. A feeder doesn't choose a meal over a
+  fight; it can't help it.
+- **Coordinated intents.** `suppress` and `flank` go to one instance per target
+  per exchange, in instance order. A trained pair that lists
+  `["cover", "suppress", "flank", "attack", "close"]` gets one man pinning
+  `{{user}}` behind the counter while the other works around it, and a lone
+  operator, with nobody to cover for, just shoots.
 - **Boss phases switch tactics.** A phase with its own `tactics` replaces the
   entry's list from the moment it fires. "Fights from behind his men until
   there are none left" becomes a list, not a hope.
@@ -1110,10 +1169,13 @@ model-chosen and no condition language is authored.
 3. otherwise one at random among the party members its attack can reach.
 
 **The model never picks the target.** A fact that says "someone takes 9" ends
-up on whoever the model would rather hurt, which is never `{{user}}`. Downed
-party members aren't targeted while that is open (§3.9): `atZero` is authored
-from the world's posture boundary (`RPG_STATS.md` §3.7), and a finishing blow on
-a downed character would need to be authored the same way.
+up on whoever the model would rather hurt, which is never `{{user}}`.
+
+**The downed.** A downed party member is targeted only by an instance that
+`feeds`, which goes to downed and left-behind bodies before anyone standing, or
+when no standing party member is in reach. What a hit on them does is that
+character's death path (§3.7e), authored from the world's posture boundary
+(`RPG_STATS.md` §3.7).
 
 **Which attack.** When several of an instance's attacks reach, the fork picks
 one at random, weighted by each attack's `weight` (default `1`).
@@ -1157,23 +1219,87 @@ weapon `ready`, plus a held attack.
   fires on any band.
 - **Unfired, it lapses** at the end of the exchange. The weapon stays `ready`.
 - **A companion can be told to hold** ("Maya, cover the door"): an instruction
-  asking for a `stance` with `when` holds her action the same way (§3.5).
-- Outside an encounter the conditional stays a stance (§2.7). Whether one held
-  then fires when an arrival roll starts a fight is initiative (§3.9).
+  asking for a `stance` with `when` holds her action the same way (§3.5), and
+  a standing `hold` order holds it every exchange.
+- Outside an encounter the conditional stays a stance (§2.7). One held as the
+  party arrives fires in an ambush's enemy step (§3.3a); otherwise the arriving
+  exchange has no enemy step for it to fire in.
+
+### 3.4b Suppressive fire
+
+Decided 2026-11-19. An attack action can be fired to pin rather than to hit
+("I put rounds over their heads", "keep them down"): a `check` with
+`suppress: true`.
+
+- **It needs volume:** at least 3 rounds in the action, from three single
+  pulls, a burst, or automatic fire. With fewer, it's an ordinary attack.
+- **It does no damage.** It rolls like an attack on an instance in the target
+  band, with no aim and no recoil.
+- **Success** pins up to 3 instances in that band; automatic fire pins every
+  instance in it. **Partial** pins one. **Fail** pins none. Every round is
+  spent either way.
+- **A pinned instance** can't `close` or `attack` this exchange. It can still
+  take cover, withdraw, or flee. Pinning happens in the party's steps, before
+  the enemy step.
+- **`fearless` enemies can't be pinned** (`RPG_STATS.md` §3.5). Covering fire
+  buys time against people, not against the dead.
+- A companion with a `suppress` order does this every exchange her weapon can
+  (§3.5). Loud suppression is gunfire like any other (§3.3a).
+
+### 3.4c Called shots: the legs
+
+An aimed attack (§4.2) can be called at the legs: a `check` with
+`called: legs`. It keeps the aim bonus to the chance, and a success trades the
+×1.5 damage for the **`hobbled`** status. A partial does half damage with no
+status.
+
+- **Hobbled** means no dashing. A hobbled enemy's `speed` drops by 1, to a
+  minimum of 1: a hobbled Runner moves like a Shambler, and can be outrun.
+- **It is the first status an attack inflicts.** On an instance it lasts the
+  encounter. On a party sheet it lasts until a consumable tagged `medical` is
+  used on them (`RPG_STATS.md` §3.3), until statuses and rest are designed
+  (`RPG_STATS.md` §7).
+- **Party members can be shot.** An attack on a party member is an attempt like
+  any other, at the `engaged` accuracy: she's beside you. Shooting Maya in the
+  leg so the Runners take her instead is legal, and the fork resolves it. What
+  follows in the fiction is the cast's, under the posture contract (producer
+  `CLAUDE.md` principle #13): it is moral and relational harm, the world
+  doesn't soften it, and she doesn't forgive by default. That would be the
+  yield reflex.
 
 ### 3.5 Party members in a fight
 
 - **`{{user}}`** acts through their beats (§2).
-- **A party member given an instruction** this exchange ("Maya, shoot the big
-  one") acts on it in step 2 of the exchange (§3.2). The fork checks the asked
-  kind against her own sheet (§2.2) and resolves it as it would `{{user}}`'s:
-  her proficiency, her weapon, her rounds, and her own action and move
-  (§3.2a). Until refusal is settled (§3.9), an
-  instruction her state allows is carried out, and the model voices how she
-  does it.
-- **A party member with no instruction** takes no mechanical action until
-  companion behavior is settled (§3.9). The model may write her bracing,
-  shouting, or staying close, but she deals no damage and makes no roll.
+- **A one-off instruction** this exchange ("Maya, shoot the big one") acts in
+  step 2 of the exchange (§3.2). The fork checks the asked kind against her
+  own sheet (§2.2) and resolves it as it would `{{user}}`'s: her proficiency,
+  her weapon, her rounds, and her own action and move (§3.2a). Until refusal is
+  settled (§3.9), an instruction her state allows is carried out, and the
+  model voices how she does it. It overrides her standing order for that
+  exchange only.
+- **Standing orders**, decided 2026-11-19. An instruction meant to last
+  ("keep their heads down", "cover the door", "stay close") carries
+  `standing: true` and becomes her **order**, kept until another replaces it.
+  Orders are a closed set:
+
+  | Order | Each exchange |
+  | --- | --- |
+  | `follow` | **The default.** She attacks whatever is engaged with her. With nothing engaged, no attack. |
+  | `attack` | She attacks the instance named, or the nearest, using her move to close on it when she has to. |
+  | `hold` | She holds her action as overwatch (§3.4a). |
+  | `suppress` | She fires suppression at the named band (§3.4b), while her weapon can. |
+  | `cover` | She gets into cover and stays there. No attacks. |
+
+  The state block shows each companion's order on one line
+  (`Maya — order: covering the door`), so the model never has to infer what
+  three companions are doing. One line each keeps the prompt small.
+- **She moves with the party.** The party shares one position (§3.3) and moves
+  at its slowest member: nobody dashes unless every standing member can
+  (stamina, carry tier, hobbled; §3.7d). An engaged companion disengages only
+  when told, with her own check, and breaking contact needs every standing
+  member clear (§3.7a).
+- **Leaving her behind** is an explicit choice: a `position` or `move` beat
+  with `leaves` (§3.7e).
 - **Every party member can be targeted** (§3.4). Damage to a companion commits
   to her sheet like damage to `{{user}}`.
 
@@ -1186,7 +1312,10 @@ order resolved:
 - each party roll and its result;
 - each enemy's action: its intent, its target, the band, the damage, and the
   **severity** the target is left at;
-- band changes, defeats, flights, and any boss phase that fired.
+- band changes, defeats, flights, and any boss phase that fired;
+- awareness changes, pins, suppression, and flanks;
+- in a chase, the evasion result and where each pursuer ended up;
+- downed characters with their bleed-out clock, and deaths with their cause.
 
 **Severity** is a short descriptive band derived from `current / max`
 (unhurt, lightly hurt, badly hurt, barely standing, downed), given beside the
@@ -1216,10 +1345,192 @@ works as `RPG_STATS.md` §4.6 describes: a fall, a fire, a hazard.
 
 ### 3.7 Encounter end
 
-An encounter ends when no enemy instance is left able to act: each one
-defeated or fled. The working copy then commits (`RPG_STATS.md` §4.3). So does leaving the
-place while nothing is close enough to stop the party (§3.2a). Fleeing from
-closer is open (§3.9).
+An encounter ends when no enemy instance is left able to act (each one
+defeated, fled, or feeding on a body the party left), when the party breaks
+contact or loses a chase (§3.7a–§3.7b), or when nobody in the party is left
+standing (§3.7e). The working copy then commits (`RPG_STATS.md` §4.3).
+Instances the party got away from are discarded with no loot.
+
+### 3.7a Breaking contact
+
+Decided 2026-11-19. Replaces the interim leave rule.
+
+- **The party breaks contact** when, after the enemy step, no instance that can
+  act is within `far` (every one at distance 3 or more, §3.3) and every
+  standing party member moved with the party. The encounter ends for the party.
+- **Distance is the whole mechanism.** A `position` away adds one band to every
+  instance not engaged with the mover, and a `dash` adds two for the action.
+  An instance's `close` takes back its `speed`. From `near`, a party that
+  dashes is clear of Shamblers (speed 1) in about two exchanges, and never of
+  Runners (speed 2) by distance alone: those take a chase (§3.7b).
+- **Running from guns costs HP.** Ranged enemies shoot at the band the party
+  started in (§3.3). Suppression (§3.4b) is how that price comes down.
+- **Pinned instances don't close,** so the gap opens on them.
+- **Unaware enemies** are left as §3.3a says.
+- **Pursuers don't drop out past `far`** (`pursues`, `RPG_STATS.md` §3.5). They
+  stay at `far`, and when they are the only instances left within reach, the
+  encounter becomes a chase.
+
+### 3.7b Chases
+
+When the party dashes away and the only instances left within reach are
+pursuers, the encounter becomes a **chase**. Each chase exchange:
+
+1. **The party runs.** Every standing party member dashes and pays its stamina
+   (§3.7d). A member who can't dash ends the chase for everyone, unless they
+   are left behind (§3.7e).
+2. **The party rolls to evade:** the world's stealth check (`system.stealth`)
+   at the lowest rank among its standing members, with stress and encumbrance
+   (§4.2). A companion who can't move quietly is the one who gets you found.
+3. **Each pursuer moves by the result:**
+
+   | Evasion | Pursuer at `speed` 2+ | Pursuer at `speed` 1 |
+   | --- | --- | --- |
+   | Success | falls back one band | falls back two |
+   | Partial | holds its band | falls back one |
+   | Fail | gains one band | holds its band |
+
+   A pursuer that falls back past `far` has lost the party. When none is left,
+   the chase and the encounter end.
+4. **The enemy step** runs as usual: a pursuer that reached `engaged` attacks,
+   and ranged pursuers shoot from their band.
+
+- **Stopping ends the chase.** An exchange without a dash (turning to fight,
+  disengaging, ducking into cover) goes back to ordinary distances from where
+  the pursuers stand. One engaged with a party member has to be disengaged from
+  (§3.3) before the party can run again.
+- **The chase has a clock.** Runners don't tire and the party does. When
+  stamina runs out (§3.7d), it's a fight. That is the decision the chase
+  forces: keep rolling, or turn while there is still HP and stamina to fight
+  with.
+- **Breaking off.** A pursuer that isn't `fearless` abandons the chase when an
+  encounter with `fearless` enemies starts, from gunfire noise (§3.3a) or an
+  arrival roll on the way. Operators don't follow anyone into the dead. Fights
+  between enemy groups are open (§3.9); for now they just leave.
+- **Feeders stop** at a downed or left-behind body (§3.7e).
+- **Chases cross places.** A dash through an exit is a chase exchange like any
+  other, and the new place's arrival roll applies (§3.7c).
+
+### 3.7c Places, exits, and terrain
+
+Decided 2026-11-19.
+
+- **The encounter moves with the party.** A `move` during an encounter is a
+  dash through one of the place's exits (§3.2a). Distances carry through the
+  doorway: Shamblers at `near` in the basement are at `near` on the stairs, and
+  follow the party up until it breaks contact. The new place's arrival roll
+  still applies (§2.5), so running can find more trouble.
+- **Terrain is data, never narration.** Each kind of place may author
+  `terrain` (`RPG_STATS.md` §3.12): its exits, whether it has a chokepoint, and
+  whether it has cover. The fork records a place's terrain when the party
+  enters it, matched the way a search is (`RPG_STATS.md` §3.12), and the state
+  block lists the exits. An unauthored place has two exits, cover, and no
+  chokepoint.
+- **An exit the record doesn't have isn't there.** A `move` through it fails,
+  and the attempt spends the action (§3.2a). The model narrates the exits the
+  state lists. This is what keeps a dead end from being sourceless adversity
+  (`protagonist_jeopardy`): the model can't invent a locked door mid-chase, and
+  the player can see that a place is a dead end before running into it.
+- **A dead end** is a place whose only exit is the one the enemies are coming
+  through. The way out is gone, and the fight is a consequence of where the
+  party chose to run.
+- **Chokepoints make a last stand possible.** In a place with
+  `chokepoint: "narrow"`, at most one instance can be engaged with each party
+  member; with `"tight"`, two. The rest wait at `near`. Ranged attacks aren't
+  limited. Holding the basement stairs against eight Shamblers is a fight only
+  if two reach you at a time.
+- **No cover.** In a place with `cover: false`, a `stance` into cover fails:
+  there is nothing to get behind.
+- **Doors.** An exit with `door: true` can be shut behind the party. It costs
+  the action, and every pursuer coming through it spends its next action
+  getting through. Barricading and holding a door are open (§3.9).
+
+### 3.7d Stamina
+
+Opt-in per world (`system.exertion`, `RPG_STATS.md` §3.2). Movement has weight:
+like the bars in a tactics game, stamina is a number the player learns to
+watch.
+
+- **A dash** costs `costs.dash` from every party member who makes it (10 in the
+  §8 world), and every chase exchange is a dash. **A disengage** costs
+  `costs.disengage` (5).
+- **At zero** a character can't dash or disengage. They walk, or they fight.
+  A carry tier with `dash: false` forbids dashing the same way (`RPG_STATS.md`
+  §3.13).
+- **Recovery.** Each exchange a character doesn't dash, they recover
+  `recoverPerExchange` (3). Outside an encounter, a `wait` of an hour or more
+  brings stamina back to where it stood before the fighting started.
+  Recovering past that (the post-coma body getting stronger) is regeneration
+  and rest (`RPG_STATS.md` §7).
+- The HUD and the state block show stamina beside HP.
+
+### 3.7e Downed, dead, and left behind
+
+Decided 2026-11-19. A character at 0 HP takes their `atZero` (`RPG_STATS.md`
+§3.7). Where that is `downed`, the character's **death path** (`diesWhen`)
+says what turns downed into dead:
+
+| Entry | Kills when |
+| --- | --- |
+| `bleedOut` | `bleedOut` exchanges pass (3 by default) and nothing on their `recovery` list has got them up. The clock counts the encounter's exchanges, and the HUD shows it. |
+| `harmWhileDowned` | Any hit lands on them while they're down. |
+| `fedOn` | An instance that `feeds` reaches the body (§3.4). |
+
+A world that rules a character's death out leaves the list empty, and
+`allDown` names the lost scene instead.
+
+- **Nobody standing.** When no party member is left standing, the party gets
+  one more exchange: the downed still do what their status `allows` (speak,
+  crawl, use a consumable). At its end, if nobody stands, `allDown` applies
+  (`OUTCOME_AUTHORITY.md` §6): captured, left for dead, wakes somewhere worse,
+  or `dead` where the world rules death in. The death path can end it sooner.
+- **Carrying.** A standing party member can lift a downed one (`stance`,
+  `carrying`, §2.7). Lifting costs the action, and so does every exchange of
+  carrying after it. While anyone carries, the party can't dash. Putting them
+  down is free.
+- **Left behind.** A `position` or `move` beat with `leaves` deliberately
+  leaves the named party members: they leave the party and stay where they are,
+  with the enemies. A downed member nobody is carrying is left behind by any
+  movement away, and the HUD flags it on the parse before the message is sent,
+  so it is never an accident. An instance that `feeds` goes for a downed or
+  left-behind body first and, once it reaches it, stays there: it drops out of
+  the encounter and out of any chase. That is the trade.
+- **Dead** is HP 0 with the status `dead` and a cause, shown in the state block
+  every turn (`Maya — dead (eaten, exchange 14)`). It is permanent campaign
+  state (`RPG_STATS.md` §4.4), and nothing on a `recovery` list applies to it,
+  which is what stops the model writing the character back in. A dead
+  companion leaves the party and her order is cleared. Her gear stays with the
+  body; taking it is a `gear` `loot` on the body.
+- **What being fed on does is the world's.** Whether `fedOn`, or any entry, is
+  in a character's death path is authored from the world's boundary (Master
+  Design Section 6, producer `CLAUDE.md` principle #13), separately for
+  `{{user}}` and for companions, like the rest of `atZero`. A world that rules
+  `{{user}}`'s death out never puts an entry in theirs.
+
+### 3.7f When `{{user}}` dies
+
+- **The fork decides it, never the model:** an HP total and a death path, both
+  in the state.
+- **The death exchange's reply is the last one.** The fork injects the death as
+  fact, with the instruction that this reply ends the story. After it the chat
+  is ended: the input is replaced with **Start a new chat**. Swiping the final
+  reply gives different prose of the same death, because the rolls are pinned
+  (`OUTCOME_AUTHORITY.md` §4.2).
+- **The model narrates the death in full and as final.** No last-second
+  rescue, no ambiguity, no fade to black that leaves it open. It describes the
+  body and the world: what hits, what falls, what the enemies do next, what is
+  left in the room.
+- **It never writes `{{user}}`'s thoughts, feelings, or last words.** The
+  player owns those (`OUTCOME_AUTHORITY.md` §2). What the player wrote in the
+  last message, the words said and the last act attempted, is rendered as
+  written.
+- **The ending is not anti-cheat.** Editing or deleting the fatal message, or
+  branching from earlier, stays the player's business (`OUTCOME_AUTHORITY.md`
+  §8). The lock ends the story; it doesn't police the save file.
+- **Narrating a decided death is not narrating defeat on the player's behalf.**
+  `protagonist_jeopardy`'s guardrail stops the model from deciding that
+  `{{user}}` lost. A death the fork resolved is the opposite case, and the
+  block's wording has to say so when it is built (`OUTCOME_AUTHORITY.md` §5).
 
 ### 3.8 Graceful degradation
 
@@ -1231,35 +1542,45 @@ closer is open (§3.9).
 - **No beat pass** (§2.12): no exchange is resolved. The model handles the fight
   under `protagonist_jeopardy`.
 - **No `tactics`:** the default `["attack", "close"]`. No `speed`: `1`.
+- **No encounter data:** every instance starts `alerted`, nobody ambushes, and
+  gunfire's time roll finds nothing.
+- **No `system.stealth`:** stealth and evasion checks read no proficiency
+  (rank 0, §4.2).
+- **No `system.exertion`:** dashes and disengages cost nothing but the action.
+- **No `terrain`:** every place has two exits, cover, and no chokepoint.
+- **No `pursues` anywhere:** nobody chases, and distance alone decides every
+  escape.
+- **No `diesWhen`:** downed holds until recovery or `allDown`, as before.
 
 ### 3.9 Open questions
 
-- **Escape and avoidance.** The calibrated curves (§4.6) make groups lethal by
-  design, so a way out has to exist. Sketched 2026-11-19, not decided:
-  fleeing by speed (distance as a count past `far`; escape when no enemy that
-  can act is within `far` after the enemy step, so Shamblers can be outrun and
-  Runners can't); suppression from volume fire, which pins human enemies and
-  not `fearless` ones; coordinated enemy intents (`suppress`, `flank`);
-  awareness (`unaware` enemies from the arrival roll, stealth, ambush); and
-  companions who defend themselves but never retreat unless told.
-- **Initiative and surprise.** Whether an alerted enemy acts on the exchange an
-  encounter starts, whether a surprised one loses its first, what `quiet`
-  stance does to it, and whether a readiness conditional held outside a fight
-  fires when one starts (§3.4a).
-- **Companions.** What a party member with no instruction does, and whether one
-  may refuse an order mid-fight.
-- **Attacks on downed characters.** Whether an enemy can target a downed party
-  member, and what a hit does to someone already at the floor. Authored from
-  the posture boundary if it exists at all.
+- ~~**Escape and avoidance.**~~ Resolved 2026-11-19: awareness (§3.3a),
+  suppression (§3.4b), breaking contact and chases (§3.7a–§3.7b), terrain
+  (§3.7c), stamina (§3.7d).
+- **Initiative and surprise.** Settled in part by awareness (§3.3a): unaware
+  enemies, ambush both ways, and a held conditional firing in an ambush step.
+  Still open: the encounter data that sets awareness, starting band, and
+  ambush (`RPG_STATS.md` §10).
+- **Companions.** Settled in part by standing orders (§3.5). Still open:
+  whether one may refuse an order mid-fight.
+- ~~**Attacks on downed characters.**~~ Resolved 2026-11-19: feeders first,
+  others only with nobody standing in reach, and the death path decides what a
+  hit does (§3.4, §3.7e).
+- **Fights between enemy groups.** Zombies attacking the operators who were
+  chasing the party: a three-way fight needs hostility between bestiary
+  entries. Deferred on purpose to keep this round small; non-`fearless`
+  pursuers just break off (§3.7b).
+- **Barricades and holding a door** (§3.7c): nailing it shut, bracing it while
+  something pushes.
+- **What a pursuer does after losing the party.** Whether it searches, and
+  whether it can turn up again later.
 - **Talking an enemy down.** A successful intimidation or plea that switches an
   enemy's intent to `withdraw` or `flee`.
-- **Statuses from attacks.** A grab that holds, a bite that infects. Waits on
-  statuses (`OUTCOME_AUTHORITY.md` §10.2).
+- **Statuses from attacks.** `hobbled` is the first (§3.4c). A grab that
+  holds, a bite that infects wait on statuses (`OUTCOME_AUTHORITY.md` §10.2).
 - **Morale** beyond `fleeAtHpPct`: fleeing when the others fall, or when the
   leader does.
-- **Leaving a fight** (§3.7). The interim rule in §3.2a lets the party leave
-  only when nothing is `engaged` or `near`; fleeing from closer, and enemies
-  that follow, are unsettled.
+- ~~**Leaving a fight.**~~ Resolved 2026-11-19 (§3.7a–§3.7c).
 - **A fleeing `unique` enemy.** Its HP doesn't persist yet (`RPG_STATS.md`
   §7), so it comes back whole.
 
@@ -1315,12 +1636,14 @@ a named source, so the HUD can show exactly why the odds are what they are.
 | **Untrained** | a fitting proficiency exists and the actor has none | −10 |
 | **Weapon at range** | an attack with a weapon | the weapon's `combat.accuracy` for the target's band (`RPG_STATS.md` §3.3) |
 | **Weapon condition** | the copy is below half its durability `max` | −10. A `broken` copy can't be used at all. |
-| **Aimed** | weapon `aimed` (§2.7), on an attack of one round | +15, and a success does ×1.5 damage (§4.3). Volume fire and overwatch shots get none. |
+| **Aimed** | weapon `aimed` (§2.7), on an attack of one round | +15, and a success does ×1.5 damage (§4.3), or inflicts `hobbled` when called at the legs (§3.4c). Volume fire, suppression, and overwatch shots get none. |
 | **Recoil** | an action fires more than one round that can hit (§4.3) | −10 per round past the first |
 | **Ready** | weapon `ready`, the first attack the actor makes in an encounter | +10 |
-| **Target in cover** | the target's `cover` is `hidden` | −15 |
+| **Target in cover** | the target's `cover` is `hidden`, and the attacker hasn't flanked them (§3.4) | −15 |
+| **Target unaware** | the first attack on an `unaware` instance (§3.3a) | +20 |
+| **Suppressed** | the actor is suppressed (§3.4), on their attacks | −20 |
 | **Target prone** | the target's `posture` is `prone` | −10 against ranged, +10 against melee |
-| **Exposed** | the target took a partial on a non-attack check this exchange (§4.3) | +10 to the next attack against them |
+| **Exposed** | the target took a partial on a non-attack check this exchange (§4.3), or left cover while suppressed (§3.4) | +10 to the next attack against them |
 | **Stress** | the actor isn't `steady` (§4.4) | the level's `mod` |
 | **Encumbrance** | a carry tier is in force | the tier's `mod` (`RPG_STATS.md` §3.13) |
 | **Authored difficulty** | a check object carries `mod` (`RPG_STATS.md` §3.2) | as authored |
@@ -1352,9 +1675,9 @@ brings its `combat.accuracy`. Stress doesn't apply to enemies (§4.8).
 **One roll per action.** An attack action rolls once, however many trigger
 pulls it covers (§3.2a). **Up to 3 rounds can hit:** each pull of a single-round
 mode, or each round of a burst. Every round past the first costs recoil
-(§4.2). Automatic fire spends more rounds than can hit; the extra rounds are
-suppression, which isn't defined yet (§4.8). The band decides what the whole
-action did:
+(§4.2). Automatic fire spends more rounds than can hit; the extra rounds do
+nothing more to the target, and fired as suppression they pin every instance
+in the band (§3.4b). The band decides what the whole action did:
 
 | Band | An attack | A check that isn't an attack |
 | --- | --- | --- |
@@ -1472,6 +1795,9 @@ has the last word.
 | Clamp | 5–95, with 01–05 and 96–00 fixed |
 | Stress | `shaken` −10, `overwhelmed` −25; outnumbered at 3:1 and 6:1, threat-weighted (§4.4) |
 | Natural attack rank by tier | common 1, elite 2, boss 3 |
+| Target unaware / actor suppressed | +20 / −20 |
+| Suppression pins | success 3 (automatic fire: the whole band), partial 1 |
+| Bleed-out, when a world doesn't set it | 3 exchanges |
 
 **Target curves.** What a fight should feel like, with the measured result for
 the §8 world. `{{user}}` fights alone at 100 HP, shooting first unless noted.
@@ -1520,14 +1846,33 @@ checked against these (`RPG_STATS.md` §6):
 
 **What the simulation assumed.** `{{user}}` always aims (when aiming), stands
 still, and acts first unless noted. Maya isn't fighting. Suppression, flanking,
-fleeing, and stealth aren't modeled. Flanking would make groups worse; fleeing
-and stealth are what make them avoidable (§4.8).
+fleeing, and stealth aren't in the curves above. Flanking makes groups worse;
+fleeing and stealth are what make them avoidable, measured below.
 
 **Lethal is not no-win.** These curves make groups lethal by design. A lethal
 fight stays inside the `protagonist_jeopardy` guardrail only while there is a
-way out of it: running, hiding, or never being seen. That is the escape and
-avoidance work still open (§3.9), and it should land before anything is built
-on these numbers.
+way out of it: running, hiding, or never being seen (§3.3a, §3.7a–§3.7c).
+Measured 2026-11-19 under those rules, `{{user}}` alone at 100 HP and 60
+stamina:
+
+| Situation | Got away | Cost |
+| --- | --- | --- |
+| 5 Shamblers at `near`, `{{user}}` runs | 100% | 0 HP, about 2 exchanges (1–3 HP with one or two already engaged) |
+| 4 Rogue Operators at `near`, `{{user}}` in cover, just runs | 95% | ~72 HP |
+| … laying Glock covering fire (3 pulls) while running | 91% | ~54 HP |
+| … laying C8 automatic suppression while running | 95% | ~27 HP |
+| 2 Rogue Operators, Glock covering fire | 100% | ~11 HP (36 just running) |
+| 3 Runners chase, stealth 3 | 90% | ~4 HP; otherwise stamina runs out and it's a fight |
+| … `{{user}}` shaken | 76% | ~8 HP |
+| … with Maya (her stealth 1 sets the roll) | 59% | ~13 HP |
+| … the same Runners, hobbled | ~100% | ~0 HP |
+| 1 / 2 / 4 Rogue Operators chase | 100% / 96% / 83% | ~12 / 23 / 36 HP |
+
+Getting away from the dead costs stamina; getting away from guns costs blood,
+and suppression is what brings that price down. Runners are the gamble the
+design wants: keep rolling, cut someone loose, or turn and fight. The
+breaking-contact rows count the fight up to the moment of escape; operators
+who pursue then start a chase, priced in the last row.
 
 ### 4.7 Graceful degradation
 
@@ -1541,8 +1886,8 @@ on these numbers.
 
 ### 4.8 Open questions
 
-- **Play-testing the calibration** (§4.6), especially with cover, movement,
-  companions, and initiative in play, none of which the simulation modeled.
+- **Play-testing the calibration** (§4.6), especially with cover, companions,
+  and flanking in play, which the simulations modeled only in part.
 - **Vision.** Darkness and visibility should come from the world, not the
   player: the Scene Tracker's time of day, or a place's lighting. No signal is
   chosen.
@@ -1550,8 +1895,7 @@ on these numbers.
   NPC side to roll against, and the posture contract governs what a success
   may mean. A round of its own, together with talking an enemy down (§3.9).
 - **Critical results.** None in v0.
-- **Suppression.** What automatic fire's extra rounds do: the covering-fire
-  half of escape and avoidance (§3.9).
+- ~~**Suppression.**~~ Resolved 2026-11-19 (§3.4b).
 - **Attributes.** Not part of the formula in v0 (`RPG_STATS.md` §10).
 - **Morale** for enemies, as stress's counterpart (§3.9).
 - **Dice grammar** shared with the dice oracle (§1).
@@ -1572,7 +1916,7 @@ uses it.
 
 | Concern | Governed by |
 | --- | --- |
-| What exists: stats, items, sheets, bestiary (including attacks, speed, tactics), economy | `RPG_STATS.md` (Draft) |
+| What exists: stats, items, sheets, bestiary (including attacks, speed, tactics, pursuit and feeding), stamina, terrain, death paths, economy | `RPG_STATS.md` (Draft) |
 | Who decides: attempts vs. results, pinned rolls, legality | `OUTCOME_AUTHORITY.md` (Draft) |
-| How an attempt resolves: beats, the exchange budget and the enemy side of a fight, the core roll, modifiers, stress, parsing | this document (§2–§4 Draft, rest Placeholder) |
+| How an attempt resolves: beats, the exchange budget and the enemy side of a fight, escape, chases, death, the core roll, modifiers, stress, parsing | this document (§2–§4 Draft, rest Placeholder) |
 | Stateless narrative roll tables | `DICE_ORACLE.md` |

@@ -488,7 +488,17 @@ posture blocks:
   sword. Your hand is still wrapped around the rebar."). No out-of-character
   note, no lecture.
 - **No narrated recovery.** Never write a downed or dead character, `{{user}}`
-  or anyone else, back into action unless the state shows the recovery.
+  or anyone else, back into action unless the state shows the recovery. Dead
+  is dead: no breath found after all, no "barely alive."
+- **A death the state shows is final, and narrated in full.** When `{{user}}`
+  dies (`RESOLUTION.md` §3.7f), that reply ends the story. Narrate the death
+  completely: what hits, what falls, what the world does next. No rescue, no
+  ambiguity, no fade that leaves it open. Never write their thoughts,
+  feelings, or last words; what the player's last message said and attempted
+  is rendered as written.
+- **The ways out are the ones the state lists.** Narrate the exits the state
+  block gives for the place (`RESOLUTION.md` §3.7c). Never add a door, a
+  window, or a lucky gap that isn't there, and never take one away.
 - **Stress is the body, never the feeling.** When the state block shows a
   stress level, render its `note`: the tremor, the breath, the narrowing
   vision. Never write that `{{user}}` is afraid, panicking, or calm; what they
@@ -522,7 +532,12 @@ posture blocks:
   player's. *Integrity, not obstruction.*
 - **Composes with, doesn't restate:** `protagonist_jeopardy` (the disposition
   behind auto-success and rescue), `dice_oracle` (how injected facts are read),
-  Consequence Tracking (in-scene continuity).
+  Consequence Tracking (in-scene continuity). One seam to fix when either is
+  built: `protagonist_jeopardy`'s guardrail forbids narrating `{{user}}`'s
+  defeat on their behalf. That targets the model *deciding* the player lost.
+  A death the fork resolved is the opposite case, and the guardrail's wording
+  must exempt it ("never on the model's own judgment"), or the two blocks
+  contradict each other at the one moment it matters most.
 - World-agnostic: no character, arc, faction, or item names.
 
 **Open:** one new block, or a state-aware extension of `protagonist_jeopardy`.
@@ -532,12 +547,13 @@ not, and may belong in the jeopardy block or jailbreak clause 2b instead (§10).
 
 ---
 
-## 6. Downed and recovery — sketch for `RPG_STATS.md`
+## 6. Downed, recovery, and death
 
-`RPG_STATS.md` §3.7 defines `"downed"` as "out of the fight, alive,
+`RPG_STATS.md` §3.7 defined `"downed"` as "out of the fight, alive,
 recoverable" without saying *how* a character recovers. A status with no
 recovery rule gets recovered by narration, which is the outcome-denial hole
-(§3.3). The proposed extension, shape not settled:
+(§3.3). The extension below was applied to `RPG_STATS.md` §3.7 on 2026-11-19,
+with a death path added; the field table and defaults live there:
 
 ```jsonc
 "atZero": {
@@ -551,6 +567,8 @@ recovery rule gets recovered by narration, which is the outcome-denial hole
       { "by": "item",    "tag": "revive" }, // an item tagged revive
       { "by": "encounterEnd", "requires": "allyStanding", "restoreTo": 1 }
     ],
+    "diesWhen": ["bleedOut", "harmWhileDowned", "fedOn"],  // the death path; empty ⇒ downed never becomes dead
+    "bleedOut": 3,                          // exchanges, when bleedOut is listed
     "allDown": "captured"                   // what happens when the whole party is downed
   }
 }
@@ -567,13 +585,20 @@ recovery rule gets recovered by narration, which is the outcome-denial hole
   `stance` beat the status refuses.
 - **`recovery`** is closed: nothing outside the list ends the status. A revive
   ability is itself an attempt the fork resolves.
+- **`diesWhen`** is closed too: a downed character dies only by bleeding out,
+  a hit while down, or being fed on, as listed (`RESOLUTION.md` §3.7e). The
+  fork decides a death, never the narration. An empty list means downed never
+  becomes dead.
 - **`allDown`** is authored from Master Design Section 6's permitted shapes of a
-  lost scene (captured, left for dead, wakes somewhere worse), never defaulted.
-  It is the posture contract's boundary turned into a rule, the same way
-  `atZero` already ties to it.
+  lost scene (captured, left for dead, wakes somewhere worse), never defaulted,
+  or `dead` where the world rules death in. It is the posture contract's
+  boundary turned into a rule, the same way `atZero` already ties to it.
+- **Dead** is HP 0, the status `dead`, and a cause, restated in the state block
+  every turn (§4.4). Nothing on a `recovery` list applies to it. When it is
+  `{{user}}`, the chat ends (`RESOLUTION.md` §3.7f).
 
-A plain string `"downed"` keeps working and means "recovers at encounter end if
-any ally stands" until the field is settled.
+A plain string `"downed"` keeps working and means the object with every
+default: it never kills, and it recovers at encounter end if any ally stands.
 
 ---
 
@@ -593,7 +618,9 @@ any ally stands" until the field is settled.
 
 - **Out-of-fiction cheating.** Editing JSON, editing or deleting messages,
   branching a chat. Not detected, not prevented. The player owns the chat.
-- **Ironman / rewind locks.** Not planned; same reason.
+- **Ironman / rewind locks.** Not planned; same reason. Ending the chat when
+  `{{user}}` dies (`RESOLUTION.md` §3.7f) is not one: it stops new messages
+  after a decided death and leaves editing, deleting, and branching alone.
 - **Combat resolution.** Belongs to `RESOLUTION.md` (§3 drafts the exchange,
   its budget, and the enemy side), with its data in `RPG_STATS.md`. This document only fixes the rule
   that a resolution, once made, holds.
@@ -610,8 +637,8 @@ any ally stands" until the field is settled.
 | §4.3 working copy | Swipes replay pinned rolls (§4.2); only out-of-fiction edits re-roll. **Applied 2026-11-13** with the enemy side of combat (`RESOLUTION.md` §3), covering both sides' rolls. |
 | §4.6 rolls and observations | Inside an encounter the enemy side is rolled, not observed (§2.2 writer 3). **Applied 2026-11-13.** |
 | §4.6 rolls and observations | Corrections are parse-only, UI-only, never against a roll (§4.3). |
-| §3.7 `atZero` | `downed` gains `allows`, `recovery`, `allDown` (§6). |
-| §4.5 what the model sees | Status lines with allowed actions are restated each turn (§4.4). |
+| §3.7 `atZero` | `downed` gains `allows`, `recovery`, `allDown` (§6). **Applied 2026-11-19**, with the death path (`diesWhen`, `bleedOut`). |
+| §4.5 what the model sees | Status lines with allowed actions are restated each turn (§4.4). **Applied in part 2026-11-19:** stress, bleed-out clocks, and dead with its cause. The allowed actions aren't listed yet. |
 | §1.2 who owns what | Points here for the authority order (§2.1). |
 | §3.3 `items[]` | Items gain `type` (from the §4.5 vocabulary) and `nature`; possession is matched by type (§3.1). **Applied 2026-11-09** with the weapons and economy sections (required on weapons, ammunition, magazines, and currency). |
 
@@ -752,6 +779,38 @@ The core roll's numbers, calibrated by simulation (`RESOLUTION.md` §4.6):
   guardrail only while a way out exists. Escape and avoidance are therefore a
   precondition for building on these numbers, not a nice-to-have.
 
+### 10.1j Decided (2026-11-19, escape and death)
+
+Escape, avoidance, and death, drafted in `RESOLUTION.md` §3.3a–§3.7f:
+
+- **Distance decides an escape, and running costs.** A party gets away when no
+  enemy that can act is within `far`. Dashing and disengaging cost stamina
+  where a world enables it; at zero the party walks or fights. Ranged enemies
+  shoot at the band the party left, so running from guns costs HP, and
+  suppression is how that price comes down. Unseen, leaving is free.
+- **Some enemies chase.** Pursuers keep after a running party, and a chase is
+  an evasion roll each exchange at the least stealthy member's rank, against
+  a stamina clock. Pursuers that fear the dead break off when the dead turn
+  up.
+- **The party moves together, at its slowest.** Companions follow by default
+  and keep standing orders until changed, one line each in the state block.
+  Leaving a companion behind is an explicit beat, never an accident, and
+  enemies that feed stop at the body. Whether that kills her is the world's
+  boundary, authored per character.
+- **Terrain is data.** Exits, chokepoints, and cover come from the kind of
+  place. The model can't invent a door to escape through or a locked one to
+  trap the party, so a dead end is a consequence of where the party ran, and
+  a chokepoint is what makes a last stand winnable.
+- **Death exists where the world rules it in, for `{{user}}` too.** The fork
+  decides it from HP and the death path. The model narrates it in full and as
+  final, without writing `{{user}}`'s thoughts, feelings, or last words. The
+  chat then ends with **Start a new chat**. That is an ending, not anti-cheat:
+  editing and branching stay the player's (§8).
+- **Narrating a decided death is not the model deciding.** The
+  `protagonist_jeopardy` guardrail against narrating defeat on the player's
+  behalf needs wording that exempts fork-resolved deaths when it is built
+  (§5).
+
 ### 10.2 Open
 
 - **Where premise refusal lives.** It applies to every world, with or without
@@ -772,7 +831,8 @@ The core roll's numbers, calibrated by simulation (`RESOLUTION.md` §4.6):
 - ~~**The `allows` vocabulary.**~~ Resolved 2026-11-12: beat kinds (§6,
   §10.1e).
 - **Statuses beyond downed.** Stress, the first, is built as a gauge of its own
-  (§10.1h). Broken limbs, bleeding, restrained, blinded remain, each
+  (§10.1h), and `hobbled` is the first an attack inflicts (`RESOLUTION.md`
+  §3.4c). Broken limbs, bleeding, restrained, blinded remain, each
   with its own `allows` and the cost of acting against it. The broken-leg case
   in §3.3 needs these, so `RPG_STATS.md`'s reserved `statuses` field is
   probably needed before combat resolution is. This document's §6 shape is meant
