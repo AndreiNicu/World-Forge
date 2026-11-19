@@ -740,6 +740,18 @@ The core roll, drafted in `RESOLUTION.md` §4:
   and tunnel vision, rises on deterministic triggers, is resisted by nerve, and
   is lowered only by attempts and events. "I'm calm" changes nothing.
 
+### 10.1i Decided (2026-11-19, later)
+
+The core roll's numbers, calibrated by simulation (`RESOLUTION.md` §4.6):
+
+- **Danger scales with numbers, by design.** One common enemy is trivial,
+  three are dangerous, five or more mean run. One trained human is a costly
+  fight, two or three are very bad odds, four or more in the open are game
+  over. The curve moves one step worse with a sidearm.
+- **Lethal is not no-win.** A lethal fight is inside the `protagonist_jeopardy`
+  guardrail only while a way out exists. Escape and avoidance are therefore a
+  precondition for building on these numbers, not a nice-to-have.
+
 ### 10.2 Open
 
 - **Where premise refusal lives.** It applies to every world, with or without

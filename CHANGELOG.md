@@ -28,11 +28,21 @@ backing off can't kite a slow enemy forever. A third pass adds the **core
 roll**: d100 against a chance built from additive, named modifiers (weapon at
 range, aim, stress, cover, and the rest), one roll per action, armor and
 pierce in the damage, and **stress** as the body's response to danger rather
-than an emotion the world imposes on `{{user}}`. The numbers are illustrative
-until a calibration pass. Still a Draft; nothing reads it.
+than an emotion the world imposes on `{{user}}`. A last pass **calibrates the
+numbers by simulation** against stated danger curves: one zombie is trivial
+and five mean run; one trained human is a costly fight, two or three are very
+bad odds, four in the open are game over. Still a Draft; nothing reads it.
 
 ### Added
 
+- `contracts/RESOLUTION.md` §4.6 — **calibration.** The engine constants
+  (base 35, +10 per rank, aim +15 with ×1.5 damage on a success, recoil −10
+  per extra round that can hit, at most 3 hitting rounds per action, and the
+  rest), the target curves with their measured results for the §8 world, the
+  weapon-dependence of the curve, the volume/aim/single-shot trade-off, world
+  authoring targets, the simulation's assumptions, and the rule that lethal
+  groups need a way out before anything is built on them. Graceful
+  degradation and open questions renumber to §4.7–§4.8.
 - `contracts/RESOLUTION.md` §4 — **the core roll.** d100 against a chance
   clamped to 5–95 (01–05 always succeed, 96–00 always fail), up to 20 over is
   a partial; the chance is a base plus named, additive modifiers (never
@@ -97,6 +107,15 @@ until a calibration pass. Still a Draft; nothing reads it.
   gains `aimed` (costs the move); `check` beats gain `skill` and `steady`; the
   enemy attack's roll and damage are the core roll's; worked example D shows
   its odds. The trailing sections renumber to §5–§6.
+- `contracts/RESOLUTION.md` §4.2–§4.4, §3.2a, §3.9, §2.11 — calibrated values
+  replace illustrative ones; a burst's rounds can hit (up to 3) and pay
+  recoil; the outnumbered ratio is threat-weighted (elite 2, boss 4); escape
+  and avoidance are recorded as the open precondition, with the sketch.
+- `contracts/RPG_STATS.md` §8 — the Rogue Operator drops to rifles 2 ± 1 and
+  80 ± 10 HP; §6 gains the authoring targets; §3.3 and §7 point at the
+  calibration.
+- `contracts/OUTCOME_AUTHORITY.md` §10.1i — danger scales with numbers by
+  design, and lethal is not no-win.
 - `contracts/RPG_STATS.md` §1.3, §3.13, §4.5, §5, §7, §10 — encumbrance tiers
   modify rolls; the state block shows stress; weapon numbers and the refill
   roll scheme are no longer deferred; attributes stay out of the formula.

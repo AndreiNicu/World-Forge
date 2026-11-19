@@ -30,8 +30,7 @@ something" and "the fork commits a result."
   outcome bands (success / partial / fail) that `RPG_STATS.md` and
   `OUTCOME_AUTHORITY.md` already use: **§4, Draft.**
 - **The math** — how proficiency ranks and modifiers turn into odds;
-  difficulty and who sets it: **§4.2, Draft**, with every number still
-  illustrative.
+  difficulty and who sets it: **§4.2, Draft**, calibrated in §4.6.
 - **The modifier stack** — named sources (rank, weapon accuracy and condition,
   aim, stance, cover, range, stress, encumbrance tier), so the HUD can show why
   the odds are what they are: **§4.2, Draft.** Statuses beyond stress join it
@@ -691,8 +690,8 @@ loose 9mm, and is fighting a Shambler.
 The message fits the exchange budget (§3.2a): three pulls are one attack
 action, at the default cap, and the reload is the move. The failed reload still
 spends it. The two shots that fire are one roll (§4.3): with the Shambler at
-`near` and `{{user}}` `steady`, the chance is 30 base + 40 handguns + 0 for a
-pistol at near = 70% (illustrative numbers, §4.7), and a partial lands both
+`near` and `{{user}}` `steady`, the chance is 35 base + 40 handguns + 0 for a
+pistol at near = 75% (§4.6), and a partial lands both
 rounds at half damage. A miss on beat 1 doesn't cut (§2.6, inside an encounter). The model narrates two
 shots, the dry click, a hand finding only the empty spare, and the Shambler's
 response. Its narration of the shots isn't counted again (§2.9). Refilling the
@@ -1011,8 +1010,8 @@ move. A party member acting on an instruction has her own action and move
   refuses each use the moment they took (`OUTCOME_AUTHORITY.md` §3.3).
 - **Trigger pulls per action.** One attack action covers up to **3** trigger
   pulls; a weapon's `pullsPerAction` overrides it (`RPG_STATS.md` §3.3). A
-  burst or automatic pull counts as one. A `count` above the cap fires only
-  the cap, the beat stays whole in the model's copy (§2.4), and a fact says how
+  burst or automatic pull counts as one pull; how many of its rounds can hit
+  is §4.3. A `count` above the cap fires only the cap, the beat stays whole in the model's copy (§2.4), and a fact says how
   many pulls fired.
 - **An implied close.** A melee attack on an enemy at `near` spends the move to
   close first, when the move is still unspent (§3.3). Without it, the attack
@@ -1235,7 +1234,14 @@ closer is open (§3.9).
 
 ### 3.9 Open questions
 
-- **Calibration** of the core roll's numbers against the bestiary (§4.7).
+- **Escape and avoidance.** The calibrated curves (§4.6) make groups lethal by
+  design, so a way out has to exist. Sketched 2026-11-19, not decided:
+  fleeing by speed (distance as a count past `far`; escape when no enemy that
+  can act is within `far` after the enemy step, so Shamblers can be outrun and
+  Runners can't); suppression from volume fire, which pins human enemies and
+  not `fearless` ones; coordinated enemy intents (`suppress`, `flank`);
+  awareness (`unaware` enemies from the arrival roll, stealth, ambush); and
+  companions who defend themselves but never retreat unless told.
 - **Initiative and surprise.** Whether an alerted enemy acts on the exchange an
   encounter starts, whether a surprised one loses its first, what `quiet`
   stance does to it, and whether a readiness conditional held outside a fight
@@ -1262,10 +1268,10 @@ closer is open (§3.9).
 ## 4. The core roll — Draft
 
 Decided 2026-11-19. One roll serves every `check`, both sides of a fight, and
-every authored check object (`RPG_STATS.md` §3.2). The **shape** is decided:
-the dice, the bands, how modifiers combine, what a band does. The **numbers**
-in this section are illustrative and uncalibrated (§4.7). They show the scale,
-not the balance.
+every authored check object (`RPG_STATS.md` §3.2). The dice, the bands, how
+modifiers combine, and what a band does are decided; the numbers were
+calibrated by simulation against stated target curves (§4.6), and play-testing
+has the last word.
 
 ### 4.1 The roll
 
@@ -1302,14 +1308,15 @@ success, 06–25 partial, the rest fail.
 **Chance = base + every modifier that applies**, then clamped. Each modifier is
 a named source, so the HUD can show exactly why the odds are what they are.
 
-| Source | Applies when | Illustrative value |
+| Source | Applies when | Value (§4.6) |
 | --- | --- | --- |
-| **Base** | always | 30 |
+| **Base** | always | 35 |
 | **Proficiency** | the check reads a proficiency (below) | +10 per rank, scaled to five ranks when the world's `maxRank` differs |
 | **Untrained** | a fitting proficiency exists and the actor has none | −10 |
 | **Weapon at range** | an attack with a weapon | the weapon's `combat.accuracy` for the target's band (`RPG_STATS.md` §3.3) |
 | **Weapon condition** | the copy is below half its durability `max` | −10. A `broken` copy can't be used at all. |
-| **Aimed** | weapon `aimed` (§2.7), on an attack of one trigger pull | +15. Volume fire and overwatch shots get none. |
+| **Aimed** | weapon `aimed` (§2.7), on an attack of one round | +15, and a success does ×1.5 damage (§4.3). Volume fire and overwatch shots get none. |
+| **Recoil** | an action fires more than one round that can hit (§4.3) | −10 per round past the first |
 | **Ready** | weapon `ready`, the first attack the actor makes in an encounter | +10 |
 | **Target in cover** | the target's `cover` is `hidden` | −15 |
 | **Target prone** | the target's `posture` is `prone` | −10 against ranged, +10 against melee |
@@ -1338,21 +1345,26 @@ it is harder to **hurt** because of armor, which is damage, not chance (§4.3).
 **Enemies roll the same way.** An instance's proficiency comes from its
 bestiary values (`RPG_STATS.md` §3.5). A natural attack reads its own `rank`,
 which defaults by tier: common 1, elite 2, boss 3. Its weapon, if it has one,
-brings its `combat.accuracy`. Stress doesn't apply to enemies (§4.7).
+brings its `combat.accuracy`. Stress doesn't apply to enemies (§4.8).
 
 ### 4.3 What a band does
 
 **One roll per action.** An attack action rolls once, however many trigger
-pulls it covers (§3.2a). The band decides what the whole action did:
+pulls it covers (§3.2a). **Up to 3 rounds can hit:** each pull of a single-round
+mode, or each round of a burst. Every round past the first costs recoil
+(§4.2). Automatic fire spends more rounds than can hit; the extra rounds are
+suppression, which isn't defined yet (§4.8). The band decides what the whole
+action did:
 
 | Band | An attack | A check that isn't an attack |
 | --- | --- | --- |
-| **Success** | Every pull that fired hits, at full damage. | It works. |
-| **Partial** | Every pull that fired hits, at half damage (rounded down, minimum 1). | It works, with a cost (below). |
+| **Success** | Every round that can hit does, at full damage (×1.5 if aimed). | It works. |
+| **Partial** | Every round that can hit does, at half damage (rounded down, minimum 1). | It works, with a cost (below). |
 | **Fail** | Nothing hits. The rounds are still spent. | It doesn't work. The cost of trying is still spent (§3.2a). |
 
 **Damage, per hit:** roll the weapon's `combat.damage` (or the natural attack's
-`damage`), halve it on a partial, then subtract the target's **armor** reduced
+`damage`), multiply it by 1.5 on an aimed success or halve it on a partial,
+then subtract the target's **armor** reduced
 by the weapon's **pierce**, to a minimum of 0. Each hit the armor takes costs
 it one use of durability (`RPG_STATS.md` §3.9); a `broken` or `destroyed` piece
 absorbs nothing. This is where "the rifle goes through the vest and the Glock
@@ -1380,7 +1392,7 @@ per world (`system.stress`, `RPG_STATS.md` §3.2) and is the first tracked
 status after `downed`.
 
 **Three levels.** `steady` (no modifier), `shaken`, `overwhelmed`, each with
-an authored `mod` (illustratively −10 and −25) and a `note` in observable
+an authored `mod` (−10 and −25 in the calibration, §4.6) and a `note` in observable
 register.
 
 **It is the body, never the feeling.** The player owns what `{{user}}` feels;
@@ -1394,9 +1406,10 @@ contradicting the state.
 **What raises it.** The fork checks these deterministically, from the state:
 
 - **Outnumbered.** When able enemies outnumber standing party members by the
-  authored ratios (illustratively 3:1 for `shaken`, 6:1 for `overwhelmed`),
-  each party member is raised to at least that level. Fifteen Shamblers
-  against two people is 7.5:1.
+  authored ratios (3:1 for `shaken`, 6:1 for `overwhelmed`, §4.6), each party
+  member is raised to at least that level. The count is **threat-weighted**:
+  a common enemy counts 1, an elite 2, a boss 4. Fifteen Shamblers against two
+  people is 7.5:1; two Rogue Operators against `{{user}}` alone is 4:1.
 - **Badly hurt.** A hit that leaves the character at `badly hurt` severity or
   worse (§3.6) raises them one level.
 - **An ally goes down.** Every standing party member rises one level.
@@ -1432,11 +1445,91 @@ sheets. Enemies have none; human enemies breaking is morale, which is open
 ### 4.5 What the HUD shows
 
 For every roll: the chance with each source and its points ("Glock at near:
-30 base, +40 handguns, +0 range, −10 shaken = 60%"), the d100 result, and the
+35 base, +40 handguns, +0 range, −10 shaken = 65%"), the d100 result, and the
 band. For an attack, the damage per hit and what armor took off. For stress,
 each party member's level and what raised it. The exact layout is the fork's.
 
-### 4.6 Graceful degradation
+### 4.6 Calibration
+
+Calibrated 2026-11-19 by simulation: a Monte Carlo of the `RPG_STATS.md` §8
+zombie world, 12,000–20,000 fights per case, against the target curves below.
+The curves are the design intent; the numbers are what hits them. Play-testing
+has the last word.
+
+**Engine constants** (the fork's, the same in every world):
+
+| Constant | Value |
+| --- | --- |
+| Base chance | 35 |
+| Per proficiency rank | +10 (untrained −10; no fitting proficiency 0) |
+| Aimed | +15, and a success does ×1.5 damage. One round only. |
+| Ready, first attack of the encounter | +10 |
+| Recoil | −10 per round past the first that can hit |
+| Rounds that can hit, per action | at most 3 |
+| Target in cover / prone | −15 / −10 against ranged, +10 against melee |
+| Exposed | +10 |
+| Partial band | 20 points over the chance |
+| Clamp | 5–95, with 01–05 and 96–00 fixed |
+| Stress | `shaken` −10, `overwhelmed` −25; outnumbered at 3:1 and 6:1, threat-weighted (§4.4) |
+| Natural attack rank by tier | common 1, elite 2, boss 3 |
+
+**Target curves.** What a fight should feel like, with the measured result for
+the §8 world. `{{user}}` fights alone at 100 HP, shooting first unless noted.
+
+*A common enemy (a Shambler, 40 ± 10 HP), `{{user}}` with a Glock:*
+
+| Shamblers | Target | Single shots | Aimed | Three pulls |
+| --- | --- | --- | --- | --- |
+| 1 | trivial | loses ~9 HP | ~3 HP | ~2 HP |
+| 3 | dangerous to careless play | downed 26% | 1% | 0.5% |
+| 5 | lethal standing your ground: run | downed 100% | 91% | 41% |
+
+*Trained human enemies (the Rogue Operator: rifles 2 ± 1, 80 ± 10 HP, a
+vest, a C8), downed rate in the open / from cover, stress included:*
+
+| Operators | Target | `{{user}}` with a C8 | `{{user}}` with a Glock |
+| --- | --- | --- | --- |
+| 1 | the adrenaline fight: winnable, costly | 0% / 0%, ends near 65 HP (47 if the operator shoots first) | 22% / 10% (47% / 23% if the operator shoots first) |
+| 2 | very bad odds | 77% / 48% | ~100% / 99% |
+| 3 | nearly hopeless | 100% / 99% | 100% |
+| 4 or more, in the open | game over | 100% | 100% |
+
+**The curve moves with the protagonist's weapon.** A rifle-armed protagonist
+sits on the curve as written; a sidearm moves every row one step worse. That is
+deliberate: the weapon gap is what makes finding a rifle matter.
+
+**The action trade-off.** Against one Shambler with the Glock: three pulls kill
+fastest (2.1 exchanges) at the most ammunition (6.3 rounds); an aimed shot is
+nearly as fast (2.6) at the least (2.6) but costs the move; a plain single shot
+is slowest (3.9) and leaves the move free. No option dominates.
+
+**World authoring targets.** World data is authored, not engine-fixed, and is
+checked against these (`RPG_STATS.md` §6):
+
+- **A common enemy** dies in about 3 hits from the world's standard sidearm,
+  or 2 from a rifle.
+- **Human enemies** have 60–90 HP. Armor, not HP, makes them tough.
+- **An elite** takes 4–6 exchanges for a trained, properly armed character.
+  **A boss** takes 10–15, with phases.
+- **A common enemy's hit** costs about 5–10% of a protagonist's max HP; **an
+  armed elite's** about 15–25%.
+- **Danger scales with numbers.** One common enemy is trivial, three are
+  dangerous to careless play, five or more mean run. One trained human is a
+  fight; two or three are very bad odds; four or more in the open are game
+  over.
+
+**What the simulation assumed.** `{{user}}` always aims (when aiming), stands
+still, and acts first unless noted. Maya isn't fighting. Suppression, flanking,
+fleeing, and stealth aren't modeled. Flanking would make groups worse; fleeing
+and stealth are what make them avoidable (§4.8).
+
+**Lethal is not no-win.** These curves make groups lethal by design. A lethal
+fight stays inside the `protagonist_jeopardy` guardrail only while there is a
+way out of it: running, hiding, or never being seen. That is the escape and
+avoidance work still open (§3.9), and it should land before anything is built
+on these numbers.
+
+### 4.7 Graceful degradation
 
 - **No `combat` numbers on a weapon:** it has no accuracy modifier and no
   damage; an attack with it can't hurt anything, and the fallback in §3.8
@@ -1446,12 +1539,10 @@ each party member's level and what raised it. The exact layout is the fork's.
 - **No carry tier `mod`:** encumbrance adds no modifier, as before.
 - **An unknown `skill` tag** counts as no tag: rank 0, no untrained penalty.
 
-### 4.7 Open questions
+### 4.8 Open questions
 
-- **Calibration.** Every number in §4.2–§4.4 is illustrative: the base, points
-  per rank, weapon accuracy and damage tables, armor and pierce, stress
-  modifiers and thresholds. They need a calibration pass against the bestiary's
-  HP before anything is built on them.
+- **Play-testing the calibration** (§4.6), especially with cover, movement,
+  companions, and initiative in play, none of which the simulation modeled.
 - **Vision.** Darkness and visibility should come from the world, not the
   player: the Scene Tracker's time of day, or a place's lighting. No signal is
   chosen.
@@ -1459,8 +1550,8 @@ each party member's level and what raised it. The exact layout is the fork's.
   NPC side to roll against, and the posture contract governs what a success
   may mean. A round of its own, together with talking an enemy down (§3.9).
 - **Critical results.** None in v0.
-- **What a fire mode does to a hit.** Burst and automatic fire still count only
-  as pulls and rounds.
+- **Suppression.** What automatic fire's extra rounds do: the covering-fire
+  half of escape and avoidance (§3.9).
 - **Attributes.** Not part of the formula in v0 (`RPG_STATS.md` §10).
 - **Morale** for enemies, as stress's counterpart (§3.9).
 - **Dice grammar** shared with the dice oracle (§1).

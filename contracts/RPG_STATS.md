@@ -306,7 +306,7 @@ is added to every roll its bearer makes while it's in force
     "shaken":      { "mod": -10, "note": "Hands unsteady, breathing fast." },
     "overwhelmed": { "mod": -25, "note": "Tunnel vision; fine control going." }
   },
-  "outnumbered": [3, 6],                   // enemy:party ratios that raise to shaken / overwhelmed
+  "outnumbered": [3, 6],                   // threat-weighted enemy:party ratios that raise to shaken / overwhelmed
   "triggers": ["outnumbered", "badlyHurt", "allyDown", "surprised"]   // default: all four
 }
 ```
@@ -339,7 +339,7 @@ explained in `buildNote`. Absent ⇒ no stress anywhere.
 | `durability` | object | no | Wear: `{ "max": int, "perUse"?: int, "atZero": "broken" \| "destroyed" }` (§3.9). |
 | `recover` | number | no | `0–1`. Chance each spent unit is recovered after the encounter (arrows, bolts, throwing knives; §3.8.3). Default `0`. |
 | `tags` | string[] | no | Free world vocabulary (`"medical"`, `"quest"`, `"rare"`). |
-| `combat` | object | no | The numbers the core roll reads (`RESOLUTION.md` §4.2–§4.3). On a weapon: `{ "accuracy"?: { "engaged"?, "near"?, "far"? }, "damage": number \| range, "pierce"?: int }`. `accuracy` is points added to the chance in each range band (a missing band is `0`); `damage` follows §3.6 and is rolled per hit; `pierce` (default `0`) is how much armor the hit ignores. On armor: `{ "armor": int }`, subtracted from each hit. **Shape drafted, numbers uncalibrated.** What a fire mode does to a hit is still reserved. Enemies with weapons attack with these numbers (`RESOLUTION.md` §3.4). |
+| `combat` | object | no | The numbers the core roll reads (`RESOLUTION.md` §4.2–§4.3). On a weapon: `{ "accuracy"?: { "engaged"?, "near"?, "far"? }, "damage": number \| range, "pierce"?: int }`. `accuracy` is points added to the chance in each range band (a missing band is `0`); `damage` follows §3.6 and is rolled per hit; `pierce` (default `0`) is how much armor the hit ignores. On armor: `{ "armor": int }`, subtracted from each hit. Authoring targets: `RESOLUTION.md` §4.6. How many of a burst's rounds can hit is the core roll's (`RESOLUTION.md` §4.3); what automatic fire's extra rounds do is still reserved. Enemies with weapons attack with these numbers (`RESOLUTION.md` §3.4). |
 
 The catalog exists because inventory, equipment, and loot all point at the same
 things. Without one list, the same carbine is described three slightly different
@@ -995,7 +995,7 @@ Absence never errors, matching every other seam:
 - No Scene Tracker location ⇒ depletion is skipped, and trade with fixed vendors
   goes through an explicit trade action (§3.10.3, §3.12).
 - A weapon with no `combat` block has no accuracy modifier and does no damage
-  (`RESOLUTION.md` §4.6). An unknown band key in `accuracy` is ignored.
+  (`RESOLUTION.md` §4.7). An unknown band key in `accuracy` is ignored.
 - `system.stress` with a `check` that names no declared proficiency ⇒ no one
   resists triggers; warning. A level `mod` above `0` is clamped to `0`.
 - Unknown fields are ignored. The reserved `statuses` field is ignored until
@@ -1080,6 +1080,13 @@ Absence never errors, matching every other seam:
       (`current < max` at the start, an unusually high or low rank). Observable
       register; `{{user}}`'s note is reference data, never a behavioral mandate
       (principle #14).
+- [ ] Enemy numbers meet the authoring targets in `RESOLUTION.md` §4.6: a
+      common enemy dies in about 3 hits of the world's standard sidearm;
+      human enemies have 60–90 HP and get their toughness from armor; an
+      elite takes 4–6 exchanges for a trained, properly armed character and a
+      boss 10–15; a common hit costs 5–10% of the protagonist's max HP and an
+      armed elite's 15–25%. Danger scales with numbers as the curves there
+      describe.
 - [ ] `atZero` for `persona` and `npc` matches the boundary in Master Design
       Section 6 (principle #13). If `{{user}}`'s death is off the table, it is
       never `"dead"`. If it is ruled in, it says so explicitly.
@@ -1105,7 +1112,8 @@ mechanics among them (combat, refill time, encumbrance effects, repair checks,
 restocking) are specified in [`RESOLUTION.md`](./RESOLUTION.md), written from
 the fork side. Any new authored data they need is added here.
 
-- **Combat resolution** — initiative, and the calibration of every number.
+- **Combat resolution** — initiative, escape and avoidance, and play-testing
+  the calibration.
   The structure is drafted in `RESOLUTION.md` §3 (exchange, budget, enemy
   side) and §4 (the core roll), with its data in §3.2, §3.3, and §3.5 here.
   Per `DICE_ORACLE.md` §7.3, rolls are likely server-authoritative.
@@ -1115,9 +1123,9 @@ the fork side. Any new authored data they need is added here.
 - **Levels, XP, and growth** — how `max` and ranks rise. v0 already allows `max`
   to change through `target: "max"` effects; systematic growth is later.
 - **Regeneration and rest** — how `current` recovers between fights.
-- **Weapon combat numbers** — the `combat` shape is drafted (§3.3); the
-  numbers are uncalibrated. Still reserved: what a fire mode does to a hit,
-  and reach (knife vs. katana).
+- **Weapon combat numbers** — the `combat` shape is drafted (§3.3) and the
+  §8 numbers are calibrated against `RESOLUTION.md` §4.6. Still reserved:
+  suppression from automatic fire, and reach (knife vs. katana).
 - **Repair** — restoring durability (a repair kit item, a vendor service, a
   proficiency). Until then a `broken` copy stays broken.
 - **Ammunition realism** — a chambered round (+1), dropping magazines on a speed
@@ -1176,7 +1184,9 @@ they roll with the C8's and the Glock's `combat` numbers and their own rifle
 ranks, and their stab vests take 4 off each hit. The operator takes cover first and breaks off at a quarter of its HP,
 and Hale stays back until his phase at 50% switches him to closing in.
 
-The weapons carry illustrative `combat` numbers (`RESOLUTION.md` §4.7): the
+The numbers are calibrated against `RESOLUTION.md` §4.6: one Shambler is
+trivial and five mean run; one Rogue Operator is a costly fight with a rifle,
+two are very bad odds, four in the open are game over. On the weapons: the
 Glock is good at arm's reach and poor across a street, the carbine the
 opposite; the carbine goes clean through a vest, and the Glock loses 3 points
 of every hit to one. Stress is
@@ -1350,8 +1360,8 @@ on: `{{user}}`'s nerve 4 resists most triggers, and Maya's 2 resists few.
       "attacks": [ { "key": "slam", "label": "Slam", "damage": { "base": 16, "spread": 5 }, "reach": "melee" } ],
       "note": "Swollen and slow. Bursts when it drops, and anyone close gets sprayed." },
     { "id": "rogue_operator", "name": "Rogue Operator", "tier": "elite",
-      "resources": { "hp": { "base": 120, "spread": 15 } },
-      "proficiencies": { "rifles": { "base": 3, "spread": 1 }, "hand_to_hand": 3 },
+      "resources": { "hp": { "base": 80, "spread": 10 } },
+      "proficiencies": { "rifles": { "base": 2, "spread": 1 }, "hand_to_hand": 3 },
       "equipment": { "main": "c8_carbine", "secondary": "glock_17", "armor": "stab_vest" },
       "tactics": ["flee", "cover", "attack", "close"], "fleeAtHpPct": 25,
       "note": "Trained, works in pairs, uses cover and flanks. Breaks off when badly hurt.",
